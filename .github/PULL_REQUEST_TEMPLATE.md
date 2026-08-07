@@ -1,6 +1,6 @@
 ## Descrição
 
-"O que este PR entrega."
+<!-- O que este PR entrega. -->
 
 ## Issue relacionada
 
