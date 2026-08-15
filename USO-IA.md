@@ -16,3 +16,9 @@ Conforme o *Protocolo de uso de inteligência artificial* da disciplina.
   Uso: apoio na criação dos templates
   Artefato: templates de issues e pull request
   Validação: pesquisa em documentos do github
+
+- Data: 14/08/2026
+Ferramenta: Claude
+Uso: apoio na atualização do README.md.
+Artefato: README.md
+Validação: conferência manual do conteúdo adicionado e dos links referenciados
