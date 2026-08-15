@@ -59,8 +59,29 @@ Perfis públicos de autor com métricas (h-index, nº de publicações etc.)
 
 > Esses itens ficam mapeados como candidatos para as próximas sprints, evitando que o MVP fique "vazio" de trabalho futuro.
 
-## 7. Equipe
+O documento completo de Inception — contendo a visão do produto, usuários, contexto de aplicação e a definição detalhada do MVP — está disponível em [`docs/inception.md`](docs/inception.md).
+ 
+## 7. Documentação e gestão do projeto
+ 
+### 7.1 Board e Backlog
+ 
+O andamento das tarefas é gerenciado através do board do projeto no GitHub Projects, organizado nas colunas *Backlog*, *Todo*, *In Progress* e *Done*, com cada item vinculado a uma issue do repositório.
+ 
+- **Board:** [github.com/orgs/IFSC-ES2/projects/34](https://github.com/orgs/IFSC-ES2/projects/34)
 
+### 7.2 Definition of Done (DoD)
+ 
+Os critérios que um item do backlog precisa atender para ser considerado concluído — versionamento, Pull Request, revisão por outro integrante, checks automáticos e atualização de documentação — estão registrados em [`docs/dod.md`](docs/dod.md).
+ 
+### 7.3 Architecture Decision Records (ADRs)
+ 
+As principais decisões técnicas e arquiteturais do projeto são registradas individualmente como ADRs:
+ 
+- [ADR-0001 — Arquitetura do Projeto](docs/adr/ADR-0001.md)
+- [ADR-0002 — Stack Tecnológica do Projeto](docs/adr/ADR-0002.md)
+
+## 8. Equipe
+ 
 - Marcos | Scrum Master
 - Bernardo | Arquiteto de Software 
 - Marcos | DevOps/Infra 
