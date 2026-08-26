@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - 'entrega-*'
+
+permissions:
+  contents: read
+
+jobs:
+  documentos:
+    name: Documentos obrigatórios
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Conferir documentos obrigatórios
+        run: ls README.md USO-IA.md docs/inception.md docs/dod.md
+
+  links:
+    name: Links internos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Conferir links dos arquivos Markdown
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --offline --no-progress './**/*.md'
