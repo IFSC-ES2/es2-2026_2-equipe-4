@@ -22,3 +22,9 @@ Ferramenta: Claude
 Uso: apoio na atualização do README.md.
 Artefato: README.md
 Validação: conferência manual do conteúdo adicionado e dos links referenciados
+
+- Data: 26/08/2026
+Ferramenta: Claude
+Uso: apoio na criação e estudos para configuração dos checks obrigatórios (CI)
+Artefato: ci.yml
+Validação: sintaxe e flags conferidas na documentação do Github Actions e do lychee
