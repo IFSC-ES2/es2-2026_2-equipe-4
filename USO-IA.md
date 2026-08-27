@@ -28,3 +28,9 @@ Ferramenta: Claude
 Uso: apoio na criação e estudos para configuração dos checks obrigatórios (CI)
 Artefato: ci.yml
 Validação: sintaxe e flags conferidas na documentação do Github Actions e do lychee
+
+- Data: 27/08/2026
+Ferramente: Claude
+Uso: auxílio na formatação e estrutura em Markdown no arquivo de estimativas
+Artefato: ESTIMATIVAS.md
+Validação: visualização e validação manual da estrutura construída
