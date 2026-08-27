@@ -2,25 +2,35 @@
 
 Plataforma web para publicação de artigos acadêmicos com processo de revisão por pares integrado.
 
-## 1. Problema
+## 1. Equipe
+ 
+| Nome | Papel | Matrícula |
+|---|---|---|
+| Bernardo Vieira de Souza | Arquiteto de Software | 202510703707 |
+| Marcos Júnior Lemes Ferreira | DevOps / Infra | 202510703657 |
+| Juliano Tavares da Silva | Engenheiro de Qualidade | 202510704909 |
+| Pedro Henrique Bernhardt Valete | DBA / Scrum Master | 202510703675 |
+| Gabriel Ferreira de Souza da Silva | Front-end Dev | 202410004990 |
+
+## 2. Problema
 
 Grande parte da produção acadêmica de instituições como IFSC, UFSC e SENAI fica restrita a arquivos locais, repositórios institucionais pouco intuitivos ou plataformas pagas. Isso dificulta o acesso de outros pesquisadores e estudantes a esses materiais, reduzindo o impacto e a visibilidade das pesquisas. 
 
-## 2. Área de aplicação
+## 3. Área de aplicação
 
 Educação e apoio à aprendizagem (linha temática 1) e comunicação, transparência e acesso à informação (linha temática 6), com foco no ambiente acadêmico e científico.
 
-## 3. Usuários
+## 4. Usuários
 
 **Pesquisadores e professores** — submetem e revisam artigos
 **Alunos (graduação e pós-graduação)** — publicam trabalhos e acessam conteúdos
 **Coordenações de cursos/pesquisa** — acompanham a produção científica da instituição
 
-## 4. Contexto de aplicação
+## 5. Contexto de aplicação
 
 Aplicação inicial no IFSC (Instituto Federal de Santa Catarina), campus São José, com possibilidade de expansão futura para outras instituições parceiras.
 
-## 5. Relevância
+## 6. Relevância
 
 A produção científica brasileira cresce a cada ano, mas grande parte dela fica subutilizada por falta de visibilidade e de canais acessíveis de publicação. O PublicaIFSC contribui para:
 
@@ -29,7 +39,7 @@ Valorizar a produção local de pesquisa
 Estimular a colaboração entre instituições
 Servir como vitrine para projetos de iniciação científica e extensão
 
-## 6. Escopo do MVP
+## 7. Escopo do MVP
 
 O MVP foi deliberadamente enxuto: poucas funcionalidades, bem implementadas, deixando espaço para expansão nas próximas sprints.
 
@@ -61,30 +71,41 @@ Perfis públicos de autor com métricas (h-index, nº de publicações etc.)
 
 O documento completo de Inception — contendo a visão do produto, usuários, contexto de aplicação e a definição detalhada do MVP — está disponível em [`docs/inception.md`](docs/inception.md).
  
-## 7. Documentação e gestão do projeto
+## 8. Documentação e gestão do projeto
  
-### 7.1 Board e Backlog
+### 8.1 Board e Backlog
  
 O andamento das tarefas é gerenciado através do board do projeto no GitHub Projects, organizado nas colunas *Backlog*, *Todo*, *In Progress* e *Done*, com cada item vinculado a uma issue do repositório.
  
 - **Board:** [github.com/orgs/IFSC-ES2/projects/34](https://github.com/orgs/IFSC-ES2/projects/34)
+- **Backlog:** [Issues do repositório](https://github.com/IFSC-ES2/es2-2026_2-equipe-4/issues)
 
-### 7.2 Definition of Done (DoD)
+### 8.2 Definition of Done (DoD)
  
 Os critérios que um item do backlog precisa atender para ser considerado concluído — versionamento, Pull Request, revisão por outro integrante, checks automáticos e atualização de documentação — estão registrados em [`docs/dod.md`](docs/dod.md).
  
-### 7.3 Architecture Decision Records (ADRs)
+### 8.3 Architecture Decision Records (ADRs)
  
 As principais decisões técnicas e arquiteturais do projeto são registradas individualmente como ADRs:
  
 - [ADR-0001 — Arquitetura do Projeto](docs/adr/ADR-0001.md)
 - [ADR-0002 — Stack Tecnológica do Projeto](docs/adr/ADR-0002.md)
 
-## 8. Equipe
- 
-- Marcos | Scrum Master
-- Bernardo | Arquiteto de Software 
-- Marcos | DevOps/Infra 
-- Juliano | Engenheiro de Qualidade 
-- Pedro Valete | DBA 
-- Gabriel | Front-end Dev 
+### 8.4 Artefatos da Entrega 3
+
+Os documentos produzidos para a entrega 3 estão organizados nos seguintes arquivos:
+
+- [Linha de base do planejamento](docs/BASELINE.md)
+- [Estimativas do backlog priorizado](docs/ESTIMATIVAS.md)
+- [Métricas definidas](docs/METRICAS.md)
+
+As fichas individuais das métricas estão disponíveis em:
+
+- [M-01 — NCLOC](docs/metricas/M-01.md)
+- [M-02 — Complexidade Ciclomática](docs/metricas/M-02.md)
+- [M-03 — Cobertura de Testes](docs/metricas/M-03.md)
+- [M-04 — Acoplamento entre Classes](docs/metricas/M-04.md)
+- [M-05 — Taxa de Retrabalho](docs/metricas/M-05.md)
+- [M-06 — Densidade de Defeitos](docs/metricas/M-06.md)
+- [M-07 — Variação de Cronograma](docs/metricas/M-07.md)
+- [M-08 — Variação de Escopo](docs/metricas/M-08.md)
