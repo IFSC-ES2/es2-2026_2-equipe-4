@@ -78,6 +78,7 @@ O documento completo de Inception — contendo a visão do produto, usuários, c
 O andamento das tarefas é gerenciado através do board do projeto no GitHub Projects, organizado nas colunas *Backlog*, *Todo*, *In Progress* e *Done*, com cada item vinculado a uma issue do repositório.
  
 - **Board:** [github.com/orgs/IFSC-ES2/projects/34](https://github.com/orgs/IFSC-ES2/projects/34)
+- **Backlog:** [Issues do repositório](https://github.com/IFSC-ES2/es2-2026_2-equipe-4/issues)
 
 ### 8.2 Definition of Done (DoD)
  
@@ -89,3 +90,22 @@ As principais decisões técnicas e arquiteturais do projeto são registradas in
  
 - [ADR-0001 — Arquitetura do Projeto](docs/adr/ADR-0001.md)
 - [ADR-0002 — Stack Tecnológica do Projeto](docs/adr/ADR-0002.md)
+
+### 8.4 Artefatos da Entrega 3
+
+Os documentos produzidos para a entrega 3 estão organizados nos seguintes arquivos:
+
+- [Linha de base do planejamento](docs/BASELINE.md)
+- [Estimativas do backlog priorizado](docs/ESTIMATIVAS.md)
+- [Métricas definidas](docs/METRICAS.md)
+
+As fichas individuais das métricas estão disponíveis em:
+
+- [M-01 — NCLOC](docs/metricas/M-01.md)
+- [M-02 — Complexidade Ciclomática](docs/metricas/M-02.md)
+- [M-03 — Cobertura de Testes](docs/metricas/M-03.md)
+- [M-04 — Acoplamento entre Classes](docs/metricas/M-04.md)
+- [M-05 — Taxa de Retrabalho](docs/metricas/M-05.md)
+- [M-06 — Densidade de Defeitos](docs/metricas/M-06.md)
+- [M-07 — Variação de Cronograma](docs/metricas/M-07.md)
+- [M-08 — Variação de Escopo](docs/metricas/M-08.md)

@@ -40,3 +40,10 @@ Ferramente: Generative Pre-trained Transformer (GPT)
 Uso: Organização do MarkDown
 Artefato: BASELINE.md
 Validação: Leitura e pequenas correções feitas
+
+- Data: 27/08/2026
+
+Ferramenta: ChatGPT
+Uso: apoio organização e documentação das métricas de produto, processo e projeto
+Artefato: Fichas M-01.md a M-08.md em docs/metricas/
+Validação: Conferência das métricas, fórmulas, classificações e interpretações com o material da disciplina e revisão manual dos documentos
