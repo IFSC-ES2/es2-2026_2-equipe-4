@@ -34,3 +34,9 @@ Ferramente: Claude
 Uso: auxílio na formatação e estrutura em Markdown no arquivo de estimativas
 Artefato: ESTIMATIVAS.md
 Validação: visualização e validação manual da estrutura construída
+
+- Data: 27/08/2026
+Ferramente: Generative Pre-trained Transformer (GPT)
+Uso: Organização do MarkDown
+Artefato: BASELINE.md
+Validação: Leitura e pequenas correções feitas
