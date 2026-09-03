@@ -49,9 +49,9 @@ Permitir que um aluno/professor submeta um artigo, o artigo ficará em uma lista
 
 ### Funcionalidades principais
 
-2. Submissão de artigo com metadados: título, resumo, autores, palavras-chave, área do conhecimento, arquivo PDF
-4. Listagem pública de artigos, com busca por área, autor ou palavra-chave
-5. Armazenamento seguro dos arquivos PDF
+1. Submissão de artigo com metadados: título, resumo, autores, palavras-chave, área do conhecimento, arquivo PDF
+2. Listagem pública de artigos, com busca por área, autor ou palavra-chave
+3. Armazenamento seguro dos arquivos PDF
 
 ### Fora do escopo (por enquanto)
 
