@@ -30,20 +30,27 @@ Artefato: ci.yml
 Validação: sintaxe e flags conferidas na documentação do Github Actions e do lychee
 
 - Data: 27/08/2026
-Ferramente: Claude
+Ferramenta: Claude
 Uso: auxílio na formatação e estrutura em Markdown no arquivo de estimativas
 Artefato: ESTIMATIVAS.md
 Validação: visualização e validação manual da estrutura construída
 
 - Data: 27/08/2026
-Ferramente: Generative Pre-trained Transformer (GPT)
+Ferramenta: Generative Pre-trained Transformer (GPT)
 Uso: Organização do MarkDown
 Artefato: BASELINE.md
 Validação: Leitura e pequenas correções feitas
 
 - Data: 27/08/2026
-
 Ferramenta: ChatGPT
 Uso: apoio organização e documentação das métricas de produto, processo e projeto
 Artefato: Fichas M-01.md a M-08.md em docs/metricas/
 Validação: Conferência das métricas, fórmulas, classificações e interpretações com o material da disciplina e revisão manual dos documentos
+
+- Data: 03/09/2026  
+  Ferramenta: Claude
+  Uso: apoio na seleção das regras do markdownlint e na construção do job de lint do CI
+  Artefato: ci.yml e .markdownlint.jsonc
+  Validação: a primeira execução local do linter avisou mais de 300 violações, com a grande maioria sendo de estilização.
+  Optei por desativar esse conjunto padrão e ativar apenas as regras que pegam Markdown quebrado, tendo cada regra escolhida conferida
+  na documentação do markdownlint e validado localmente.
