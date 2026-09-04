@@ -115,8 +115,7 @@ As fichas individuais das métricas estão disponíveis em:
 Os documentos produzidos para a entrega 4 estão organizados nos seguintes arquivos:
 
 - [Registro de riscos](docs/riscos.md)
-- [Fluxo de trabalho](docs/fluxo-de-trabalho.md)
-- [CI mínimo](docs/ci.md)
+- [Fluxo de trabalho e CI mínimo](docs/fluxo-de-trabalho.md)
 - [Critérios de qualidade](docs/qualidade.md)
 
 Evidências da etapa: PR #46 (correção dos templates), PR #47 (lint no CI), PR #48
