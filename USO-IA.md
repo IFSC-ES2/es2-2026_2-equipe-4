@@ -60,3 +60,9 @@ Validação: Conferência das métricas, fórmulas, classificações e interpret
   Uso: apoio na definição dos critérios de qualidade do projeto (ajuda a relacionar os itens prioritários com os riscos).
   Artefato: docs/qualidade.md
   Validação: Conferi linha a linha o mapeamento risco → atributo de qualidade contra a tabela original de riscos, e verifiquei que as métricas citadas (ex.: complexidade ciclomática, acoplamento, densidade de defeitos) correspondem exatamente às já definidas nas métricas, sem duplicação. Também revisei a terminologia usada frente ao modelo ISO/IEC 25010.
+
+- Data: 03/09/2026
+  Ferramenta: Claude
+  Uso: apoio na estrutura do documento de fluxo de trabalho
+  Artefato: fluxo-de-trabalho.md
+  Validação: cada tópico foi conferido no documento da entrega 4 e validado visualmente
