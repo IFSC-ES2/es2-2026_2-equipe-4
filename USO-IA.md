@@ -54,3 +54,9 @@ Validação: Conferência das métricas, fórmulas, classificações e interpret
   Validação: a primeira execução local do linter avisou mais de 300 violações, com a grande maioria sendo de estilização.
   Optei por desativar esse conjunto padrão e ativar apenas as regras que pegam Markdown quebrado, tendo cada regra escolhida conferida
   na documentação do markdownlint e validado localmente.
+
+- Data: 03/09/2026
+  Ferramenta: Claude
+  Uso: apoio na estrutura do documento de fluxo de trabalho
+  Artefato: fluxo-de-trabalho.md
+  Validação: cada tópico foi conferido no documento da entrega 4 e validado visualmente
