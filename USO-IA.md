@@ -54,3 +54,9 @@ Validação: Conferência das métricas, fórmulas, classificações e interpret
   Validação: a primeira execução local do linter avisou mais de 300 violações, com a grande maioria sendo de estilização.
   Optei por desativar esse conjunto padrão e ativar apenas as regras que pegam Markdown quebrado, tendo cada regra escolhida conferida
   na documentação do markdownlint e validado localmente.
+
+- Data: 03/09/2026  
+  Ferramenta: Claude
+  Uso: apoio na definição dos critérios de qualidade do projeto (ajuda a relacionar os itens prioritários com os riscos).
+  Artefato: docs/qualidade.md
+  Validação: Conferi linha a linha o mapeamento risco → atributo de qualidade contra a tabela original de riscos, e verifiquei que as métricas citadas (ex.: complexidade ciclomática, acoplamento, densidade de defeitos) correspondem exatamente às já definidas nas métricas, sem duplicação. Também revisei a terminologia usada frente ao modelo ISO/IEC 25010.
