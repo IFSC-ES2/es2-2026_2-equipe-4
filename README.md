@@ -109,3 +109,15 @@ As fichas individuais das métricas estão disponíveis em:
 - [M-06 — Densidade de Defeitos](docs/metricas/M-06.md)
 - [M-07 — Variação de Cronograma](docs/metricas/M-07.md)
 - [M-08 — Variação de Escopo](docs/metricas/M-08.md)
+
+### 8.5 Artefatos da Entrega 4
+
+Os documentos produzidos para a entrega 4 estão organizados nos seguintes arquivos:
+
+- [Registro de riscos](docs/riscos.md)
+- [Fluxo de trabalho](docs/fluxo-de-trabalho.md)
+- [CI mínimo](docs/ci.md)
+- [Critérios de qualidade](docs/qualidade.md)
+
+Evidências da etapa: PR #46 (correção dos templates), PR #47 (lint no CI), PR #48
+(fluxo de trabalho), PR #50 (registro dos riscos) e PR #51 (define qualidades)
