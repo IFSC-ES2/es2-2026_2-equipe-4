@@ -47,6 +47,12 @@ Uso: apoio organização e documentação das métricas de produto, processo e p
 Artefato: Fichas M-01.md a M-08.md em docs/metricas/
 Validação: Conferência das métricas, fórmulas, classificações e interpretações com o material da disciplina e revisão manual dos documentos
 
+- Data: 03/09/2026
+Ferramente: Generative Pre-trained Transformer (GPT)
+Uso: Organização do MarkDown - organização das tabelas
+Artefato: riscos.md
+Validação: Leitura e pequenas correções feitas 
+
 - Data: 03/09/2026  
   Ferramenta: Claude
   Uso: apoio na seleção das regras do markdownlint e na construção do job de lint do CI
