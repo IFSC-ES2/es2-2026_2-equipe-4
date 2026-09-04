@@ -49,9 +49,9 @@ Permitir que um aluno/professor submeta um artigo, o artigo ficará em uma lista
 
 ### Funcionalidades principais
 
-2. Submissão de artigo com metadados: título, resumo, autores, palavras-chave, área do conhecimento, arquivo PDF
-4. Listagem pública de artigos, com busca por área, autor ou palavra-chave
-5. Armazenamento seguro dos arquivos PDF
+1. Submissão de artigo com metadados: título, resumo, autores, palavras-chave, área do conhecimento, arquivo PDF
+2. Listagem pública de artigos, com busca por área, autor ou palavra-chave
+3. Armazenamento seguro dos arquivos PDF
 
 ### Fora do escopo (por enquanto)
 
@@ -109,3 +109,14 @@ As fichas individuais das métricas estão disponíveis em:
 - [M-06 — Densidade de Defeitos](docs/metricas/M-06.md)
 - [M-07 — Variação de Cronograma](docs/metricas/M-07.md)
 - [M-08 — Variação de Escopo](docs/metricas/M-08.md)
+
+### 8.5 Artefatos da Entrega 4
+
+Os documentos produzidos para a entrega 4 estão organizados nos seguintes arquivos:
+
+- [Registro de riscos](docs/riscos.md)
+- [Fluxo de trabalho e CI mínimo](docs/fluxo-de-trabalho.md)
+- [Critérios de qualidade](docs/qualidade.md)
+
+Evidências da etapa: PR #46 (correção dos templates), PR #47 (lint no CI), PR #48
+(fluxo de trabalho), PR #50 (registro dos riscos) e PR #51 (define qualidades)

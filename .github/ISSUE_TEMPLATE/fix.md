@@ -6,7 +6,7 @@ labels: fix
 ---
 
 ## Descrição do problema
-<!-- O que está acontecendo de errado? -->
+
 
 ## Passos para reproduzir
 1. 
@@ -14,9 +14,9 @@ labels: fix
 3. 
 
 ## Comportamento esperado
-<!-- O que deveria acontecer? -->
+
 
 ## Comportamento atual
-<!-- O que está acontecendo de fato? -->
+
 
 ## Possível causa (opcional)
