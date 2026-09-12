@@ -1,6 +1,5 @@
 ## Descrição
 
-<!-- O que este PR entrega. -->
 
 ## Issue relacionada
 

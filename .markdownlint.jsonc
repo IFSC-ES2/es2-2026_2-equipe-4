@@ -1,0 +1,22 @@
+{
+  // Desliga as 50 regras do markdownlint de uma vez
+  "default": false,
+
+  // verifica sintaxe de link invertida: (url)[texto] em vez de [texto](url)
+  "MD011": true,
+
+  // verifica lista ordenada que a numeração escrita difere da renderizada
+  "MD029": true,
+
+  // link vazio: [texto]() ou [texto](#)
+  "MD042": true,
+
+  // âncora inválida: [texto](#secao-que-nao-existe)
+  "MD051": true,
+
+  // link de referência [texto][ref] sem a definição [ref]: url
+  "MD052": true,
+
+  // verifica referência declarada e nunca usada, ou duplicada
+  "MD053": true
+}
