@@ -1,33 +1,24 @@
 package ifsc.edu.artigos.dtos;
 
-// No futuro usar lombok para gerar getters e setters automaticamente
-// evitar boilerplate code. Exemplo: @Data, @Getter, @Setter, etc.
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@Document("artigos")
 public class ArquivoMetadadoDTO {
 
-    private String nomeArquivo;
-    private String descricao;
-    private String autor;
-    private String categoria;
+    @Id
+    private String id;
 
-    public ArquivoMetadadoDTO() {}
-
-    public ArquivoMetadadoDTO(String nomeArquivo, String descricao, String autor, String categoria) {
-        this.nomeArquivo = nomeArquivo;
-        this.descricao = descricao;
-        this.autor = autor;
-        this.categoria = categoria;
-    }
-
-    public String getNomeArquivo() { return nomeArquivo; }
-    public void setNomeArquivo(String nomeArquivo) { this.nomeArquivo = nomeArquivo; }
-
-    public String getDescricao() { return descricao; }
-    public void setDescricao(String descricao) { this.descricao = descricao; }
-
-    public String getAutor() { return autor; }
-    public void setAutor(String autor) { this.autor = autor; }
-
-    public String getCategoria() { return categoria; }
-    public void setCategoria(String categoria) { this.categoria = categoria; }
+    private String titulo;
+    private String resumo;
+    private List<String> autores;
+    private List<String> palavrasChave;
+    private String areaConhecimento;
+    private String caminhoArquivo;
 }

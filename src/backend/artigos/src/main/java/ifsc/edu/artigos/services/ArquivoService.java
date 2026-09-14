@@ -58,7 +58,7 @@ public class ArquivoService {
     }
 
     public ArquivoMetadadoDTO salvarMetadados(ArquivoMetadadoDTO metadadoDTO) {
-        if (metadadoDTO.getNomeArquivo() == null || metadadoDTO.getNomeArquivo().isBlank()) {
+        if (metadadoDTO.getTitulo() == null || metadadoDTO.getTitulo().isBlank()) {
             throw new IllegalArgumentException("Nome do arquivo é obrigatório nos metadados");
         }
 
