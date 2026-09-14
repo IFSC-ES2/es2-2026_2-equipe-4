@@ -72,3 +72,18 @@ Validação: Leitura e pequenas correções feitas
   Uso: apoio na estrutura do documento de fluxo de trabalho
   Artefato: fluxo-de-trabalho.md
   Validação: cada tópico foi conferido no documento da entrega 4 e validado visualmente
+
+- Data: 12/09/2026
+  Ferramenta: Claude
+  Uso: Nomeclatura de métodos da API em SpringBoot, e configurações para rotas inválidas. Desenvolvimento de DTO para agilizar o desenvolvimento.
+  Artefatos: src/backend/artigos/src/main/java/ifsc/edu/artigos/dtos/* e src/backend/artigos/src/main/resources/application.properties
+  Validação: A API foi inicializada com sucesso, as partes desenvolvida com IA foram testadas via requisições usando curl.
+
+- Data: 14/09/2026
+  Ferramenta: Calude
+  Uso: Configuração rápida de um container e configuração necessaria para conectar com a API.
+  Artefats: src/backend/artigos/src/main/resources/application.properties e docker-compose.yml
+  Validação: A API foi inicializada corretamente, e um integrante da equipe, com experiência nessa área do desenvolvimento, realizou a revisão.
+  
+  
+  
