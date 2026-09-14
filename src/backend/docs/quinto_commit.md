@@ -41,8 +41,7 @@ You can opt-out by running the disableTelemetry() command.
 
 Segue uma imagem:
 
-[Serviços rodando](./services_run.png)
-
+![Serviços rodando](./services_run.png)
 
 
 ## Zero operações
