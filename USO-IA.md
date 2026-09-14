@@ -85,5 +85,8 @@ Validação: Leitura e pequenas correções feitas
   Artefats: src/backend/artigos/src/main/resources/application.properties e docker-compose.yml
   Validação: A API foi inicializada corretamente, e um integrante da equipe, com experiência nessa área do desenvolvimento, realizou a revisão.
   
-  
-  
+- Data: 14/09/2026
+  Ferramenta: ChatGPT
+  Uso: Apoio na implementação de um drag and drop dropzone.
+  Artefato: Enviar.jsx
+  Validação: Leitura e pequenas correções feitas.
