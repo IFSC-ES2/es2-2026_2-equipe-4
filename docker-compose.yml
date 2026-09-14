@@ -1,0 +1,28 @@
+version: '3.8'
+
+# Versão previa, deve ser adiciona volume e mais configurações para o MongoDB
+# Apenas para teste e conexão com a API 
+
+# ===========
+
+# Proximos containers a serem adicionados:
+# - API
+# - Frontend
+
+# Dessa forma toda aplicação pode ser iniciada com apenas um comando: docker-compose up -d
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
