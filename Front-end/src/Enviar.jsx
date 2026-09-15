@@ -1,93 +1,155 @@
-import { useRef, useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import arquivo from './assets/arquivo.png'
+import { useState } from 'react'
+import arquivoImg from './assets/arquivo.png'
 import './Enviar.css'
 
-function Enviar() {
-    const [arquivos, setArquivos] = useState([])
-    const [arrastando, setArrastando] = useState(false)
-
-    const fileInputRef = useRef(null)
-
-    // Colocar o endpoint da API aqui
-    const API_ENDPOINT = ''
-
-    function abrirSeletor() {
-        fileInputRef.current.click()
-    }
-
-        function selecionarArquivos(event) {
-        const arquivosSelecionados = Array.from(event.target.files)
-
-        if (arquivosSelecionados.length > 0) {
-            setArquivos(arquivosSelecionados)
-        }
-    }
-
-    function arrastarSobre(event) {
-        event.preventDefault()
-        setArrastando(true)
-    }
-
-    function sairDaArea(event) {
-        event.preventDefault()
-        setArrastando(false)
-    }
-
-    function soltarArquivos(event) {
-        event.preventDefault()
-        setArrastando(false)
-
-        const arquivosSoltos = Array.from(event.dataTransfer.files)
-
-        if (arquivosSoltos.length > 0) {
-            setArquivos(arquivosSoltos)
-        }
-    }
-
-    async function enviarArquivos() {
-        if (arquivos.length === 0) {
-            return
-        }
-
-        /*
-         * Quando a API estiver pronta:
-         *
-         * const formData = new FormData()
-         *
-         * arquivos.forEach((arquivo) => {
-         *     formData.append('files', arquivo)
-         * })
-         *
-         * await fetch(API_ENDPOINT, {
-         *     method: 'POST',
-         *     body: formData
-         * })
-         */
-    }
-
-
-    return (
-        <section id="center">
-                <h3>Enviador de Arquivos</h3>
-            <div className={`enviar ${arrastando ? 'arrastando' : ''}`} role="button" tabIndex="0" aria-label="Área para envio de arquivos" onDragOver={arrastarSobre} onDragLeave={sairDaArea} onDrop={soltarArquivos} onClick={abrirSeletor}>
-                <img src={arquivo} className="arquivo" alt="Arquivo"/>
-                <h2>Puxe um arquivo para adicioná-lo</h2>
-                <span>Ou escolha seus arquivos</span>
-                <input ref={fileInputRef} id="fileInput" type="file" multiple hidden onChange={selecionarArquivos}/>
-            </div>
-            {arquivos.length > 0 && (
-                <div className="arquivos-selecionados">
-                    <h4> {arquivos.length === 1 ? 'Arquivo selecionado:' : 'Arquivos selecionados:'}</h4>
-                    {arquivos.map((arquivo, index) => ( <p key={index}> {arquivo.name} </p> ))}
-                    <button onClick={enviarArquivos}>Enviar arquivos</button>
-                </div>
-            )}
-        </section>
-    )
+const formularioInicial = {
+  titulo: '',
+  resumo: '',
+  autores: '',
+  palavrasChave: '',
+  areaConhecimento: '',
 }
 
+function Enviar() {
+  const [formulario, setFormulario] = useState(formularioInicial)
+  const [arquivoSelecionado, setArquivoSelecionado] = useState(null)
+  const [arrastando, setArrastando] = useState(false)
+
+  function atualizarCampo(event) {
+    const { name, value } = event.target
+
+    setFormulario((camposAtuais) => ({
+      ...camposAtuais,
+      [name]: value,
+    }))
+  }
+
+  function selecionarArquivo(event) {
+    setArquivoSelecionado(event.target.files[0] ?? null)
+  }
+
+  function arrastarSobre(event) {
+    event.preventDefault()
+    setArrastando(true)
+  }
+
+  function sairDaArea(event) {
+    event.preventDefault()
+    setArrastando(false)
+  }
+
+  function soltarArquivo(event) {
+    event.preventDefault()
+    setArrastando(false)
+    setArquivoSelecionado(event.dataTransfer.files[0] ?? null)
+  }
+
+  function enviarFormulario(event) {
+    event.preventDefault()
+  }
+
+  return (
+    <main id="center" className="pagina-submissao">
+      <header className="cabecalho-submissao">
+        <p>Nova submissão</p>
+        <h1>Submissão de artigo</h1>
+      </header>
+
+      <form className="formulario-submissao" onSubmit={enviarFormulario} noValidate>
+        <label className="campo campo-largo" htmlFor="titulo">
+          <span>Título <strong aria-hidden="true">*</strong></span>
+          <input
+            id="titulo"
+            name="titulo"
+            type="text"
+            value={formulario.titulo}
+            onChange={atualizarCampo}
+            required
+          />
+        </label>
+
+        <label className="campo campo-largo" htmlFor="resumo">
+          <span>Resumo <strong aria-hidden="true">*</strong></span>
+          <textarea
+            id="resumo"
+            name="resumo"
+            rows="6"
+            value={formulario.resumo}
+            onChange={atualizarCampo}
+            required
+          />
+        </label>
+
+        <label className="campo" htmlFor="autores">
+          <span>Autores <strong aria-hidden="true">*</strong></span>
+          <input
+            id="autores"
+            name="autores"
+            type="text"
+            value={formulario.autores}
+            onChange={atualizarCampo}
+            required
+          />
+        </label>
+
+        <label className="campo" htmlFor="palavrasChave">
+          <span>Palavras-chave <strong aria-hidden="true">*</strong></span>
+          <input
+            id="palavrasChave"
+            name="palavrasChave"
+            type="text"
+            value={formulario.palavrasChave}
+            onChange={atualizarCampo}
+            required
+          />
+        </label>
+
+        <label className="campo campo-largo" htmlFor="areaConhecimento">
+          <span>Área do conhecimento <strong aria-hidden="true">*</strong></span>
+          <input
+            id="areaConhecimento"
+            name="areaConhecimento"
+            type="text"
+            value={formulario.areaConhecimento}
+            onChange={atualizarCampo}
+            required
+          />
+        </label>
+
+        <div className="campo campo-largo campo-arquivo">
+          <span>Anexo em PDF <strong aria-hidden="true">*</strong></span>
+          <label
+            className={`enviar ${arrastando ? 'arrastando' : ''}`}
+            htmlFor="arquivo"
+            onDragOver={arrastarSobre}
+            onDragLeave={sairDaArea}
+            onDrop={soltarArquivo}
+          >
+            <img src={arquivoImg} className="arquivo" alt="" />
+            <strong>Arraste o PDF aqui</strong>
+            <span>ou selecione o arquivo</span>
+          </label>
+          <input
+            id="arquivo"
+            className="arquivo-input"
+            name="arquivo"
+            type="file"
+            accept=".pdf,application/pdf"
+            onChange={selecionarArquivo}
+            required
+          />
+
+          {arquivoSelecionado && (
+            <p className="arquivo-selecionado">{arquivoSelecionado.name}</p>
+          )}
+        </div>
+
+        <div className="acoes-formulario campo-largo">
+          <button type="submit">Enviar artigo</button>
+        </div>
+      </form>
+    </main>
+  )
+}
 
 export default Enviar
