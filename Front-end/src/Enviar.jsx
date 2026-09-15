@@ -10,10 +10,32 @@ const formularioInicial = {
   areaConhecimento: '',
 }
 
+const mensagensCamposObrigatorios = {
+  titulo: 'Informe o título.',
+  resumo: 'Informe o resumo.',
+  autores: 'Informe ao menos um autor.',
+  palavrasChave: 'Informe ao menos uma palavra-chave.',
+  areaConhecimento: 'Informe a área do conhecimento.',
+}
+
 function Enviar() {
   const [formulario, setFormulario] = useState(formularioInicial)
   const [arquivoSelecionado, setArquivoSelecionado] = useState(null)
   const [arrastando, setArrastando] = useState(false)
+  const [erros, setErros] = useState({})
+  const [mensagem, setMensagem] = useState('')
+
+  function limparErro(campo) {
+    setErros((errosAtuais) => {
+      if (!errosAtuais[campo]) {
+        return errosAtuais
+      }
+
+      const proximosErros = { ...errosAtuais }
+      delete proximosErros[campo]
+      return proximosErros
+    })
+  }
 
   function atualizarCampo(event) {
     const { name, value } = event.target
@@ -22,10 +44,38 @@ function Enviar() {
       ...camposAtuais,
       [name]: value,
     }))
+    limparErro(name)
+    setMensagem('')
+  }
+
+  function definirArquivo(arquivo) {
+    if (!arquivo) {
+      setArquivoSelecionado(null)
+      return
+    }
+
+    if (!arquivo.name.toLowerCase().endsWith('.pdf')) {
+      setArquivoSelecionado(null)
+      setErros((errosAtuais) => ({
+        ...errosAtuais,
+        arquivo: 'O arquivo deve estar no formato PDF.',
+      }))
+      setMensagem('')
+      return
+    }
+
+    setArquivoSelecionado(arquivo)
+    limparErro('arquivo')
+    setMensagem('')
   }
 
   function selecionarArquivo(event) {
-    setArquivoSelecionado(event.target.files[0] ?? null)
+    const arquivo = event.target.files[0] ?? null
+    definirArquivo(arquivo)
+
+    if (arquivo && !arquivo.name.toLowerCase().endsWith('.pdf')) {
+      event.target.value = ''
+    }
   }
 
   function arrastarSobre(event) {
@@ -41,11 +91,35 @@ function Enviar() {
   function soltarArquivo(event) {
     event.preventDefault()
     setArrastando(false)
-    setArquivoSelecionado(event.dataTransfer.files[0] ?? null)
+    definirArquivo(event.dataTransfer.files[0] ?? null)
+  }
+
+  function validarFormulario() {
+    const proximosErros = {}
+
+    Object.entries(mensagensCamposObrigatorios).forEach(([campo, mensagemErro]) => {
+      if (!formulario[campo].trim()) {
+        proximosErros[campo] = mensagemErro
+      }
+    })
+
+    if (!arquivoSelecionado) {
+      proximosErros.arquivo = erros.arquivo ?? 'Anexe o arquivo PDF.'
+    }
+
+    setErros(proximosErros)
+    return Object.keys(proximosErros).length === 0
   }
 
   function enviarFormulario(event) {
     event.preventDefault()
+
+    if (!validarFormulario()) {
+      setMensagem('')
+      return
+    }
+
+    setMensagem('Dados validados para envio.')
   }
 
   return (
@@ -56,7 +130,10 @@ function Enviar() {
       </header>
 
       <form className="formulario-submissao" onSubmit={enviarFormulario} noValidate>
-        <label className="campo campo-largo" htmlFor="titulo">
+        <label
+          className={`campo campo-largo ${erros.titulo ? 'campo-com-erro' : ''}`}
+          htmlFor="titulo"
+        >
           <span>Título <strong aria-hidden="true">*</strong></span>
           <input
             id="titulo"
@@ -64,11 +141,17 @@ function Enviar() {
             type="text"
             value={formulario.titulo}
             onChange={atualizarCampo}
+            aria-invalid={Boolean(erros.titulo)}
+            aria-describedby={erros.titulo ? 'erro-titulo' : undefined}
             required
           />
+          {erros.titulo && <small id="erro-titulo">{erros.titulo}</small>}
         </label>
 
-        <label className="campo campo-largo" htmlFor="resumo">
+        <label
+          className={`campo campo-largo ${erros.resumo ? 'campo-com-erro' : ''}`}
+          htmlFor="resumo"
+        >
           <span>Resumo <strong aria-hidden="true">*</strong></span>
           <textarea
             id="resumo"
@@ -76,11 +159,17 @@ function Enviar() {
             rows="6"
             value={formulario.resumo}
             onChange={atualizarCampo}
+            aria-invalid={Boolean(erros.resumo)}
+            aria-describedby={erros.resumo ? 'erro-resumo' : undefined}
             required
           />
+          {erros.resumo && <small id="erro-resumo">{erros.resumo}</small>}
         </label>
 
-        <label className="campo" htmlFor="autores">
+        <label
+          className={`campo ${erros.autores ? 'campo-com-erro' : ''}`}
+          htmlFor="autores"
+        >
           <span>Autores <strong aria-hidden="true">*</strong></span>
           <input
             id="autores"
@@ -88,11 +177,17 @@ function Enviar() {
             type="text"
             value={formulario.autores}
             onChange={atualizarCampo}
+            aria-invalid={Boolean(erros.autores)}
+            aria-describedby={erros.autores ? 'erro-autores' : undefined}
             required
           />
+          {erros.autores && <small id="erro-autores">{erros.autores}</small>}
         </label>
 
-        <label className="campo" htmlFor="palavrasChave">
+        <label
+          className={`campo ${erros.palavrasChave ? 'campo-com-erro' : ''}`}
+          htmlFor="palavrasChave"
+        >
           <span>Palavras-chave <strong aria-hidden="true">*</strong></span>
           <input
             id="palavrasChave"
@@ -100,11 +195,19 @@ function Enviar() {
             type="text"
             value={formulario.palavrasChave}
             onChange={atualizarCampo}
+            aria-invalid={Boolean(erros.palavrasChave)}
+            aria-describedby={erros.palavrasChave ? 'erro-palavras-chave' : undefined}
             required
           />
+          {erros.palavrasChave && (
+            <small id="erro-palavras-chave">{erros.palavrasChave}</small>
+          )}
         </label>
 
-        <label className="campo campo-largo" htmlFor="areaConhecimento">
+        <label
+          className={`campo campo-largo ${erros.areaConhecimento ? 'campo-com-erro' : ''}`}
+          htmlFor="areaConhecimento"
+        >
           <span>Área do conhecimento <strong aria-hidden="true">*</strong></span>
           <input
             id="areaConhecimento"
@@ -112,14 +215,17 @@ function Enviar() {
             type="text"
             value={formulario.areaConhecimento}
             onChange={atualizarCampo}
+            aria-invalid={Boolean(erros.areaConhecimento)}
+            aria-describedby={erros.areaConhecimento ? 'erro-area' : undefined}
             required
           />
+          {erros.areaConhecimento && <small id="erro-area">{erros.areaConhecimento}</small>}
         </label>
 
         <div className="campo campo-largo campo-arquivo">
           <span>Anexo em PDF <strong aria-hidden="true">*</strong></span>
           <label
-            className={`enviar ${arrastando ? 'arrastando' : ''}`}
+            className={`enviar ${arrastando ? 'arrastando' : ''} ${erros.arquivo ? 'enviar-com-erro' : ''}`}
             htmlFor="arquivo"
             onDragOver={arrastarSobre}
             onDragLeave={sairDaArea}
@@ -136,16 +242,20 @@ function Enviar() {
             type="file"
             accept=".pdf,application/pdf"
             onChange={selecionarArquivo}
+            aria-invalid={Boolean(erros.arquivo)}
+            aria-describedby={erros.arquivo ? 'erro-arquivo' : undefined}
             required
           />
 
           {arquivoSelecionado && (
             <p className="arquivo-selecionado">{arquivoSelecionado.name}</p>
           )}
+          {erros.arquivo && <small id="erro-arquivo">{erros.arquivo}</small>}
         </div>
 
         <div className="acoes-formulario campo-largo">
           <button type="submit">Enviar artigo</button>
+          <p className="mensagem-formulario" aria-live="polite">{mensagem}</p>
         </div>
       </form>
     </main>
