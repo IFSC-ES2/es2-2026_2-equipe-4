@@ -1,0 +1,52 @@
+h3 {
+    color: black;
+}
+
+.enviar {
+    background-color: lightblue;
+    border: 1px solid gray;
+    height: 300px;
+    width: 600px;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.arquivo {
+    margin-top: 75px;
+    height: 100px;
+}
+
+.entire-clickable-button {
+  padding: 20px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.entire-clickable-button:hover {
+  background-color: #e5e5e5;
+}
+
+.entire-clickable-button:focus-visible {
+  outline: 3px solid #0056b3;
+}
+
+.entire-clickable-button:active {
+  background-color: #d8d8d8;
+}
+
+#center {
+  display: flex;
+  flex-direction: column;
+  place-content: center;
+  place-items: center;
+  flex-grow: 1;
+
+  @media (max-width: 1024px) {
+    padding: 32px 20px 24px;
+    gap: 18px;
+  }
+}
