@@ -85,5 +85,9 @@ Validação: Leitura e pequenas correções feitas
   Artefats: src/backend/artigos/src/main/resources/application.properties e docker-compose.yml
   Validação: A API foi inicializada corretamente, e um integrante da equipe, com experiência nessa área do desenvolvimento, realizou a revisão.
   
-  
+- Data: 14/09/2026
+  Ferramenta: Claude
+  Uso: Apoio na persistência dos metadados no MongoDB, ajuda na correção de dependências e da property de conexão
+  Artefatos: build.gradle, application.properties, ArquivoMetadadoDTO.java e ArquivoService.java
+  Validação: Testado via Postman, podendo observar os dados persistindo depois de reiniciar a aplicação, com cada artigo recebendo ID único
   
