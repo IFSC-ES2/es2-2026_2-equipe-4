@@ -80,7 +80,7 @@ Validação: Leitura e pequenas correções feitas
   Validação: A API foi inicializada com sucesso, as partes desenvolvida com IA foram testadas via requisições usando curl.
 
 - Data: 14/09/2026
-  Ferramenta: Calude
+  Ferramenta: Claude
   Uso: Configuração rápida de um container e configuração necessaria para conectar com a API.
   Artefats: src/backend/artigos/src/main/resources/application.properties e docker-compose.yml
   Validação: A API foi inicializada corretamente, e um integrante da equipe, com experiência nessa área do desenvolvimento, realizou a revisão.
@@ -90,3 +90,10 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio na implementação de um drag and drop dropzone.
   Artefato: Enviar.jsx
   Validação: Leitura e pequenas correções feitas.
+
+- Data: 14/09/2026
+  Ferramenta: Claude
+  Uso: Apoio na persistência dos metadados no MongoDB, ajuda na correção de dependências e da property de conexão
+  Artefatos: build.gradle, application.properties, ArquivoMetadadoDTO.java e ArquivoService.java
+  Validação: Testado via Postman, podendo observar os dados persistindo depois de reiniciar a aplicação, com cada artigo recebendo ID único
+  

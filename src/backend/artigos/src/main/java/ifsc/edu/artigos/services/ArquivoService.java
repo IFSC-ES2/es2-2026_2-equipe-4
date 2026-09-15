@@ -2,6 +2,7 @@ package ifsc.edu.artigos.services;
 
 import ifsc.edu.artigos.dtos.ArquivoMetadadoDTO;
 import ifsc.edu.artigos.dtos.ArquivoRespostaDTO;
+import ifsc.edu.artigos.repositories.ArquivoMetadadoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,16 +12,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.Map;
 
 @Service
 public class ArquivoService {
+    private final ArquivoMetadadoRepository repository;
 
     private static final String DIRETORIO_UPLOAD = "uploads/";
 
-    // "banco" em memória só pra exemplo — troque por JPA/Repository depois
-    private final Map<String, ArquivoMetadadoDTO> metadadosArmazenados = new ConcurrentHashMap<>();
+    public ArquivoService(ArquivoMetadadoRepository repository){
+        this.repository = repository;
+    }
 
     public ArquivoRespostaDTO salvarArquivo(MultipartFile arquivo) {
         if (arquivo == null || arquivo.isEmpty()) {
@@ -58,12 +59,11 @@ public class ArquivoService {
     }
 
     public ArquivoMetadadoDTO salvarMetadados(ArquivoMetadadoDTO metadadoDTO) {
-        if (metadadoDTO.getNomeArquivo() == null || metadadoDTO.getNomeArquivo().isBlank()) {
+        if (metadadoDTO.getTitulo() == null || metadadoDTO.getTitulo().isBlank()) {
             throw new IllegalArgumentException("Nome do arquivo é obrigatório nos metadados");
         }
 
-        String chave = UUID.randomUUID().toString();
-        metadadosArmazenados.put(chave, metadadoDTO);
-        return metadadoDTO;
+        metadadoDTO.setId(null);
+        return repository.save(metadadoDTO);
     }
 }
