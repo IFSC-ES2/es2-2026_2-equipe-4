@@ -96,4 +96,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio na persistência dos metadados no MongoDB, ajuda na correção de dependências e da property de conexão
   Artefatos: build.gradle, application.properties, ArquivoMetadadoDTO.java e ArquivoService.java
   Validação: Testado via Postman, podendo observar os dados persistindo depois de reiniciar a aplicação, com cada artigo recebendo ID único
-  
+
+- Data: 15/09/2026
+  Ferramenta: Codex (GPT-5)
+  Uso: Apoio na estruturação do formulário de submissão, validação dos campos e revisão do layout responsivo.
+  Artefatos: Front-end/index.html, Front-end/src/Enviar.jsx, Front-end/src/Enviar.css e Front-end/src/index.css
+  Validação: Código revisado pela equipe, lint e build executados com sucesso e layout conferido em tamanhos de desktop e celular.
