@@ -102,3 +102,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio na estruturação do formulário de submissão, validação dos campos e revisão do layout responsivo.
   Artefatos: Front-end/index.html, Front-end/src/Enviar.jsx, Front-end/src/Enviar.css e Front-end/src/index.css
   Validação: Código revisado pela equipe, lint e build executados com sucesso e layout conferido em tamanhos de desktop e celular.
+
+- Data: 15/09/2026
+  Ferramenta: Claude
+  Uso: Ajuda nos estudos de configuração do CORS no Spring
+  Artefatos: WebConfig.java
+  Validação: Implementação do CORS no nosso backend, permitindo requisições da porta padrão do Vite (5173), e testando via fetch no navegador
