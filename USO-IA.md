@@ -108,3 +108,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Ajuda nos estudos de configuração do CORS no Spring
   Artefatos: WebConfig.java
   Validação: Implementação do CORS no nosso backend, permitindo requisições da porta padrão do Vite (5173), e testando via fetch no navegador
+
+- Data: 16/09/2026
+  Ferramenta: Gemini
+  Uso: apoio na inclusão de testes com Gradle no CI e criação dos testes unitários do backend
+  Artefatos: ci.yml, ArquivoServiceTest.java e ArtigosApplicationTests.java
+  Validação: execução dos testes via Gradle (`./gradlew test`) e validação da pipeline no GitHub Actions
