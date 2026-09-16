@@ -39,3 +39,35 @@ jobs:
           globs: |
             **/*.md
             #avaliacao
+
+
+  backend-tests:
+    name: Backend (Spring Boot + Gradle)
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Permissão de execução no Gradle Wrapper
+        run: chmod +x backend/gradlew
+
+      - name: Rodar Testes de Unidade
+        env:
+          SPRING_DATA_MONGODB_URI: mongodb://localhost:27017/testdb
+        run: |
+          cd backend
+          ./gradlew test
