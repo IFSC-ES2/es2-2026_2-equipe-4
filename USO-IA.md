@@ -121,3 +121,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Desenvolvimento do script que baixa os arquivos do banco usando Python
   Artefato: main.py
   Validação: Testado e revisado
+
+- Data: 17/09/2026
+  Ferramenta: Claude
+  Uso: Apoio na formatação do README atualizado
+  Artefato: README.md
+  Validação: Revisado visualmente e validado
