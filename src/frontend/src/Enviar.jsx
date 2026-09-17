@@ -131,12 +131,28 @@ function Enviar() {
     setMensagem('Processando a submissão...')
 
     try {
+            const formDataArquivo = new FormData()
+      formDataArquivo.append('arquivo', arquivoSelecionado)
+
+      const respostaArquivo = await fetch(`${API_BASE_URL}/arquivos/upload`, {
+        method: 'POST',
+        body: formDataArquivo,
+      })
+
+      if (!respostaArquivo.ok) {
+        const erroJson = await respostaArquivo.json().catch(() => ({}))
+        throw new Error(erroJson.erro || `Erro ao processar PDF (Status ${respostaArquivo.status})`)
+      }
+
+      const dadosArquivo = await respostaArquivo.json()
+
       const payloadMetadados = {
         titulo: formulario.titulo,
         resumo: formulario.resumo,
         areaConhecimento: formulario.areaConhecimento,
         autores: formulario.autores.split(',').map(item => item.trim()).filter(Boolean),
         palavrasChave: formulario.palavrasChave.split(',').map(item => item.trim()).filter(Boolean),
+        caminhoArquivo: dadosArquivo.id,
       }
 
       const respostaMetadados = await fetch(`${API_BASE_URL}/arquivos/metadados`, {
@@ -150,19 +166,6 @@ function Enviar() {
       if (!respostaMetadados.ok) {
         const erroJson = await respostaMetadados.json().catch(() => ({}))
         throw new Error(erroJson.erro || `Erro ao salvar dados (Status ${respostaMetadados.status})`)
-      }
-
-      const formDataArquivo = new FormData()
-      formDataArquivo.append('arquivo', arquivoSelecionado)
-
-      const respostaArquivo = await fetch(`${API_BASE_URL}/arquivos/upload`, {
-        method: 'POST',
-        body: formDataArquivo,
-      })
-
-      if (!respostaArquivo.ok) {
-        const erroJson = await respostaArquivo.json().catch(() => ({}))
-        throw new Error(erroJson.erro || `Erro ao processar PDF (Status ${respostaArquivo.status})`)
       }
 
       setMensagem('Sucesso! Artigo submetido e persistido no banco.')
