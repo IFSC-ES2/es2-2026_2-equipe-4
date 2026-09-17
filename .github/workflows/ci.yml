@@ -65,11 +65,11 @@ jobs:
           cache: 'gradle'
 
       - name: Permissão de execução no Gradle Wrapper
-        run: chmod +x backend/artigos/gradlew
+        run: chmod +x src/backend/artigos/gradlew
 
       - name: Rodar Testes de Unidade
         env:
           SPRING_DATA_MONGODB_URI: mongodb://localhost:27017/testdb
         run: |
-          cd backend
+          cd src/backend/artigos
           ./gradlew test
