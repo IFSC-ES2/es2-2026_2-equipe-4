@@ -69,7 +69,7 @@ jobs:
 
       - name: Rodar Testes de Unidade
         env:
-          SPRING_DATA_MONGODB_URI: mongodb://localhost:27017/testdb
+          SPRING_MONGODB_URI: mongodb://localhost:27017/testdb
         run: |
           cd src/backend/artigos
           ./gradlew test
