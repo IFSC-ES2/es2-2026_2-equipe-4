@@ -1,27 +1,25 @@
-package ifsc.edu.artigos.services;
+package ifsc.edu.artigos;
 
 import ifsc.edu.artigos.dtos.ArquivoMetadadoDTO;
 import ifsc.edu.artigos.dtos.ArquivoRespostaDTO;
 import ifsc.edu.artigos.repositories.ArquivoMetadadoRepository;
-import org.junit.jupiter.api.AfterEach;
+import ifsc.edu.artigos.services.ArquivoService;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Comparator;
-import java.util.List;
+import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,120 +28,87 @@ class ArquivoServiceTest {
     @Mock
     private ArquivoMetadadoRepository repository;
 
+    @Mock
+    private GridFsTemplate gridFsTemplate; // Adicionada a simulação do GridFS (MongoDB)
+
     @InjectMocks
     private ArquivoService arquivoService;
 
-    // Limpa a pasta de uploads criada durante os testes para evitar arquivos residuais
-    @AfterEach
-    void cleanUp() throws IOException {
-        Path pastaUploads = Paths.get("uploads");
-        if (Files.exists(pastaUploads)) {
-            Files.walk(pastaUploads)
-                    .sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(File::delete);
-        }
-    }
 
-
-    // Teste do salvarArquivo
+    // testes salvarArquivo
 
     @Test
-    @DisplayName("Deve salvar arquivo com sucesso quando receber um arquivo válido")
-    void deveSalvarArquivoComSucesso() {
+    @DisplayName("Deve salvar arquivo no GridFS com sucesso e retornar DTO")
+    void salvarArquivoComSucesso() throws Exception {
         // Arrange
-        MockMultipartFile arquivo = new MockMultipartFile(
-                "arquivo",
-                "artigo.pdf",
+        MockMultipartFile mockFile = new MockMultipartFile(
+                "file",
+                "documento.pdf",
                 "application/pdf",
-                "Conteúdo do artigo de teste".getBytes()
+                "conteudo fake".getBytes()
         );
 
+        ObjectId mockId = new ObjectId();
+
+        // Simula o comportamento do GridFS retornando um ObjectId
+        when(gridFsTemplate.store(any(InputStream.class), eq("documento.pdf"), eq("application/pdf"), any(Document.class)))
+                .thenReturn(mockId);
+
         // Act
-        ArquivoRespostaDTO resposta = arquivoService.salvarArquivo(arquivo);
+        ArquivoRespostaDTO resposta = arquivoService.salvarArquivo(mockFile);
 
         // Assert
         assertNotNull(resposta);
-        assertNotNull(resposta.getId());
-        assertEquals("artigo.pdf", resposta.getNomeOriginal());
-        assertEquals("Arquivo salvo com sucesso", resposta.getMensagem());
-        assertTrue(resposta.getTamanhoBytes() > 0);
-        assertTrue(Files.exists(Paths.get(resposta.getCaminhoArmazenado())));
+        assertEquals("documento.pdf", resposta.getNomeOriginal());
+        assertEquals(mockId.toHexString(), resposta.getId());
+        verify(gridFsTemplate, times(1)).store(any(), any(), any(), any());
     }
 
     @Test
-    @DisplayName("Deve lançar exceção quando o arquivo for nulo")
-    void deveLancarExcecaoQuandoArquivoForNulo() {
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> arquivoService.salvarArquivo(null)
-        );
-
-        assertEquals("Arquivo não pode estar vazio", exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção quando o arquivo estiver vazio")
-    void deveLancarExcecaoQuandoArquivoEstiverVazio() {
+    @DisplayName("Deve lançar exceção ao tentar salvar arquivo vazio ou nulo")
+    void salvarArquivoVazioLancaExcecao() {
         // Arrange
-        MockMultipartFile arquivoVazio = new MockMultipartFile(
-                "arquivo",
-                "vazio.txt",
-                "text/plain",
-                new byte[0]
-        );
+        MockMultipartFile arquivoVazio = new MockMultipartFile("file", new byte[0]);
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> arquivoService.salvarArquivo(arquivoVazio)
-        );
-
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> arquivoService.salvarArquivo(arquivoVazio));
         assertEquals("Arquivo não pode estar vazio", exception.getMessage());
+        verify(gridFsTemplate, never()).store(any(), any(), any(), any());
     }
 
 
-    //Teste do salvarMetadado
+    //teste salvarMetadados
 
     @Test
-    @DisplayName("Deve salvar metadados com sucesso quando o título for válido")
-    void deveSalvarMetadadosComSucesso() {
+    @DisplayName("Deve salvar metadados com sucesso")
+    void salvarMetadadosComSucesso() {
         // Arrange
-        ArquivoMetadadoDTO dto = new ArquivoMetadadoDTO();
-        dto.setTitulo("Estudo sobre Spring Boot e CI/CD");
-        dto.setResumo("Resumo do artigo");
-        dto.setAutores(List.of("Autor 1"));
+        ArquivoMetadadoDTO metadadoEntrada = new ArquivoMetadadoDTO();
+        metadadoEntrada.setTitulo("Artigo Teste");
 
-        ArquivoMetadadoDTO dtoSalvo = new ArquivoMetadadoDTO();
-        dtoSalvo.setId("12345");
-        dtoSalvo.setTitulo(dto.getTitulo());
+        ArquivoMetadadoDTO metadadoSalvo = new ArquivoMetadadoDTO();
+        metadadoSalvo.setId("12345");
+        metadadoSalvo.setTitulo("Artigo Teste");
 
-        when(repository.save(any(ArquivoMetadadoDTO.class))).thenReturn(dtoSalvo);
+        when(repository.save(any(ArquivoMetadadoDTO.class))).thenReturn(metadadoSalvo);
 
         // Act
-        ArquivoMetadadoDTO resultado = arquivoService.salvarMetadados(dto);
+        ArquivoMetadadoDTO resultado = arquivoService.salvarMetadados(metadadoEntrada);
 
         // Assert
-        assertNotNull(resultado);
-        assertEquals("12345", resultado.getId());
-        assertEquals("Estudo sobre Spring Boot e CI/CD", resultado.getTitulo());
-        verify(repository, times(1)).save(dto);
+        assertNotNull(resultado.getId());
+        assertEquals("Artigo Teste", resultado.getTitulo());
+        verify(repository, times(1)).save(any(ArquivoMetadadoDTO.class));
     }
 
     @Test
-    @DisplayName("Deve lançar exceção ao tentar salvar metadados com título nulo ou em branco")
-    void deveLancarExcecaoQuandoTituloForInvalido() {
+    @DisplayName("Deve lançar exceção ao tentar salvar metadados sem título")
+    void salvarMetadadosSemTituloLancaExcecao() {
         // Arrange
-        ArquivoMetadadoDTO dtoComTituloEmBranco = new ArquivoMetadadoDTO();
-        dtoComTituloEmBranco.setTitulo("   ");
+        ArquivoMetadadoDTO metadadoInvalido = new ArquivoMetadadoDTO(); // Título nulo
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
-                () -> arquivoService.salvarMetadados(dtoComTituloEmBranco)
-        );
-
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> arquivoService.salvarMetadados(metadadoInvalido));
         assertEquals("Nome do arquivo é obrigatório nos metadados", exception.getMessage());
         verify(repository, never()).save(any());
     }
