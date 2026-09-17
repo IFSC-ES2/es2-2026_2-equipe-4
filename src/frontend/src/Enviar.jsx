@@ -26,7 +26,12 @@ function Enviar() {
   const [mensagem, setMensagem] = useState('')
   const [carregando, setCarregando] = useState(false)
 
+  //  O segundo enpoint é usado no codespaces, pois o localhost não funciona no codespaces. Se você estiver rodando localmente, use o endpoint do localhost.
+
+  // Localhost endpoint for local development
   const API_BASE_URL = 'http://localhost:8080/api/v1';
+  // Codespaces endpoint for development in GitHub Codespaces
+  //const API_BASE_URL = 'https://glowing-funicular-g46r64wrvqwpf9px6-8080.app.github.dev/api/v1';
 
   function limparErro(campo) {
     setErros((errosAtuais) => {
