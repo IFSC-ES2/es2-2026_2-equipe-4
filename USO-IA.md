@@ -89,7 +89,7 @@ Validação: Leitura e pequenas correções feitas
   Ferramenta: ChatGPT
   Uso: Apoio na implementação de um drag and drop dropzone.
   Artefato: Enviar.jsx
-  Validação: Leitura e pequenas correções feitas.
+  Validação: Código revisado e adaptado.
 
 - Data: 14/09/2026
   Ferramenta: Claude
@@ -114,3 +114,15 @@ Validação: Leitura e pequenas correções feitas
   Uso: apoio na inclusão de testes com Gradle no CI e criação dos testes unitários do backend
   Artefatos: ci.yml, ArquivoServiceTest.java e ArtigosApplicationTests.java
   Validação: execução dos testes via Gradle (`./gradlew test`) e validação da pipeline no GitHub Actions
+
+- Ferramenta: ChatGPT
+  Uso: Apoio na implementação da ponte (API) entre o Backend e Frontend.
+  Artefato: Enviar.jsx
+  Validação: Código revisado e adaptado.
+
+  
+- Data: 17/09/2026
+  Ferramenta: ChatGPT
+  Uso: Desenvolvimento do script que baixa os arquivos do banco usando Python
+  Artefato: main.py
+  Validação: Testado e revisado

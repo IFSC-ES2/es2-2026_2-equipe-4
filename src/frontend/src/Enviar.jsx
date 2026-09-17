@@ -13,8 +13,8 @@ const formularioInicial = {
 const mensagensCamposObrigatorios = {
   titulo: 'Informe o título.',
   resumo: 'Informe o resumo.',
-  autores: 'Informe ao menos um autor.',
-  palavrasChave: 'Informe ao menos uma palavra-chave.',
+  autores: 'Informe ao menos um autor (separado por vírgula).',
+  palavrasChave: 'Informe ao menos uma palavra-chave (separada por vírgula).',
   areaConhecimento: 'Informe a área do conhecimento.',
 }
 
@@ -24,6 +24,14 @@ function Enviar() {
   const [arrastando, setArrastando] = useState(false)
   const [erros, setErros] = useState({})
   const [mensagem, setMensagem] = useState('')
+  const [carregando, setCarregando] = useState(false)
+
+  //  O segundo enpoint é usado no codespaces, pois o localhost não funciona no codespaces. Se você estiver rodando localmente, use o endpoint do localhost.
+
+  // Localhost endpoint for local development
+  const API_BASE_URL = 'http://localhost:8080/api/v1';
+  // Codespaces endpoint for development in GitHub Codespaces
+  //const API_BASE_URL = 'https://glowing-funicular-g46r64wrvqwpf9px6-8080.app.github.dev/api/v1';
 
   function limparErro(campo) {
     setErros((errosAtuais) => {
@@ -111,7 +119,7 @@ function Enviar() {
     return Object.keys(proximosErros).length === 0
   }
 
-  function enviarFormulario(event) {
+  async function enviarFormulario(event) {
     event.preventDefault()
 
     if (!validarFormulario()) {
@@ -119,7 +127,59 @@ function Enviar() {
       return
     }
 
-    setMensagem('Dados validados para envio.')
+    setCarregando(true)
+    setMensagem('Processando a submissão...')
+
+    try {
+      const payloadMetadados = {
+        titulo: formulario.titulo,
+        resumo: formulario.resumo,
+        areaConhecimento: formulario.areaConhecimento,
+        autores: formulario.autores.split(',').map(item => item.trim()).filter(Boolean),
+        palavrasChave: formulario.palavrasChave.split(',').map(item => item.trim()).filter(Boolean),
+      }
+
+      const respostaMetadados = await fetch(`${API_BASE_URL}/arquivos/metadados`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payloadMetadados),
+      })
+
+      if (!respostaMetadados.ok) {
+        const erroJson = await respostaMetadados.json().catch(() => ({}))
+        throw new Error(erroJson.erro || `Erro ao salvar dados (Status ${respostaMetadados.status})`)
+      }
+
+      const formDataArquivo = new FormData()
+      formDataArquivo.append('arquivo', arquivoSelecionado)
+
+      const respostaArquivo = await fetch(`${API_BASE_URL}/arquivos/upload`, {
+        method: 'POST',
+        body: formDataArquivo,
+      })
+
+      if (!respostaArquivo.ok) {
+        const erroJson = await respostaArquivo.json().catch(() => ({}))
+        throw new Error(erroJson.erro || `Erro ao processar PDF (Status ${respostaArquivo.status})`)
+      }
+
+      setMensagem('Sucesso! Artigo submetido e persistido no banco.')
+      setFormulario(formularioInicial)
+      setArquivoSelecionado(null)
+      setErros({})
+      event.target.reset()
+
+    } catch (erro) {
+      if (erro.message.includes('Failed to fetch')) {
+        setMensagem('Erro de conexão: A API parece estar fora do ar ou o endpoint não existe.')
+      } else {
+        setMensagem(`Atenção: ${erro.message}`)
+      }
+    } finally {
+      setCarregando(false)
+    }
   }
 
   return (
@@ -144,6 +204,7 @@ function Enviar() {
             aria-invalid={Boolean(erros.titulo)}
             aria-describedby={erros.titulo ? 'erro-titulo' : undefined}
             required
+            disabled={carregando}
           />
           {erros.titulo && <small id="erro-titulo">{erros.titulo}</small>}
         </label>
@@ -162,6 +223,7 @@ function Enviar() {
             aria-invalid={Boolean(erros.resumo)}
             aria-describedby={erros.resumo ? 'erro-resumo' : undefined}
             required
+            disabled={carregando}
           />
           {erros.resumo && <small id="erro-resumo">{erros.resumo}</small>}
         </label>
@@ -175,11 +237,13 @@ function Enviar() {
             id="autores"
             name="autores"
             type="text"
+            placeholder="Ex: João, Maria"
             value={formulario.autores}
             onChange={atualizarCampo}
             aria-invalid={Boolean(erros.autores)}
             aria-describedby={erros.autores ? 'erro-autores' : undefined}
             required
+            disabled={carregando}
           />
           {erros.autores && <small id="erro-autores">{erros.autores}</small>}
         </label>
@@ -193,11 +257,13 @@ function Enviar() {
             id="palavrasChave"
             name="palavrasChave"
             type="text"
+            placeholder="Ex: Tecnologia, Redes"
             value={formulario.palavrasChave}
             onChange={atualizarCampo}
             aria-invalid={Boolean(erros.palavrasChave)}
             aria-describedby={erros.palavrasChave ? 'erro-palavras-chave' : undefined}
             required
+            disabled={carregando}
           />
           {erros.palavrasChave && (
             <small id="erro-palavras-chave">{erros.palavrasChave}</small>
@@ -218,6 +284,7 @@ function Enviar() {
             aria-invalid={Boolean(erros.areaConhecimento)}
             aria-describedby={erros.areaConhecimento ? 'erro-area' : undefined}
             required
+            disabled={carregando}
           />
           {erros.areaConhecimento && <small id="erro-area">{erros.areaConhecimento}</small>}
         </label>
@@ -225,11 +292,11 @@ function Enviar() {
         <div className="campo campo-largo campo-arquivo">
           <span>Anexo em PDF <strong aria-hidden="true">*</strong></span>
           <label
-            className={`enviar ${arrastando ? 'arrastando' : ''} ${erros.arquivo ? 'enviar-com-erro' : ''}`}
+            className={`enviar ${arrastando ? 'arrastando' : ''} ${erros.arquivo ? 'enviar-com-erro' : ''} ${carregando ? 'desabilitado' : ''}`}
             htmlFor="arquivo"
-            onDragOver={arrastarSobre}
-            onDragLeave={sairDaArea}
-            onDrop={soltarArquivo}
+            onDragOver={carregando ? undefined : arrastarSobre}
+            onDragLeave={carregando ? undefined : sairDaArea}
+            onDrop={carregando ? undefined : soltarArquivo}
           >
             <img src={arquivoImg} className="arquivo" alt="" />
             <strong>Arraste o PDF aqui</strong>
@@ -245,6 +312,7 @@ function Enviar() {
             aria-invalid={Boolean(erros.arquivo)}
             aria-describedby={erros.arquivo ? 'erro-arquivo' : undefined}
             required
+            disabled={carregando}
           />
 
           {arquivoSelecionado && (
@@ -254,8 +322,12 @@ function Enviar() {
         </div>
 
         <div className="acoes-formulario campo-largo">
-          <button type="submit">Enviar artigo</button>
-          <p className="mensagem-formulario" aria-live="polite">{mensagem}</p>
+          <button type="submit" disabled={carregando}>
+            {carregando ? 'Enviando...' : 'Enviar artigo'}
+          </button>
+          <p className="mensagem-formulario" aria-live="polite">
+            <strong>{mensagem}</strong>
+          </p>
         </div>
       </form>
     </main>

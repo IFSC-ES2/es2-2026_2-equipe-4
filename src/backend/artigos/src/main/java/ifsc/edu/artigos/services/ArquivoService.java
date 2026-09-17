@@ -1,26 +1,27 @@
 package ifsc.edu.artigos.services;
 
+import com.mongodb.client.gridfs.model.GridFSFile;
 import ifsc.edu.artigos.dtos.ArquivoMetadadoDTO;
 import ifsc.edu.artigos.dtos.ArquivoRespostaDTO;
 import ifsc.edu.artigos.repositories.ArquivoMetadadoRepository;
+import org.bson.Document;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.UUID;
+import java.io.InputStream;
 
 @Service
 public class ArquivoService {
+
     private final ArquivoMetadadoRepository repository;
+    private final GridFsTemplate gridFsTemplate; // Configuração do GridFS para armazenar arquivos no MongoDB
 
-    private static final String DIRETORIO_UPLOAD = "uploads/";
-
-    public ArquivoService(ArquivoMetadadoRepository repository){
+    public ArquivoService(ArquivoMetadadoRepository repository, GridFsTemplate gridFsTemplate) {
         this.repository = repository;
+        this.gridFsTemplate = gridFsTemplate;
     }
 
     public ArquivoRespostaDTO salvarArquivo(MultipartFile arquivo) {
@@ -29,26 +30,24 @@ public class ArquivoService {
         }
 
         try {
-            Path diretorio = Paths.get(DIRETORIO_UPLOAD);
-            if (!Files.exists(diretorio)) {
-                Files.createDirectories(diretorio);
-            }
-
-            String id = UUID.randomUUID().toString();
             String nomeOriginal = arquivo.getOriginalFilename();
-            String extensao = nomeOriginal != null && nomeOriginal.contains(".")
-                    ? nomeOriginal.substring(nomeOriginal.lastIndexOf("."))
-                    : "";
 
-            String nomeArmazenado = id + extensao;
-            Path caminhoDestino = diretorio.resolve(nomeArmazenado);
+    
+            Document metadata = new Document();
+            metadata.put("contentType", arquivo.getContentType());
+            metadata.put("size", arquivo.getSize());
 
-            Files.copy(arquivo.getInputStream(), caminhoDestino, StandardCopyOption.REPLACE_EXISTING);
+            ObjectId fileId = gridFsTemplate.store(
+                    arquivo.getInputStream(),
+                    nomeOriginal,
+                    arquivo.getContentType(),
+                    metadata
+            );
 
             return new ArquivoRespostaDTO(
-                    id,
+                    fileId.toHexString(),
                     nomeOriginal,
-                    caminhoDestino.toString(),
+                    fileId.toHexString(), // referência do path local
                     arquivo.getSize(),
                     "Arquivo salvo com sucesso"
             );
