@@ -114,3 +114,10 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio na implementação da ponte (API) entre o Backend e Frontend.
   Artefato: Enviar.jsx
   Validação: Código revisado e adaptado.
+
+  
+- Data: 17/09/2026
+  Ferramenta: ChatGPT
+  Uso: Desenvolvimento do script que baixa os arquivos do banco usando Python
+  Artefato: main.py
+  Validação: Testado e revisado
