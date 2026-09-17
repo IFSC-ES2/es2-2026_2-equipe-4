@@ -89,7 +89,7 @@ Validação: Leitura e pequenas correções feitas
   Ferramenta: ChatGPT
   Uso: Apoio na implementação de um drag and drop dropzone.
   Artefato: Enviar.jsx
-  Validação: Leitura e pequenas correções feitas.
+  Validação: Código revisado e adaptado.
 
 - Data: 14/09/2026
   Ferramenta: Claude
@@ -108,3 +108,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Ajuda nos estudos de configuração do CORS no Spring
   Artefatos: WebConfig.java
   Validação: Implementação do CORS no nosso backend, permitindo requisições da porta padrão do Vite (5173), e testando via fetch no navegador
+
+- Data: 16/09/2026
+  Ferramenta: ChatGPT
+  Uso: Apoio na implementação da ponte (API) entre o Backend e Frontend.
+  Artefato: Enviar.jsx
+  Validação: Código revisado e adaptado.
