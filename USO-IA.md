@@ -72,3 +72,73 @@ Validação: Leitura e pequenas correções feitas
   Uso: apoio na estrutura do documento de fluxo de trabalho
   Artefato: fluxo-de-trabalho.md
   Validação: cada tópico foi conferido no documento da entrega 4 e validado visualmente
+
+- Data: 12/09/2026
+  Ferramenta: Claude
+  Uso: Nomeclatura de métodos da API em SpringBoot, e configurações para rotas inválidas. Desenvolvimento de DTO para agilizar o desenvolvimento.
+  Artefatos: src/backend/artigos/src/main/java/ifsc/edu/artigos/dtos/* e src/backend/artigos/src/main/resources/application.properties
+  Validação: A API foi inicializada com sucesso, as partes desenvolvida com IA foram testadas via requisições usando curl.
+
+- Data: 14/09/2026
+  Ferramenta: Claude
+  Uso: Configuração rápida de um container e configuração necessaria para conectar com a API.
+  Artefats: src/backend/artigos/src/main/resources/application.properties e docker-compose.yml
+  Validação: A API foi inicializada corretamente, e um integrante da equipe, com experiência nessa área do desenvolvimento, realizou a revisão.
+  
+- Data: 14/09/2026
+  Ferramenta: ChatGPT
+  Uso: Apoio na implementação de um drag and drop dropzone.
+  Artefato: Enviar.jsx
+  Validação: Código revisado e adaptado.
+
+- Data: 14/09/2026
+  Ferramenta: Claude
+  Uso: Apoio na persistência dos metadados no MongoDB, ajuda na correção de dependências e da property de conexão
+  Artefatos: build.gradle, application.properties, ArquivoMetadadoDTO.java e ArquivoService.java
+  Validação: Testado via Postman, podendo observar os dados persistindo depois de reiniciar a aplicação, com cada artigo recebendo ID único
+
+- Data: 15/09/2026
+  Ferramenta: Codex (GPT-5)
+  Uso: Apoio na estruturação do formulário de submissão, validação dos campos e revisão do layout responsivo.
+  Artefatos: Front-end/index.html, Front-end/src/Enviar.jsx, Front-end/src/Enviar.css e Front-end/src/index.css
+  Validação: Código revisado pela equipe, lint e build executados com sucesso e layout conferido em tamanhos de desktop e celular.
+
+- Data: 15/09/2026
+  Ferramenta: Claude
+  Uso: Ajuda nos estudos de configuração do CORS no Spring
+  Artefatos: WebConfig.java
+  Validação: Implementação do CORS no nosso backend, permitindo requisições da porta padrão do Vite (5173), e testando via fetch no navegador
+
+- Data: 16/09/2026
+  Ferramenta: Gemini
+  Uso: apoio na inclusão de testes com Gradle no CI e criação dos testes unitários do backend
+  Artefatos: ci.yml, ArquivoServiceTest.java e ArtigosApplicationTests.java
+  Validação: execução dos testes via Gradle (`./gradlew test`) e validação da pipeline no GitHub Actions
+
+- Ferramenta: ChatGPT
+  Uso: Apoio na implementação da ponte (API) entre o Backend e Frontend.
+  Artefato: Enviar.jsx
+  Validação: Código revisado e adaptado.
+
+  
+- Data: 17/09/2026
+  Ferramenta: ChatGPT
+  Uso: Desenvolvimento do script que baixa os arquivos do banco usando Python
+  Artefato: main.py
+  Validação: Testado e revisado
+
+- Data: 17/09/2026
+  Ferramenta: Codex (OpenAI)
+  Uso: Apoio na definição do escopo, coleta e documentação das métricas M-01 (NCLOC) e M-04 (CBO interno).
+  Artefatos: docs/metricas/M-01.md e docs/metricas/M-04.md
+  Validação: Conferência das contagens de linhas e das dependências internas por tipo no código-fonte; verificação com `git diff --check`.
+  Ferramenta: Claude
+  Uso: Apoio na formatação do README atualizado
+  Artefato: README.md
+  Validação: Revisado visualmente e validado
+
+- Data: 17/09/2026
+  Ferramente: Claude
+  Uso: Formatação e ajuda na finalização da documentação da Sprint 1
+  Artefato: sprint-1.mds
+  Validação: Revisado visualmente e checado no Github
