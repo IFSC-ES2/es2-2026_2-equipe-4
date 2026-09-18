@@ -39,3 +39,59 @@ jobs:
           globs: |
             **/*.md
             #avaliacao
+
+
+#testes backend
+
+  backend-tests:
+    name: Backend (Spring Boot + Gradle)
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Permissão de execução no Gradle Wrapper
+        run: chmod +x src/backend/artigos/gradlew
+
+      - name: Rodar Testes de Unidade
+        env:
+          SPRING_MONGODB_URI: mongodb://localhost:27017/testdb
+        run: |
+          cd src/backend/artigos
+          ./gradlew test
+
+#testes frontend
+
+  frontend-tests:
+    name: Frontend (React + Vitest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./src/frontend
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: ./src/frontend/package-lock.json
+      - name: Instalar dependências
+        run: npm ci
+      - name: Rodar testes de interface
+        run: npm run test -- --run
