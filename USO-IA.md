@@ -136,3 +136,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio na formatação do README atualizado
   Artefato: README.md
   Validação: Revisado visualmente e validado
+
+- Data: 17/09/2026
+  Ferramente: Claude
+  Uso: Formatação e ajuda na finalização da documentação da Sprint 1
+  Artefato: sprint-1.mds
+  Validação: Revisado visualmente e checado no Github

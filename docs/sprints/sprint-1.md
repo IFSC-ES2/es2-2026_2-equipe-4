@@ -27,11 +27,17 @@ Ver seção 2, issue #17, única planejada para esta sprint.
 
 ### 5.2 Issues concluídas
 
-A preencher ao longo da sprint.
+- #55, #56, #57, #58, #59, #18, #66, #67, #68, #75, #77, #60, #61
+
+13 issues concluídas, evidenciadas por 12 PRs mergeados na `entrega-5` (alguns PRs fecham
+mais de uma issue relacionada).
 
 ### 5.3 Issues parciais ou replanejadas
 
-A preencher ao longo da sprint.
+- **#57 (Docker Compose)**: parcialmente: hoje só o
+  MongoDB está containerizado. A API (Spring Boot) e o front-end (React) continuam rodando fora do Docker,
+  precisam de `./gradlew bootRun`/`npm run dev` manuais. Fica como candidato pra próxima
+  um `docker-compose up -d` que suba tudo de uma vez.
 
 ### 5.4 Justificativa do vertical slice
 
@@ -50,45 +56,46 @@ três, que sozinha já resulta em algo utilizável e demonstrável de ponta a po
 
 ### 6.1 Valores observados ao final da Sprint 1
 
-A preencher ao longo da sprint.
-
-| Métrica | Valor observado | Ficha |
-|---|---|---|
-| M-01 — NCLOC | | [M-01](../metricas/M-01.md) |
-| M-02 — Complexidade Ciclomática | | [M-02](../metricas/M-02.md) |
-| M-03 — Cobertura de Testes | | [M-03](../metricas/M-03.md) |
-| M-04 — Acoplamento entre Classes (CBO) | | [M-04](../metricas/M-04.md) |
-| M-05 — Taxa de Retrabalho | | [M-05](../metricas/M-05.md) |
-| M-06 — Densidade de Defeitos | | [M-06](../metricas/M-06.md) |
-| M-07 — Variação de Cronograma | | [M-07](../metricas/M-07.md) |
-| M-08 — Variação de Escopo | | [M-08](../metricas/M-08.md) |
+| Métrica | Ficha |
+|---|---|
+| M-01: NCLOC | [M-01](../metricas/M-01.md) |
+| M-02: Complexidade Ciclomática | [M-02](../metricas/M-02.md) |
+| M-03: Cobertura de Testes | [M-03](../metricas/M-03.md) |
+| M-04: Acoplamento entre Classes (CBO) | [M-04](../metricas/M-04.md) |
+| M-05: Taxa de Retrabalho | [M-05](../metricas/M-05.md) |
+| M-06: Densidade de Defeitos | [M-06](../metricas/M-06.md) |
+| M-07: Variação de Cronograma | [M-07](../metricas/M-07.md) |
+| M-08: Variação de Escopo | [M-08](../metricas/M-08.md) |
 
 ### 6.2 Comparação com o esperado
 
-A preencher ao longo da sprint.
+Como não tem sprint anterior, não existe um valor de referência para as métricas, porém concluímos
+que precisamos melhorar principalmente a comunicação, para evitar retrabalho e variação de escopo.
 
 ### 6.3 Análise — planejado x executado
 
-A preencher ao longo da sprint.
+O planejado era entregar só a #17. O executado foi #17 **e** #18 juntas, porque a
+#17 sozinha não sobrevivia a um restart da aplicação sem persistência real, a ampliação de
+escopo foi consequência direta. Os fatores que mais influenciaram o retrabalho foram: falta de
+experiência prévia da equipe com MongoDB e decisões tomadas sem confirmar
+com quem já estava implementando.
 
 ## 7. Contribuições individuais
 
-A preencher ao longo da sprint.
-
 | Integrante | Papel (Entrega 1) | Contribuição na Sprint 1 | Evidência |
 |---|---|---|---|
-| Pedro Henrique Bernhardt Valete | DBA | | |
-| Bernardo Vieira de Souza | Arquiteto de Software / ScrumMaster | | |
-| Marcos Júnior Lemes Ferreira | DevOps/Infra | | |
-| Juliano Tavares da Silva | Engenheiro de Qualidade | | |
-| Gabriel Ferreira de Souza da Silva | Front-end | | |
+| Pedro Henrique Bernhardt Valete | DBA | Planejamento e fechamento da sprint; persistência real dos metadados no MongoDB; ligação arquivo e metadado (GridFS); CORS; README | PRs #64, #70, #73, #78, #81 |
+| Bernardo Vieira de Souza | Arquiteto de Software / Scrum Master | Formulário de submissão de artigo (front-end) | PR #72 |
+| Marcos Júnior Lemes Ferreira | DevOps/Infra | Esqueleto do back-end (Spring Boot); correção do armazenamento do PDF (GridFS) | PRs #65, #76 |
+| Juliano Tavares da Silva | Engenheiro de Qualidade | Testes de unidade do back-end e do front-end | PR #80 |
+| Gabriel Ferreira de Souza da Silva | Front-end | ADR-0003 (mudança de stack); inicialização do projeto React; integração front-end e API | PRs #63, #69, #74 |
 
 ## 8. Marco da sprint
 
-A preencher ao longo da sprint.
+Preencher os links abaixo assim que a release existir.
 
-- Release: `v0.1.0` — [link da release]
-- PR da entrega: `entrega-5 → main` — [link do PR]
+- Release: `v0.1.0`: [link da release]
+- PR da entrega: `entrega-5 → main`: [link do PR]
 
 
 Relacionado: [`BASELINE.md`](../BASELINE.md) / [`fluxo-de-trabalho.md`](../fluxo-de-trabalho.md) /
