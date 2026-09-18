@@ -160,7 +160,22 @@ Interface disponível em `http://localhost:5173`.
 
 ## 10. Como rodar os testes automatizados
 
-> Esperar Juliano finalizar os testes
+### Back-end
+
+```bash
+cd src/backend/artigos
+./gradlew test
+```
+
+
+### Front-end
+
+```bash
+cd src/frontend
+npm test
+```
+
+Testes do componente de submissão (`Enviar.jsx`).
 
 ## 11. O que funciona hoje (MVP ao final da Sprint 1)
 
