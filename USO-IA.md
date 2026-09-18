@@ -110,7 +110,12 @@ Validação: Leitura e pequenas correções feitas
   Validação: Implementação do CORS no nosso backend, permitindo requisições da porta padrão do Vite (5173), e testando via fetch no navegador
 
 - Data: 16/09/2026
-  Ferramenta: ChatGPT
+  Ferramenta: Gemini
+  Uso: apoio na inclusão de testes com Gradle no CI e criação dos testes unitários do backend
+  Artefatos: ci.yml, ArquivoServiceTest.java e ArtigosApplicationTests.java
+  Validação: execução dos testes via Gradle (`./gradlew test`) e validação da pipeline no GitHub Actions
+
+- Ferramenta: ChatGPT
   Uso: Apoio na implementação da ponte (API) entre o Backend e Frontend.
   Artefato: Enviar.jsx
   Validação: Código revisado e adaptado.
