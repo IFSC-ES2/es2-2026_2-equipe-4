@@ -128,6 +128,10 @@ Validação: Leitura e pequenas correções feitas
   Validação: Testado e revisado
 
 - Data: 17/09/2026
+  Ferramenta: Codex (OpenAI)
+  Uso: Apoio na definição do escopo, coleta e documentação das métricas M-01 (NCLOC) e M-04 (CBO interno).
+  Artefatos: docs/metricas/M-01.md e docs/metricas/M-04.md
+  Validação: Conferência das contagens de linhas e das dependências internas por tipo no código-fonte; verificação com `git diff --check`.
   Ferramenta: Claude
   Uso: Apoio na formatação do README atualizado
   Artefato: README.md
