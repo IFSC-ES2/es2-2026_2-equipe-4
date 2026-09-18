@@ -73,3 +73,25 @@ jobs:
         run: |
           cd src/backend/artigos
           ./gradlew test
+
+#testes frontend
+
+  frontend-tests:
+    name: Frontend (React + Vitest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./src/frontend
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: ./src/frontend/package-lock.json
+      - name: Instalar dependências
+        run: npm ci
+      - name: Rodar testes de interface
+        run: npm run test -- --run
