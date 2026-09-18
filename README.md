@@ -90,6 +90,7 @@ As principais decisões técnicas e arquiteturais do projeto são registradas in
  
 - [ADR-0001 — Arquitetura do Projeto](docs/adr/ADR-0001.md)
 - [ADR-0002 — Stack Tecnológica do Projeto](docs/adr/ADR-0002.md)
+- [ADR-0003 — Front-end para React](docs/adr/ADR-0003.md)
 
 ### 8.4 Artefatos da Entrega 3
 
@@ -120,3 +121,66 @@ Os documentos produzidos para a entrega 4 estão organizados nos seguintes arqui
 
 Evidências da etapa: PR #46 (correção dos templates), PR #47 (lint no CI), PR #48
 (fluxo de trabalho), PR #50 (registro dos riscos) e PR #51 (define qualidades)
+
+### 8.6 Artefatos da Entrega 5 (Sprint 1)
+
+- [`docs/sprints/sprint-1.md`](docs/sprints/sprint-1.md)
+- [ADR-0003](docs/adr/ADR-0003.md).
+
+## 9. Como executar o projeto
+
+### 9.1 Banco de dados (MongoDB)
+
+Na raiz do repositório:
+
+```bash
+docker-compose up -d
+```
+
+Sobe o MongoDB em `localhost:27017` (usuário `admin`, senha `admin123`).
+
+### 9.2 Back-end (Spring Boot)
+
+```bash
+cd src/backend/artigos
+./gradlew bootRun
+```
+
+API disponível em `http://localhost:8080/api/v1`. Requer JDK 25 instalado e configurado.
+
+### 9.3 Front-end (React + Vite)
+
+```bash
+cd src/frontend
+npm install
+npm run dev
+```
+
+Interface disponível em `http://localhost:5173`.
+
+## 10. Como rodar os testes automatizados
+
+### Back-end
+
+```bash
+cd src/backend/artigos
+./gradlew test
+```
+
+
+### Front-end
+
+```bash
+cd src/frontend
+npm test
+```
+
+Testes do componente de submissão (`Enviar.jsx`).
+
+## 11. O que funciona hoje (MVP ao final da Sprint 1)
+
+- Submissão de artigo com metadados (título, resumo, autores, palavras-chave, área do
+  conhecimento) e anexo de PDF, pelo formulário do front-end
+- Metadados e arquivo persistidos de forma real no MongoDB, o PDF fica em GridFS, e o
+  documento de metadados guarda a referência ao arquivo correspondente
+- CORS configurado, permitindo a comunicação entre front-end (`:5173`) e back-end (`:8080`)
