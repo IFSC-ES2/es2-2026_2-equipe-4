@@ -9,4 +9,4 @@ RUN npm run build
 EXPOSE 5173
 
 # Roda o frontend
-CMD ["npm", "run", "preview", "--", "--host"]
+CMD ["npm", "run", "preview", "--", "--host", "--port", "5173"]
