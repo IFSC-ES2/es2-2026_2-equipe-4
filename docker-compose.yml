@@ -24,5 +24,27 @@ services:
     volumes:
       - mongodb_data:/data/db
 
+  backend:
+    build:
+      context: ./src/backend/artigos
+    container_name: artigos-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_MONGODB_URI: mongodb://admin:admin123@mongodb:27017/publicaifsc?authSource=admin
+    depends_on:
+      - mongodb
+
+  frontend:
+    build:
+      context: ./src/frontend
+    container_name: artigos-frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
 volumes:
-  mongodb_data:
+  mongodb_data:  

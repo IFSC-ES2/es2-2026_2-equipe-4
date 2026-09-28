@@ -142,3 +142,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Formatação e ajuda na finalização da documentação da Sprint 1
   Artefato: sprint-1.mds
   Validação: Revisado visualmente e checado no Github
+
+- Data: 22/09/2026
+  Ferramenta: Claude
+  Uso: Apoio na criação dos Dockerfile e ajuda na correção de problemas ao longo do processo
+  Artefato: docker-compose.yml, src/backend/artigos/Dockerfile, src/frontend/Dockerfile, src/backend/artigos/.dockerignore, src/backend/artigos/build.gradle
+  Validação: Após ajuda nas correções, foi revisado e testado ao vivo a aplicação por inteira, enviando um artigo de teste

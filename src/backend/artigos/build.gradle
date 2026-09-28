@@ -31,3 +31,9 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// Desativa o jar "plain" (sem Main-Class) que o plugin do Spring Boot gera por padrão,
+// pra sobrar só o jar executável de verdade em build/libs/ (usado pelo Dockerfile)
+tasks.named('jar') {
+	enabled = false
+}
