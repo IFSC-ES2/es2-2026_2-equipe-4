@@ -148,3 +148,15 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio na criação dos Dockerfile e ajuda na correção de problemas ao longo do processo
   Artefato: docker-compose.yml, src/backend/artigos/Dockerfile, src/frontend/Dockerfile, src/backend/artigos/.dockerignore, src/backend/artigos/build.gradle
   Validação: Após ajuda nas correções, foi revisado e testado ao vivo a aplicação por inteira, enviando um artigo de teste
+
+- Data: 28/09/2026
+  Ferramenta: Claude
+  Uso: Desenvolvimento do script em python para realização dos testes manuais
+  Artefato: testes-manuais-python/*
+  Validação: Revisados e executados.
+  
+- Data: 28/09/2026
+  Ferramenta: copilot  
+  Uso: Desenvolvimento da path de criação de contas, ajustados erros de conexões e erros de importações das classes e ajuda na lógica de alguns endpoints
+  Artefato: ../../backend/artigos/src/main/java/accountcreation/*
+  Validação: Revisados e executados.

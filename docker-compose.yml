@@ -1,4 +1,6 @@
-version: '3.8'
+#version: '3.8' # Comentado pois a versão do Docker Compose não é mais necessária
+# WARN[0000] /workspaces/es2-2026_2-equipe-4/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+
 
 # Versão previa, deve ser adiciona volume e mais configurações para o MongoDB
 # Apenas para teste e conexão com a API 
