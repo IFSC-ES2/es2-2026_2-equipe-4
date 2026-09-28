@@ -42,7 +42,7 @@ public class UserService {
     }
 
     public String updatUser(CreateUserRequest dataForUpdateUserRequestDTO) {
-        Long userId = usuarioRepository.findByEmail(dataForUpdateUserRequestDTO.getEmail())
+        String userId = usuarioRepository.findByEmail(dataForUpdateUserRequestDTO.getEmail())
                 .map(User::getId)
                 .orElse(null);  
 
@@ -53,13 +53,13 @@ public class UserService {
         return usuarioRepository.findById(userId)
             .map(user -> {
                 if (dataForUpdateUserRequestDTO.getNome() != null) {
-                    dataForUpdateUserRequestDTO.setNome(dataForUpdateUserRequestDTO.getNome());
+                    user.setNome(dataForUpdateUserRequestDTO.getNome());
                 }
                 if (getPasswordEncode != null) {
                     user.setPassword(getPasswordEncode);
                 }
                 if (dataForUpdateUserRequestDTO.getEmail() != null) {
-                    dataForUpdateUserRequestDTO.setEmail(dataForUpdateUserRequestDTO.getEmail());
+                    user.setEmail(dataForUpdateUserRequestDTO.getEmail());
                 }
 
                 usuarioRepository.save(user);
@@ -68,7 +68,7 @@ public class UserService {
             .orElse("Erro na atualização: usuário não encontrado");
     }
     
-    public final String deleteUser(Long userIdByPathVariable){
+    public final String deleteUser(String userIdByPathVariable){
         if(usuarioRepository.existsById(userIdByPathVariable)){
             usuarioRepository.deleteById(userIdByPathVariable);
             return "Conta excluída com sucesso";

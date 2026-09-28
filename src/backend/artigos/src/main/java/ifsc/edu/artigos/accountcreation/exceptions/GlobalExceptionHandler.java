@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.dao.DataIntegrityViolationException;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -45,8 +45,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().header("Content-Type","application/json").body(responseErr);
     }
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ResponseErro> handleEntityNotFound(EntityNotFoundException ex, HttpServletRequest request) {
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<ResponseErro> handleEntityNotFound(NoSuchElementException ex, HttpServletRequest request) {
         ResponseErro responseErr = new ResponseErro(404, Map.of("error", ex.getMessage()), request.getRequestURI());
         return ResponseEntity.status(404).body(responseErr);
     }

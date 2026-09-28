@@ -2,25 +2,24 @@ package ifsc.edu.artigos.accountcreation.repository;
 
 import ifsc.edu.artigos.accountcreation.entity.User;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.data.repository.query.Param;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
-import org.springframework.transaction.annotation.Transactional;
-
 @Repository
-public interface UserRepository extends JpaRepository<User, Long>{
+public interface UserRepository extends MongoRepository<User, String> {
 
-    Optional<User> findByEmail(String emailOfUser);
-    boolean existsByEmail(String emailOfUser);
+    Optional<User> findByEmail(String email);
+    boolean existsByEmail(String email);
 
-    @Transactional
-    boolean existsById(Long idOfuser);
-    void deleteById(Long idOfuser);
+    // existsById e deleteById já vêm prontos no MongoRepository,
+    // não precisa redeclarar
 
-    @Query("SELECT u.id FROM User u WHERE u.email = :email")
-    Long searchByEmail(@Param("email") String emailOfUser);
+    // Busca só o _id, sem carregar o documento inteiro
+    @Query(value = "{ 'email': ?0 }", fields = "{ '_id': 1 }")
+    Optional<User> findIdByEmail(String email);
+
+
 }

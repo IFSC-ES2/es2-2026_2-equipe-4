@@ -65,7 +65,7 @@ public class AccountController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public final ResponseEntity<UserSummaryResponse> deleteUser(@PathVariable("id") Long UserId){
+    public final ResponseEntity<UserSummaryResponse> deleteUser(@PathVariable("id") String UserId){
 
         String responseUserService = userService.deleteUser(UserId);
         int statusResponse = 404;
