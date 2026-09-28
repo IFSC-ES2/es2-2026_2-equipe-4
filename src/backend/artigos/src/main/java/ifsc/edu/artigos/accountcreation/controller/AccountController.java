@@ -17,11 +17,15 @@ import org.springframework.http.ResponseEntity;
 import ifsc.edu.artigos.accountcreation.service.UserService;
 import ifsc.edu.artigos.accountcreation.dtos.CreateUserRequest;
 import ifsc.edu.artigos.accountcreation.dtos.UserSummaryResponse;
+import ifsc.edu.artigos.accountcreation.entity.User;
+
+import java.util.Optional;
 
 
 // 8080/api/v1/users/createAccount/0.0.1
+// curl -X GET http://localhost:8080/api/v1/users/createAccount/run
 @RestController
-//@RequestMapping("/criacao-conta")
+@RequestMapping("${app.api.users.base}${app.api.users.create-account}/${app.api.version}")
 public class AccountController {
 
     @Autowired
@@ -38,14 +42,14 @@ public class AccountController {
 
     @PostMapping("/novousers")
     public final ResponseEntity<UserSummaryResponse> createAccount(@RequestBody @Valid CreateUserRequest userRequestDTO){
-        
-        String response = userService.createUser(userRequestDTO);
-        int statusResponse = 409;
-        if(response.equals("User created successful")){
-            statusResponse = 200;
-        }
 
-        UserSummaryResponse UserResponseDTO = new UserSummaryResponse(statusResponse, response, path);
+        Optional<User> createdUser = userService.createUser(userRequestDTO);
+        int statusResponse = createdUser.isPresent() ? 200 : 409;
+        String message = createdUser.isPresent()
+                ? "Usuário criado com sucesso"
+                : "O email informado já está em uso";
+        String userId = createdUser.map(User::getId).orElse(null);
+        UserSummaryResponse UserResponseDTO = new UserSummaryResponse(statusResponse, message, path, userId);
         return ResponseEntity
                 .status(statusResponse)
                 .header("Content-Type","application/json")
@@ -53,31 +57,29 @@ public class AccountController {
     }
 
     @PostMapping("/atualizar")
-    public final ResponseEntity<UserSummaryResponse> updateUser(@RequestBody CreateUserRequest UserRequestDTO){
+    public final ResponseEntity<UserSummaryResponse> updateUser(@RequestBody @Valid CreateUserRequest UserRequestDTO){
 
-        String responseUserService = userService.updatUser(UserRequestDTO);
-        UserSummaryResponse UserResponseDTO = new UserSummaryResponse(201, responseUserService, path);
+        Optional<User> updatedUser = userService.updateUser(UserRequestDTO);
+        int statusResponse = updatedUser.isPresent() ? 200 : 404;
+        String message = updatedUser.isPresent()
+                ? "Informações atualizadas com sucesso"
+                : "Usuário não encontrado";
+        UserSummaryResponse UserResponseDTO = new UserSummaryResponse(statusResponse, message, path,
+                updatedUser.map(User::getId).orElse(null));
 
         return ResponseEntity
-                .status(201)
+                .status(statusResponse)
                 .header("Content-Type", "application/json")
                 .body(UserResponseDTO);
     }
 
     @DeleteMapping("/delete/{id}")
-    public final ResponseEntity<UserSummaryResponse> deleteUser(@PathVariable("id") String UserId){
+    public final ResponseEntity<?> deleteUser(@PathVariable("id") String userId){
 
-        String responseUserService = userService.deleteUser(UserId);
-        int statusResponse = 404;
-
-        if(responseUserService.equals("account deleted sucessfully")){
-            statusResponse = 204;    
+        if (userService.deleteUser(userId)) {
+            return ResponseEntity.noContent().build();
         }
-        UserSummaryResponse responseUserDeleteById = new UserSummaryResponse(statusResponse, responseUserService, path);
-
-        return ResponseEntity
-                .status(200)
-                .header("Content-Type", "application/json")
-                .body(responseUserDeleteById);
+        UserSummaryResponse response = new UserSummaryResponse(404, "Usuário não encontrado", path, null);
+        return ResponseEntity.status(404).body(response);
     }
 }

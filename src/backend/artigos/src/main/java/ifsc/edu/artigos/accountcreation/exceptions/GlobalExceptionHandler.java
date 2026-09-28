@@ -1,14 +1,14 @@
 package ifsc.edu.artigos.accountcreation.exceptions;
 
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import jakarta.servlet.http.HttpServletRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.beans.factory.annotation.Value;
 
@@ -34,6 +34,22 @@ public class GlobalExceptionHandler {
 
         ResponseErro responseErr = new ResponseErro(400, errors, path);
         return ResponseEntity.badRequest().header("content-Type", "application/json").body(responseErr);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ResponseErro> handleUnreadableRequest(
+            HttpMessageNotReadableException ex, HttpServletRequest request) {
+        ResponseErro responseErr = new ResponseErro(400, Map.of("error", "JSON inválido ou ausente"),
+                request.getRequestURI());
+        return ResponseEntity.badRequest().body(responseErr);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ResponseErro> handleMethodNotAllowed(
+            HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+        ResponseErro responseErr = new ResponseErro(405, Map.of("error", "Método HTTP não permitido"),
+                request.getRequestURI());
+        return ResponseEntity.status(405).body(responseErr);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

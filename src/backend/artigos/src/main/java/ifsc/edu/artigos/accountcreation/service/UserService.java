@@ -8,6 +8,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
 
@@ -20,7 +22,11 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public String createUser(CreateUserRequest dataForCreatingAnAccountUserRequestDTO) {
+    public Optional<User> createUser(CreateUserRequest dataForCreatingAnAccountUserRequestDTO) {
+        if (usuarioRepository.existsByEmail(dataForCreatingAnAccountUserRequestDTO.getEmail())) {
+            return Optional.empty();
+        }
+
         User newUser = new User();
         String getPasswordEncode = passwordEncoder.encode(dataForCreatingAnAccountUserRequestDTO.getPassword());
 
@@ -28,51 +34,27 @@ public class UserService {
         newUser.setEmail(dataForCreatingAnAccountUserRequestDTO.getEmail());
         newUser.setPassword(getPasswordEncode);
 
-        boolean existEmailOfUser = usuarioRepository.existsByEmail(newUser.getEmail());
-        if(existEmailOfUser){
-            return "O email informado já está em uso";
-        }
-
-        if (dataForCreatingAnAccountUserRequestDTO.getNome() == null || dataForCreatingAnAccountUserRequestDTO.getEmail() == null || dataForCreatingAnAccountUserRequestDTO.getPassword() == null ||
-            dataForCreatingAnAccountUserRequestDTO.getNome().isEmpty() || dataForCreatingAnAccountUserRequestDTO.getEmail().isEmpty() || dataForCreatingAnAccountUserRequestDTO.getPassword().isEmpty()) {
-            return "Erro na criação do usuário: dados inválidos";
-        }
-        usuarioRepository.save(newUser);
-        return "Usuário criado com sucesso";
+        return Optional.of(usuarioRepository.save(newUser));
     }
 
-    public String updatUser(CreateUserRequest dataForUpdateUserRequestDTO) {
-        String userId = usuarioRepository.findByEmail(dataForUpdateUserRequestDTO.getEmail())
-                .map(User::getId)
-                .orElse(null);  
-
-        String getPasswordEncode = dataForUpdateUserRequestDTO.getPassword() != null
-                ? passwordEncoder.encode(dataForUpdateUserRequestDTO.getPassword())
-                : null;
-
-        return usuarioRepository.findById(userId)
-            .map(user -> {
-                if (dataForUpdateUserRequestDTO.getNome() != null) {
-                    user.setNome(dataForUpdateUserRequestDTO.getNome());
-                }
-                if (getPasswordEncode != null) {
-                    user.setPassword(getPasswordEncode);
-                }
-                if (dataForUpdateUserRequestDTO.getEmail() != null) {
-                    user.setEmail(dataForUpdateUserRequestDTO.getEmail());
-                }
-
-                usuarioRepository.save(user);
-                return "Informações atualizadas com sucesso";
-            })
-            .orElse("Erro na atualização: usuário não encontrado");
+    public Optional<User> updateUser(CreateUserRequest dataForUpdateUserRequestDTO) {
+        return usuarioRepository.findByEmail(dataForUpdateUserRequestDTO.getEmail())
+                .map(user -> {
+                    if (dataForUpdateUserRequestDTO.getNome() != null) {
+                        user.setNome(dataForUpdateUserRequestDTO.getNome());
+                    }
+                    if (dataForUpdateUserRequestDTO.getPassword() != null) {
+                        user.setPassword(passwordEncoder.encode(dataForUpdateUserRequestDTO.getPassword()));
+                    }
+                    return usuarioRepository.save(user);
+                });
     }
-    
-    public final String deleteUser(String userIdByPathVariable){
-        if(usuarioRepository.existsById(userIdByPathVariable)){
+
+    public boolean deleteUser(String userIdByPathVariable){
+        if (usuarioRepository.existsById(userIdByPathVariable)) {
             usuarioRepository.deleteById(userIdByPathVariable);
-            return "Conta excluída com sucesso";
+            return true;
         }
-        return "Erro ao excluir a conta";
+        return false;
     }
 }

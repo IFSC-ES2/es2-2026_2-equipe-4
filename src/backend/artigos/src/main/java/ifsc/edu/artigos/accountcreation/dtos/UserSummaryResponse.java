@@ -10,4 +10,5 @@ public class UserSummaryResponse {
     private int status;
     private String message; 
     private String path;
+    private String userId;
 }
