@@ -1,9 +1,10 @@
 #!/bin/sh
 
+
+# teste para rodar no terminal 
+# Caso não tenha python na maquina
 BASE_URL="${BASE_URL:-http://localhost:8080/api/v1/users/createAccount/0.0.1}"
 
-# Se sua aplicação realmente usa este prefixo, troque para:
-# BASE_URL="http://localhost:8080/api/v1/users/createAccount/0.0.1"
 
 PASS=0
 FAIL=0

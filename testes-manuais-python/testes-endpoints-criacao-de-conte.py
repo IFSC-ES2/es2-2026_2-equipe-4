@@ -2,6 +2,7 @@
 """
 Testes dos endpoints do AccountController (Spring Boot).
 
+
 Uso:
     pip install requests
     python test_endpoints.py                      # http://localhost:8080
