@@ -1,4 +1,6 @@
-version: '3.8'
+#version: '3.8' # Comentado pois a versão do Docker Compose não é mais necessária
+# WARN[0000] /workspaces/es2-2026_2-equipe-4/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+
 
 # Versão previa, deve ser adiciona volume e mais configurações para o MongoDB
 # Apenas para teste e conexão com a API 
@@ -24,27 +26,27 @@ services:
     volumes:
       - mongodb_data:/data/db
 
-  # backend:
-  #   build:
-  #     context: ./src/backend/artigos
-  #   container_name: artigos-backend
-  #   restart: always
-  #   ports:
-  #     - "8080:8080"
-  #   environment:
-  #     SPRING_MONGODB_URI: mongodb://admin:admin123@mongodb:27017/publicaifsc?authSource=admin
-  #   depends_on:
-  #     - mongodb
+  backend:
+    build:
+      context: ./src/backend/artigos
+    container_name: artigos-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_MONGODB_URI: mongodb://admin:admin123@mongodb:27017/publicaifsc?authSource=admin
+    depends_on:
+      - mongodb
 
-  # frontend:
-  #   build:
-  #     context: ./src/frontend
-  #   container_name: artigos-frontend
-  #   restart: always
-  #   ports:
-  #     - "5173:5173"
-  #   depends_on:
-  #     - backend
+  frontend:
+    build:
+      context: ./src/frontend
+    container_name: artigos-frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
 
 volumes:
   mongodb_data:  
