@@ -95,3 +95,46 @@ jobs:
         run: npm ci
       - name: Rodar testes de interface
         run: npm run test -- --run
+
+# Builda o backend 
+
+  backend-build:
+    name: Backend (Build)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      - name: Configurar Java JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'gradle'
+      - name: Permissão de execução no Gradle Wrapper
+        run: chmod +x src/backend/artigos/gradlew
+      - name: Buildar projeto backend
+        run: |
+          cd src/backend/artigos
+          ./gradlew build -x test
+
+# Builda o frontend
+
+  frontend-build:
+    name: Frontend (Build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./src/frontend
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: ./src/frontend/package-lock.json
+      - name: Instalar dependências
+        run: npm ci
+      - name: Buildar projeto frontend
+        run: npm run build
