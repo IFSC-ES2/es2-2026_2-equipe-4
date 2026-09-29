@@ -9,8 +9,8 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-@Document("artigos")
-public class ArquivoMetadadoDTO {
+@Document("projetos")
+public class Projeto {
 
     @Id
     private String id;

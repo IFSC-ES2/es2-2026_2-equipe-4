@@ -1,9 +1,8 @@
 package ifsc.edu.artigos.services;
 
-import com.mongodb.client.gridfs.model.GridFSFile;
-import ifsc.edu.artigos.dtos.ArquivoMetadadoDTO;
-import ifsc.edu.artigos.dtos.ArquivoRespostaDTO;
-import ifsc.edu.artigos.repositories.ArquivoMetadadoRepository;
+import ifsc.edu.artigos.dtos.Projeto;
+import ifsc.edu.artigos.dtos.ProjetoRespostaDTO;
+import ifsc.edu.artigos.repositories.ProjetoRepository;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
@@ -11,20 +10,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 @Service
-public class ArquivoService {
+public class ProjetoService {
 
-    private final ArquivoMetadadoRepository repository;
+    private final ProjetoRepository repository;
     private final GridFsTemplate gridFsTemplate; // Configuração do GridFS para armazenar arquivos no MongoDB
 
-    public ArquivoService(ArquivoMetadadoRepository repository, GridFsTemplate gridFsTemplate) {
+    public ProjetoService(ProjetoRepository repository, GridFsTemplate gridFsTemplate) {
         this.repository = repository;
         this.gridFsTemplate = gridFsTemplate;
     }
 
-    public ArquivoRespostaDTO salvarArquivo(MultipartFile arquivo) {
+    public ProjetoRespostaDTO salvarArquivo(MultipartFile arquivo) {
         if (arquivo == null || arquivo.isEmpty()) {
             throw new IllegalArgumentException("Arquivo não pode estar vazio");
         }
@@ -44,7 +42,7 @@ public class ArquivoService {
                     metadata
             );
 
-            return new ArquivoRespostaDTO(
+            return new ProjetoRespostaDTO(
                     fileId.toHexString(),
                     nomeOriginal,
                     fileId.toHexString(), // referência do path local
@@ -57,7 +55,7 @@ public class ArquivoService {
         }
     }
 
-    public ArquivoMetadadoDTO salvarMetadados(ArquivoMetadadoDTO metadadoDTO) {
+    public Projeto salvarMetadados(Projeto metadadoDTO) {
         if (metadadoDTO.getTitulo() == null || metadadoDTO.getTitulo().isBlank()) {
             throw new IllegalArgumentException("Nome do arquivo é obrigatório nos metadados");
         }

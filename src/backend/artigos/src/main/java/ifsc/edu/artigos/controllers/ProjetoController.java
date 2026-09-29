@@ -1,8 +1,8 @@
 package ifsc.edu.artigos.controllers;
 
-import ifsc.edu.artigos.dtos.ArquivoMetadadoDTO;
-import ifsc.edu.artigos.dtos.ArquivoRespostaDTO;
-import ifsc.edu.artigos.services.ArquivoService;
+import ifsc.edu.artigos.dtos.Projeto;
+import ifsc.edu.artigos.dtos.ProjetoRespostaDTO;
+import ifsc.edu.artigos.services.ProjetoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,30 +13,30 @@ import java.util.*;
 
 
 @RestController
-@RequestMapping("/arquivos")
-public class ArquivoController {
+@RequestMapping("/projetos")
+public class ProjetoController {
 
-    private final ArquivoService arquivoService;
+    private final ProjetoService arquivoService;
 
-    public ArquivoController(ArquivoService arquivoService) {
+    public ProjetoController(ProjetoService arquivoService) {
         this.arquivoService = arquivoService;
     }
 
     // Rota 1: apenas o arquivo (multipart/form-data)
     @PostMapping(value = "/upload", consumes = "multipart/form-data")
-    public ResponseEntity<ArquivoRespostaDTO> uploadArquivo(
+    public ResponseEntity<ProjetoRespostaDTO> uploadArquivo(
             @RequestParam("arquivo") MultipartFile arquivo) {
 
-        ArquivoRespostaDTO resposta = arquivoService.salvarArquivo(arquivo);
+        ProjetoRespostaDTO resposta = arquivoService.salvarArquivo(arquivo);
         return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
     }
 
     // Rota 2: apenas os metadados (application/json)
     @PostMapping(value = "/metadados", consumes = "application/json")
-    public ResponseEntity<ArquivoMetadadoDTO> enviarMetadados(
-            @RequestBody ArquivoMetadadoDTO metadadoDTO) {
+    public ResponseEntity<Projeto> enviarMetadados(
+            @RequestBody Projeto metadadoDTO) {
 
-        ArquivoMetadadoDTO salvo = arquivoService.salvarMetadados(metadadoDTO);
+        Projeto salvo = arquivoService.salvarMetadados(metadadoDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 

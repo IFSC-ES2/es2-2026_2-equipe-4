@@ -1,6 +1,6 @@
 package ifsc.edu.artigos.dtos;
 
-public class ArquivoRespostaDTO {
+public class ProjetoRespostaDTO {
 
     private String id;
     private String nomeOriginal;
@@ -8,7 +8,7 @@ public class ArquivoRespostaDTO {
     private long tamanhoBytes;
     private String mensagem;
 
-    public ArquivoRespostaDTO(String id, String nomeOriginal, String caminhoArmazenado,
+    public ProjetoRespostaDTO(String id, String nomeOriginal, String caminhoArmazenado,
                               long tamanhoBytes, String mensagem) {
         this.id = id;
         this.nomeOriginal = nomeOriginal;

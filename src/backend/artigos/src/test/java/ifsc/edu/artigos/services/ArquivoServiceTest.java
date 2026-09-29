@@ -1,9 +1,9 @@
 package ifsc.edu.artigos;
 
-import ifsc.edu.artigos.dtos.ArquivoMetadadoDTO;
-import ifsc.edu.artigos.dtos.ArquivoRespostaDTO;
-import ifsc.edu.artigos.repositories.ArquivoMetadadoRepository;
-import ifsc.edu.artigos.services.ArquivoService;
+import ifsc.edu.artigos.dtos.Projeto;
+import ifsc.edu.artigos.dtos.ProjetoRespostaDTO;
+import ifsc.edu.artigos.repositories.ProjetoRepository;
+import ifsc.edu.artigos.services.ProjetoService;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
@@ -26,13 +26,13 @@ import static org.mockito.Mockito.*;
 class ArquivoServiceTest {
 
     @Mock
-    private ArquivoMetadadoRepository repository;
+    private ProjetoRepository repository;
 
     @Mock
     private GridFsTemplate gridFsTemplate; // Adicionada a simulação do GridFS (MongoDB)
 
     @InjectMocks
-    private ArquivoService arquivoService;
+    private ProjetoService arquivoService;
 
 
     // testes salvarArquivo
@@ -55,7 +55,7 @@ class ArquivoServiceTest {
                 .thenReturn(mockId);
 
         // Act
-        ArquivoRespostaDTO resposta = arquivoService.salvarArquivo(mockFile);
+        ProjetoRespostaDTO resposta = arquivoService.salvarArquivo(mockFile);
 
         // Assert
         assertNotNull(resposta);
@@ -83,29 +83,29 @@ class ArquivoServiceTest {
     @DisplayName("Deve salvar metadados com sucesso")
     void salvarMetadadosComSucesso() {
         // Arrange
-        ArquivoMetadadoDTO metadadoEntrada = new ArquivoMetadadoDTO();
+        Projeto metadadoEntrada = new Projeto();
         metadadoEntrada.setTitulo("Artigo Teste");
 
-        ArquivoMetadadoDTO metadadoSalvo = new ArquivoMetadadoDTO();
+        Projeto metadadoSalvo = new Projeto();
         metadadoSalvo.setId("12345");
         metadadoSalvo.setTitulo("Artigo Teste");
 
-        when(repository.save(any(ArquivoMetadadoDTO.class))).thenReturn(metadadoSalvo);
+        when(repository.save(any(Projeto.class))).thenReturn(metadadoSalvo);
 
         // Act
-        ArquivoMetadadoDTO resultado = arquivoService.salvarMetadados(metadadoEntrada);
+        Projeto resultado = arquivoService.salvarMetadados(metadadoEntrada);
 
         // Assert
         assertNotNull(resultado.getId());
         assertEquals("Artigo Teste", resultado.getTitulo());
-        verify(repository, times(1)).save(any(ArquivoMetadadoDTO.class));
+        verify(repository, times(1)).save(any(Projeto.class));
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao tentar salvar metadados sem título")
     void salvarMetadadosSemTituloLancaExcecao() {
         // Arrange
-        ArquivoMetadadoDTO metadadoInvalido = new ArquivoMetadadoDTO(); // Título nulo
+        Projeto metadadoInvalido = new Projeto(); // Título nulo
 
         // Act & Assert
         Exception exception = assertThrows(IllegalArgumentException.class, () -> arquivoService.salvarMetadados(metadadoInvalido));
