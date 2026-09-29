@@ -15,10 +15,14 @@ public class Projeto {
     @Id
     private String id;
 
+    private String autorId;
+
     private String titulo;
     private String resumo;
     private List<String> autores;
-    private List<String> palavrasChave;
-    private String areaConhecimento;
-    private String caminhoArquivo;
+    private List<String> tecnologias;
+    private String tema;
+    private List<String> imagens;
+    private String linkRepositorio;
+    private String linkDemonstracao;
 }
