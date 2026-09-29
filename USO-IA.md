@@ -160,3 +160,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Desenvolvimento da path de criação de contas, ajustados erros de conexões e erros de importações das classes e ajuda na lógica de alguns endpoints
   Artefato: ../../backend/artigos/src/main/java/accountcreation/*
   Validação: Revisados e executados.
+
+- Data: 29/09/2026
+  Ferramenta: codex  
+  Uso: integração dos sistema, conf=iguração do JWT e corrigir erros;
+  Artefato: ../../backend/artigos/src/main/java/accountcreation/* & ../../backend/artigos/src/main/java/login/* (Ele alterar algumas linhas detro desses package, em alguns alterou 1 ou 2 linhas, mas de modo geral ele fez uma revisão nos dois package por está dando alguns erros de integrações, e configurações)
+  Validação: Revisados e executados.
