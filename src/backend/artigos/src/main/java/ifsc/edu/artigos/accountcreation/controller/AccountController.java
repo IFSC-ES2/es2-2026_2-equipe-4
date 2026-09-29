@@ -12,6 +12,8 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import ifsc.edu.artigos.accountcreation.service.UserService;
@@ -35,16 +37,15 @@ public class AccountController {
     private String path;
 
     @GetMapping("/run")
-    public final String testeRun(){
-        String statusResponse = "{\"Status\":\"Api running successfully\", \"Test\":\"My applications is runing with devoolss\"}";
-        return statusResponse;
+    public final ResponseEntity<UserSummaryResponse> testeRun(){
+        return ResponseEntity.ok(new UserSummaryResponse(200, "Serviço de contas disponível", path, null));
     }
 
     @PostMapping("/novousers")
     public final ResponseEntity<UserSummaryResponse> createAccount(@RequestBody @Valid CreateUserRequest userRequestDTO){
 
         Optional<User> createdUser = userService.createUser(userRequestDTO);
-        int statusResponse = createdUser.isPresent() ? 200 : 409;
+        int statusResponse = createdUser.isPresent() ? 201 : 409;
         String message = createdUser.isPresent()
                 ? "Usuário criado com sucesso"
                 : "O email informado já está em uso";
@@ -52,11 +53,10 @@ public class AccountController {
         UserSummaryResponse UserResponseDTO = new UserSummaryResponse(statusResponse, message, path, userId);
         return ResponseEntity
                 .status(statusResponse)
-                .header("Content-Type","application/json")
                 .body(UserResponseDTO);
     }
 
-    @PostMapping("/atualizar")
+    @PutMapping("/atualizar")
     public final ResponseEntity<UserSummaryResponse> updateUser(@RequestBody @Valid CreateUserRequest UserRequestDTO){
 
         Optional<User> updatedUser = userService.updateUser(UserRequestDTO);
@@ -69,7 +69,6 @@ public class AccountController {
 
         return ResponseEntity
                 .status(statusResponse)
-                .header("Content-Type", "application/json")
                 .body(UserResponseDTO);
     }
 

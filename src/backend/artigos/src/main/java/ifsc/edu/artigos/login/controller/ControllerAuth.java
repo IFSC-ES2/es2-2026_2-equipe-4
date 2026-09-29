@@ -24,9 +24,9 @@ public class ControllerAuth {
         this.authService = authService;
     }
 
-    @GetMapping("/")
-    public String routeForTestRunningAPIWithSimpleMessage() {
-        return "{\"Status\":\"Api running successfully\", \"Test\":\"My applications is runing with devoolss\"}";
+    @GetMapping("/status")
+    public ResponseEntity<java.util.Map<String, String>> status() {
+        return ResponseEntity.ok(java.util.Map.of("mensagem", "Serviço de autenticação disponível"));
     }
 
     @PostMapping("/login")
@@ -37,11 +37,7 @@ public class ControllerAuth {
     }
 
     @GetMapping("/token")
-    public ResponseEntity<String> routeForTestIfTokenIsvalid() {
-        String responseIfTokenIsValid = "{\"Status\":\"Token is Valid\"}";
-        return ResponseEntity
-                .status(200)
-                .header("Content-Type", "application/json")
-                .body(responseIfTokenIsValid);
+    public ResponseEntity<java.util.Map<String, String>> routeForTestIfTokenIsvalid() {
+        return ResponseEntity.ok(java.util.Map.of("mensagem", "Token válido"));
     }
 }

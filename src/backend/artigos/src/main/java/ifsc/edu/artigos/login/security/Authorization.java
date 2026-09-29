@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -40,13 +39,19 @@ public class Authorization {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/", "/index.html", "/styles.css", "/app.js", "/favicon.ico").permitAll()
-                .requestMatchers("/api/v1/auth/**", "/auth/**").permitAll()
-                .requestMatchers("/api/v1/users/createAccount/**", "/users/createAccount/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/auth/status").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                .requestMatchers(HttpMethod.GET, "/users/createAccount/*/run").permitAll()
+                .requestMatchers(HttpMethod.POST, "/users/createAccount/*/novousers").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling(exceptions -> exceptions
-                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                .authenticationEntryPoint((request, response, exception) -> {
+                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"status\":401,\"erro\":{\"mensagem\":\"Autenticação necessária ou token inválido/expirado\"},\"caminho\":\"" + request.getRequestURI() + "\"}");
+                })
             );
 
         return http.build();

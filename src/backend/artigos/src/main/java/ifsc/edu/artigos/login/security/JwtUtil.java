@@ -1,6 +1,7 @@
 package ifsc.edu.artigos.login.security;
 
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -13,21 +14,27 @@ import java.util.Date;
 @Component
 public class JwtUtil {
     
-    private final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private final long EXPIRATION_TIME = 100 * 60 * 60; // two minutes
+    private final SecretKey secretKey;
+    private final long expirationMs;
+
+    public JwtUtil(@Value("${app.jwt.secret}") String secret,
+                   @Value("${app.jwt.expiration-ms}") long expirationMs) {
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        this.expirationMs = expirationMs;
+    }
     
     public String generateToken(String email){
         return Jwts.builder()
             .setSubject(email)
             .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-            .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
+            .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
+            .signWith(secretKey, SignatureAlgorithm.HS256)
             .compact();
     }
     
     public String extractUsername(String token){
         Claims claims = Jwts.parserBuilder()
-            .setSigningKey(SECRET_KEY)
+            .setSigningKey(secretKey)
             .build()
             .parseClaimsJws(token)
             .getBody();
@@ -41,7 +48,7 @@ public class JwtUtil {
     
     private boolean isTokenExpired(String token){
         Date expiration = Jwts.parserBuilder()
-            .setSigningKey(SECRET_KEY)
+            .setSigningKey(secretKey)
             .build()
             .parseClaimsJws(token)
             .getBody()

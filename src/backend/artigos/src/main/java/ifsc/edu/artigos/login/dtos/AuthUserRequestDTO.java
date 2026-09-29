@@ -1,17 +1,17 @@
 package ifsc.edu.artigos.login.dtos;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public class AuthUserRequestDTO {
 
-    @NotNull(message = "Email is required")
-    @Email(message = "invalid email")
+    @NotBlank(message = "O e-mail é obrigatório")
+    @Email(message = "Informe um e-mail válido")
     private String email;
 
-    @NotNull(message = "The name can't be empty")
-    @Size(min = 6, max = 50, message = "The password must be between 6 and 50 characters long")
+    @NotBlank(message = "A senha é obrigatória")
+    @Size(min = 6, max = 50, message = "A senha deve ter entre 6 e 50 caracteres")
     private String password;
 
     public String getEmail() {
