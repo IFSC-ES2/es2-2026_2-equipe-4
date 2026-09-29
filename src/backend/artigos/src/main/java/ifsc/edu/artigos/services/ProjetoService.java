@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProjetoService {
@@ -62,5 +64,13 @@ public class ProjetoService {
 
         metadadoDTO.setId(null);
         return repository.save(metadadoDTO);
+    }
+
+    public List<Projeto> listarTodos(){
+        return repository.findAll();
+    }
+
+    public Optional<Projeto> buscarPorId(String id){
+        return repository.findById(id);
     }
 }

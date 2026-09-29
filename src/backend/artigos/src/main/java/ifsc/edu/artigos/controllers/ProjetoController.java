@@ -16,10 +16,10 @@ import java.util.*;
 @RequestMapping("/projetos")
 public class ProjetoController {
 
-    private final ProjetoService arquivoService;
+    private final ProjetoService projetoService;
 
     public ProjetoController(ProjetoService arquivoService) {
-        this.arquivoService = arquivoService;
+        this.projetoService = arquivoService;
     }
 
     // Rota 1: apenas o arquivo (multipart/form-data)
@@ -27,7 +27,7 @@ public class ProjetoController {
     public ResponseEntity<ProjetoRespostaDTO> uploadArquivo(
             @RequestParam("arquivo") MultipartFile arquivo) {
 
-        ProjetoRespostaDTO resposta = arquivoService.salvarArquivo(arquivo);
+        ProjetoRespostaDTO resposta = projetoService.salvarArquivo(arquivo);
         return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
     }
 
@@ -36,8 +36,18 @@ public class ProjetoController {
     public ResponseEntity<Projeto> enviarMetadados(
             @RequestBody Projeto metadadoDTO) {
 
-        Projeto salvo = arquivoService.salvarMetadados(metadadoDTO);
+        Projeto salvo = projetoService.salvarMetadados(metadadoDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Projeto> buscarPorId(@PathVariable String id){
+        return projetoService.buscarPorId(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping
+    public List<Projeto> listarTodos(){
+        return projetoService.listarTodos();
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
