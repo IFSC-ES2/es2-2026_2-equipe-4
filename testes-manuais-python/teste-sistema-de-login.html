@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Artigos IFSC – Entrar</title>
+<style>
+  :root { --bg:#f5f6f8; --card:#fff; --text:#1d232b; --muted:#5d6875; --line:#d5dae1;
+          --accent:#1f7a4d; --accent-text:#fff; --err-bg:#fdecec; --err-text:#9b1c1c;
+          --ok-bg:#e6f5ec; --ok-text:#14603a; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#14181d; --card:#1d232b; --text:#eef1f4; --muted:#9aa5b1; --line:#333c47;
+            --accent:#3fb27a; --accent-text:#0d1a13; --err-bg:#3a1c1c; --err-text:#f3b4b4;
+            --ok-bg:#163526; --ok-text:#a8e6c4; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:grid; place-items:center; padding:16px;
+         background:var(--bg); color:var(--text);
+         font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  main { width:100%; max-width:380px; background:var(--card); border:1px solid var(--line);
+         border-radius:10px; padding:24px; }
+  h1 { font-size:1.25rem; margin:0 0 16px; }
+  .tabs { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--line); }
+  .tabs button { flex:1; padding:10px; background:none; border:0; cursor:pointer; color:var(--muted);
+                 font:inherit; border-bottom:2px solid transparent; margin-bottom:-1px; }
+  .tabs button[aria-selected="true"] { color:var(--text); border-bottom-color:var(--accent); font-weight:600; }
+  label { display:block; font-size:.875rem; margin:12px 0 4px; }
+  input { width:100%; padding:10px; font:inherit; color:var(--text); background:var(--bg);
+          border:1px solid var(--line); border-radius:6px; }
+  input:focus-visible, button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .submit { width:100%; margin-top:20px; padding:11px; font:inherit; font-weight:600;
+            background:var(--accent); color:var(--accent-text); border:0; border-radius:6px; cursor:pointer; }
+  .submit:disabled { opacity:.6; cursor:wait; }
+  .msg { margin-top:16px; padding:10px 12px; border-radius:6px; font-size:.875rem; display:none; word-break:break-word; }
+  .msg.err { display:block; background:var(--err-bg); color:var(--err-text); }
+  .msg.ok  { display:block; background:var(--ok-bg);  color:var(--ok-text); }
+  .hidden { display:none; }
+  .token { font-family:ui-monospace,Menlo,monospace; font-size:.75rem; color:var(--muted); word-break:break-all; margin:8px 0 0; }
+  .logout { margin-top:16px; background:none; border:1px solid var(--line); color:var(--text);
+            padding:9px 14px; border-radius:6px; font:inherit; cursor:pointer; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Artigos IFSC</h1>
+
+  <section id="auth">
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tab-login" aria-selected="true">Entrar</button>
+      <button role="tab" id="tab-signup" aria-selected="false">Criar conta</button>
+    </div>
+
+    <form id="form-login">
+      <label for="login-email">E-mail</label>
+      <input id="login-email" type="email" autocomplete="email" required>
+      <label for="login-password">Senha</label>
+      <input id="login-password" type="password" autocomplete="current-password" required>
+      <button class="submit" type="submit">Entrar</button>
+    </form>
+
+    <form id="form-signup" class="hidden">
+      <label for="signup-nome">Nome</label>
+      <input id="signup-nome" type="text" autocomplete="name" required>
+      <label for="signup-email">E-mail</label>
+      <input id="signup-email" type="email" autocomplete="email" required>
+      <label for="signup-password">Senha</label>
+      <input id="signup-password" type="password" autocomplete="new-password" required>
+      <button class="submit" type="submit">Criar conta</button>
+    </form>
+  </section>
+
+  <section id="logged" class="hidden">
+    <p>Você está conectado.</p>
+    <p class="token" id="token-view"></p>
+    <button class="logout" id="btn-logout" type="button">Sair</button>
+  </section>
+
+  <div id="msg" class="msg" role="status"></div>
+</main>
+
+<script> //https://glowing-funicular-g46r64wrvqwpf9px6-8080.app.github.dev/
+  // ====== CONFIGURAÇÃO ======
+
+
+  // https://glowing-funicular-g46r64wrvqwpf9px6-8080.app.github.dev/api/v1/auth/
+  const API_BASE    = "https://glowing-funicular-g46r64wrvqwpf9px6-8080.app.github.dev";
+  const LOGIN_PATH  = "/api/v1/auth/login";
+  const SIGNUP_PATH = "/api/v1/users/createAccount/0.0.1/novousers";
+  // ==========================
+
+  const $ = (id) => document.getElementById(id);
+  const msg = $("msg");
+
+  function show(text, type) { msg.textContent = text; msg.className = "msg " + type; }
+  function clearMsg() { msg.className = "msg"; msg.textContent = ""; }
+
+  function selectTab(which) {
+    const login = which === "login";
+    $("form-login").classList.toggle("hidden", !login);
+    $("form-signup").classList.toggle("hidden", login);
+    $("tab-login").setAttribute("aria-selected", login);
+    $("tab-signup").setAttribute("aria-selected", !login);
+    clearMsg();
+  }
+  $("tab-login").onclick = () => selectTab("login");
+  $("tab-signup").onclick = () => selectTab("signup");
+
+  function renderState() {
+    const token = localStorage.getItem("token");
+    $("auth").classList.toggle("hidden", !!token);
+    $("logged").classList.toggle("hidden", !token);
+    $("token-view").textContent = token ? token.slice(0, 40) + "…" : "";
+  }
+
+  async function post(path, body) {
+    const res = await fetch(API_BASE + path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    let data = null;
+    try { data = await res.json(); } catch (_) {}
+    return { ok: res.ok, status: res.status, data };
+  }
+
+  function withLoading(form, fn) {
+    return async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector("button[type=submit]");
+      btn.disabled = true;
+      clearMsg();
+      try { await fn(); }
+      catch (err) { show("Não foi possível conectar à API. Verifique se ela está rodando e se o CORS está liberado.", "err"); }
+      finally { btn.disabled = false; }
+    };
+  }
+
+  $("form-login").onsubmit = withLoading($("form-login"), async () => {
+    const { ok, status, data } = await post(LOGIN_PATH, {
+      email: $("login-email").value.trim(),
+      password: $("login-password").value,
+    });
+    if (ok && data && data.token) {
+      localStorage.setItem("token", data.token);
+      renderState();
+    } else {
+      show(status === 401 || status === 403 ? "E-mail ou senha incorretos." : "Erro ao entrar (código " + status + ").", "err");
+    }
+  });
+
+  $("form-signup").onsubmit = withLoading($("form-signup"), async () => {
+    const { ok, status, data } = await post(SIGNUP_PATH, {
+      nome: $("signup-nome").value.trim(),
+      email: $("signup-email").value.trim(),
+      password: $("signup-password").value,
+    });
+    if (ok) {
+      $("login-email").value = $("signup-email").value.trim();
+      $("form-signup").reset();
+      selectTab("login");
+      show("Conta criada. Agora é só entrar.", "ok");
+    } else {
+      show((data && data.message) || "Erro ao criar conta (código " + status + ").", "err");
+    }
+  });
+
+  $("btn-logout").onclick = () => { localStorage.removeItem("token"); clearMsg(); renderState(); };
+
+  renderState();
+</script>
+</body>
+</html>

@@ -1,16 +1,21 @@
-package com.marcos.ecommerce.auth.dtos;
-
-import lombok.*;
-import jakarta.validation.constraints.*;
-
-@Data 
-@AllArgsConstructor
-@NoArgsConstructor
+package ifsc.edu.artigos.login.dtos;
 
 public class AuthUserResponseDTO {
 
     private String token;
-    public String getToken(){
+
+    public AuthUserResponseDTO() {
+    }
+
+    public AuthUserResponseDTO(String token) {
+        this.token = token;
+    }
+
+    public String getToken() {
         return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

@@ -1,12 +1,12 @@
-package com.marcos.ecommerce.auth.service;
+package ifsc.edu.artigos.login.service;
 
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.marcos.ecommerce.account.repository.UserRepository;
-import com.marcos.ecommerce.account.entity.User;
+import ifsc.edu.artigos.accountcreation.entity.User;
+import ifsc.edu.artigos.accountcreation.repository.UserRepository;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -20,9 +20,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User usuario = usuarioRepository.findByEmail(email)
             .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
-        
-        return org.springframework.security.core.userdetails.User
-            .withUsername(usuario.getEmail())
+
+        return org.springframework.security.core.userdetails.User.withUsername(usuario.getEmail())
             .password(usuario.getPassword())
             .authorities("USER")
             .build();
