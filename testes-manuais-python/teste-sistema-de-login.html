@@ -38,11 +38,27 @@
   .token { font-family:ui-monospace,Menlo,monospace; font-size:.75rem; color:var(--muted); word-break:break-all; margin:8px 0 0; }
   .logout { margin-top:16px; background:none; border:1px solid var(--line); color:var(--text);
             padding:9px 14px; border-radius:6px; font:inherit; cursor:pointer; }
+  .api-status { margin:0 0 18px; padding:10px 12px; border:1px solid var(--line); border-radius:6px; font-size:.875rem; }
+  .api-status strong { display:inline-flex; align-items:center; gap:7px; }
+  .api-status strong::before { content:""; width:9px; height:9px; border-radius:50%; background:#9b1c1c; }
+  .api-status.online strong::before { background:#1f7a4d; }
+  .api-config { display:flex; gap:6px; margin-top:8px; }
+  .api-config input { min-width:0; padding:7px; font-size:.8rem; }
+  .api-config button { padding:7px 9px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--text); cursor:pointer; }
 </style>
 </head>
 <body>
 <main>
   <h1>Artigos IFSC</h1>
+
+  <div id="api-status" class="api-status" role="status" aria-live="polite">
+    <strong id="api-status-label">Verificando API…</strong>
+    <div id="api-status-detail">A verificação é repetida a cada 10 segundos.</div>
+    <div class="api-config">
+      <input id="api-url" type="url" aria-label="Endereço base da API" placeholder="http://localhost:8080">
+      <button id="api-url-save" type="button">Usar endereço</button>
+    </div>
+  </div>
 
   <section id="auth">
     <div class="tabs" role="tablist">
@@ -78,18 +94,39 @@
   <div id="msg" class="msg" role="status"></div>
 </main>
 
-<script> //https://glowing-funicular-g46r64wrvqwpf9px6-8080.app.github.dev/
+<script>
   // ====== CONFIGURAÇÃO ======
 
 
-  // https://glowing-funicular-g46r64wrvqwpf9px6-8080.app.github.dev/api/v1/auth/
-  const API_BASE    = "https://glowing-funicular-g46r64wrvqwpf9px6-8080.app.github.dev";
-  const LOGIN_PATH  = "/api/v1/auth/login";
-  const SIGNUP_PATH = "/api/v1/users/createAccount/0.0.1/novousers";
+  const API_PREFIX  = "/api/v1";
+  const LOGIN_PATH  = API_PREFIX + "/auth/login";
+  const SIGNUP_PATH = API_PREFIX + "/users/createAccount/0.0.1/novousers";
+  const TOKEN_PATH  = API_PREFIX + "/auth/token";
+  const STATUS_PATH = API_PREFIX + "/auth/status";
+  const STATUS_INTERVAL_MS = 10000;
   // ==========================
 
   const $ = (id) => document.getElementById(id);
   const msg = $("msg");
+
+  function detectarApiBase() {
+    const informadaNaUrl = new URLSearchParams(location.search).get("api");
+    const salva = localStorage.getItem("apiBase");
+    if (informadaNaUrl) return informadaNaUrl;
+    if (salva) return salva;
+    if (location.protocol === "file:") return "http://localhost:8080";
+    if (["localhost", "127.0.0.1"].includes(location.hostname)) {
+      return location.port === "8080" ? location.origin : "http://localhost:8080";
+    }
+    // Em encaminhamentos como Codespaces, usa o mesmo host com a porta 8080.
+    const hostComPortaDaApi = location.hostname.replace(/-\d+(\.|$)/, "-8080$1");
+    return hostComPortaDaApi !== location.hostname
+      ? location.protocol + "//" + hostComPortaDaApi
+      : location.origin;
+  }
+
+  let apiBase = detectarApiBase().replace(/\/+$/, "");
+  $("api-url").value = apiBase;
 
   function show(text, type) { msg.textContent = text; msg.className = "msg " + type; }
   function clearMsg() { msg.className = "msg"; msg.textContent = ""; }
@@ -112,16 +149,49 @@
     $("token-view").textContent = token ? token.slice(0, 40) + "…" : "";
   }
 
-  async function post(path, body) {
-    const res = await fetch(API_BASE + path, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+  async function request(path, { method = "GET", body, token } = {}) {
+    const res = await fetch(apiBase + path, {
+      method,
+      headers: { ...(body ? { "Content-Type": "application/json" } : {}), ...(token ? { "Authorization": "Bearer " + token } : {}) },
+      ...(body ? { body: JSON.stringify(body) } : {}),
     });
     let data = null;
     try { data = await res.json(); } catch (_) {}
     return { ok: res.ok, status: res.status, data };
   }
+
+  async function verificarApi() {
+    const statusBox = $("api-status");
+    try {
+      const { ok, status } = await request(STATUS_PATH);
+      statusBox.classList.toggle("online", ok);
+      $("api-status-label").textContent = ok ? "API disponível" : "API respondeu com erro";
+      $("api-status-detail").textContent = ok
+        ? "Conectada em " + apiBase
+        : "Endereço: " + apiBase + " (HTTP " + status + "). Confira o endereço da API.";
+    } catch (_) {
+      statusBox.classList.remove("online");
+      $("api-status-label").textContent = "API indisponível";
+      $("api-status-detail").textContent = "Não foi possível acessar " + apiBase + ". Confira o endereço, a API e o CORS.";
+    }
+  }
+
+  $("api-url-save").onclick = () => {
+    const valor = $("api-url").value.trim();
+    try {
+      const url = new URL(valor);
+      if (!["http:", "https:"].includes(url.protocol)) throw new Error("Protocolo inválido");
+      apiBase = url.origin.replace(/\/+$/, "");
+      $("api-url").value = apiBase;
+      localStorage.setItem("apiBase", apiBase);
+      verificarApi();
+    } catch (_) {
+      show("Informe um endereço válido da API, como http://localhost:8080.", "err");
+    }
+  };
+
+  verificarApi();
+  window.setInterval(verificarApi, STATUS_INTERVAL_MS);
 
   function withLoading(form, fn) {
     return async (e) => {
@@ -136,37 +206,45 @@
   }
 
   $("form-login").onsubmit = withLoading($("form-login"), async () => {
-    const { ok, status, data } = await post(LOGIN_PATH, {
+    const { ok, status, data } = await request(LOGIN_PATH, { method: "POST", body: {
       email: $("login-email").value.trim(),
       password: $("login-password").value,
-    });
+    } });
     if (ok && data && data.token) {
       localStorage.setItem("token", data.token);
       renderState();
     } else {
-      show(status === 401 || status === 403 ? "E-mail ou senha incorretos." : "Erro ao entrar (código " + status + ").", "err");
+      show((data && data.erro && Object.values(data.erro)[0]) || (status === 401 ? "E-mail ou senha incorretos." : "Não foi possível entrar (código " + status + ")."), "err");
     }
   });
 
   $("form-signup").onsubmit = withLoading($("form-signup"), async () => {
-    const { ok, status, data } = await post(SIGNUP_PATH, {
+    const { ok, status, data } = await request(SIGNUP_PATH, { method: "POST", body: {
       nome: $("signup-nome").value.trim(),
       email: $("signup-email").value.trim(),
       password: $("signup-password").value,
-    });
+    } });
     if (ok) {
       $("login-email").value = $("signup-email").value.trim();
       $("form-signup").reset();
       selectTab("login");
       show("Conta criada. Agora é só entrar.", "ok");
     } else {
-      show((data && data.message) || "Erro ao criar conta (código " + status + ").", "err");
+      show((data && (data.message || (data.erro && Object.values(data.erro)[0]))) || (status === 409 ? "Este e-mail já está cadastrado." : "Não foi possível criar a conta (código " + status + ")."), "err");
     }
   });
 
   $("btn-logout").onclick = () => { localStorage.removeItem("token"); clearMsg(); renderState(); };
 
-  renderState();
+  const savedToken = localStorage.getItem("token");
+  if (savedToken) {
+    request(TOKEN_PATH, { token: savedToken }).then(({ ok }) => {
+      if (!ok) localStorage.removeItem("token");
+      renderState();
+    }).catch(() => renderState());
+  } else {
+    renderState();
+  }
 </script>
 </body>
 </html>
