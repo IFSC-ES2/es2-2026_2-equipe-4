@@ -43,6 +43,7 @@ public class Authorization {
                 .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                 .requestMatchers(HttpMethod.GET, "/users/createAccount/*/run").permitAll()
                 .requestMatchers(HttpMethod.POST, "/users/createAccount/*/novousers").permitAll()
+                .requestMatchers(HttpMethod.GET, "/projetos", "/projetos/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
