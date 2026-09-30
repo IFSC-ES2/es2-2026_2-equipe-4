@@ -23,7 +23,8 @@ public class UserService {
     }
 
     public Optional<User> createUser(CreateUserRequest dataForCreatingAnAccountUserRequestDTO) {
-        if (usuarioRepository.existsByEmail(dataForCreatingAnAccountUserRequestDTO.getEmail())) {
+        String email = normalizarEmail(dataForCreatingAnAccountUserRequestDTO.getEmail());
+        if (usuarioRepository.existsByEmail(email)) {
             return Optional.empty();
         }
 
@@ -31,14 +32,14 @@ public class UserService {
         String getPasswordEncode = passwordEncoder.encode(dataForCreatingAnAccountUserRequestDTO.getPassword());
 
         newUser.setNome(dataForCreatingAnAccountUserRequestDTO.getNome());
-        newUser.setEmail(dataForCreatingAnAccountUserRequestDTO.getEmail());
+        newUser.setEmail(email);
         newUser.setPassword(getPasswordEncode);
 
         return Optional.of(usuarioRepository.save(newUser));
     }
 
     public Optional<User> updateUser(CreateUserRequest dataForUpdateUserRequestDTO) {
-        return usuarioRepository.findByEmail(dataForUpdateUserRequestDTO.getEmail())
+        return usuarioRepository.findByEmail(normalizarEmail(dataForUpdateUserRequestDTO.getEmail()))
                 .map(user -> {
                     if (dataForUpdateUserRequestDTO.getNome() != null) {
                         user.setNome(dataForUpdateUserRequestDTO.getNome());
@@ -48,6 +49,10 @@ public class UserService {
                     }
                     return usuarioRepository.save(user);
                 });
+    }
+
+    private String normalizarEmail(String email) {
+        return email.trim().toLowerCase(java.util.Locale.ROOT);
     }
 
     public boolean deleteUser(String userIdByPathVariable){
