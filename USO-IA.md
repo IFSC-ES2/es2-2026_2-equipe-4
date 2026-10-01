@@ -178,3 +178,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio na implenetação da ponte (API) de Login e Cadastro.
   Artefato: Login.jsx e Cadastro.jsx
   Validação: Código revisado e adaptado.
+  
+  - Data: 01/10/2026
+  Ferramenta: Claude
+  Uso: apoio na criação da documentação da Sprint 2
+  Artefato: docs/sprints/sprint-2.md
+  Validação: revisado manualmente
