@@ -172,3 +172,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: apoio na alteração de nomes de pastas e caminhos de arquivos pelo projeto todo
   Artefato: todos arquivos que continham "artigos"
   Validação: revisado e testado com build para o projeto
+
+- Data: 01/10/2026
+  Ferramenta: ChatGPT
+  Uso: Apoio na implenetação da ponte (API) de Login e Cadastro.
+  Artefato: Login.jsx e Cadastro.jsx
+  Validação: Código revisado e adaptado.
