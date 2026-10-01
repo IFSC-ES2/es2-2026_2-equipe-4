@@ -65,13 +65,13 @@ jobs:
           cache: 'gradle'
 
       - name: Permissão de execução no Gradle Wrapper
-        run: chmod +x src/backend/artigos/gradlew
+        run: chmod +x src/backend/projetos/gradlew
 
       - name: Rodar Testes de Unidade
         env:
           SPRING_MONGODB_URI: mongodb://localhost:27017/testdb
         run: |
-          cd src/backend/artigos
+          cd src/backend/projetos
           ./gradlew test
 
 #testes frontend
@@ -111,10 +111,10 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
       - name: Permissão de execução no Gradle Wrapper
-        run: chmod +x src/backend/artigos/gradlew
+        run: chmod +x src/backend/projetos/gradlew
       - name: Buildar projeto backend
         run: |
-          cd src/backend/artigos
+          cd src/backend/projetos
           ./gradlew build -x test
 
 # Builda o frontend

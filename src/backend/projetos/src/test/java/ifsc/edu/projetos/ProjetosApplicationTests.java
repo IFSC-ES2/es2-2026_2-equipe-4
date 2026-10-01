@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @TestPropertySource(properties = {
         "spring.mongodb.uri=mongodb://localhost:27017/testdb"
 })
-class ArtigosApplicationTests {
+class ProjetosApplicationTests {
 
     @Autowired
     private ApplicationContext context;
