@@ -166,3 +166,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: integração dos sistema, conf=iguração do JWT e corrigir erros;
   Artefato: ../../backend/artigos/src/main/java/accountcreation/* & ../../backend/artigos/src/main/java/login/* (Ele alterar algumas linhas detro desses package, em alguns alterou 1 ou 2 linhas, mas de modo geral ele fez uma revisão nos dois package por está dando alguns erros de integrações, e configurações)
   Validação: Revisados e executados.
+
+- Data: 01/10/2026
+  Ferramenta: Claude
+  Uso: apoio na alteração de nomes de pastas e caminhos de arquivos pelo projeto todo
+  Artefato: todos arquivos que continham "artigos"
+  Validação: revisado e testado com build para o projeto
