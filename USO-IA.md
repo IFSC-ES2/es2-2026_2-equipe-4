@@ -173,6 +173,12 @@ Validação: Leitura e pequenas correções feitas
   Artefato: todos arquivos que continham "artigos"
   Validação: revisado e testado com build para o projeto
 
+- Data: 01/10/2026
+  Ferramenta: ChatGPT
+  Uso: Apoio na implenetação da ponte (API) de Login e Cadastro.
+  Artefato: Login.jsx e Cadastro.jsx
+  Validação: Código revisado e adaptado.
+  
   - Data: 01/10/2026
   Ferramenta: Claude
   Uso: apoio na criação da documentação da Sprint 2
