@@ -153,6 +153,7 @@ API disponível em `http://localhost:8080/api/v1`. Requer JDK 25 instalado e con
 ```bash
 cd src/frontend
 npm install
+npm install react-router-dom
 npm run dev
 ```
 
