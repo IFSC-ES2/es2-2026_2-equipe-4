@@ -28,8 +28,8 @@ services:
 
   backend:
     build:
-      context: ./src/backend/artigos
-    container_name: artigos-backend
+      context: ./src/backend/projetos
+    container_name: projetos-backend
     restart: always
     ports:
       - "8080:8080"
@@ -41,7 +41,7 @@ services:
   frontend:
     build:
       context: ./src/frontend
-    container_name: artigos-frontend
+    container_name: projetos-frontend
     restart: always
     ports:
       - "5173:5173"
