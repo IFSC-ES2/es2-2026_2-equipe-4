@@ -28,16 +28,11 @@ describe('Componente Enviar', () => {
     expect(screen.getByText('Anexe o arquivo PDF.')).toBeInTheDocument()
   })
 
-  it('Deve preencher o formulário com sucesso, enviar e exibir mensagem de confirmação', async () => {
-    //"Mock" (simulação) da API do backend
-    global.fetch = vi.fn().mockImplementation((url) => {
-      if (url.includes('/arquivos/upload')) {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({ id: 'id-falso-123' }) })
-      }
-      if (url.includes('/arquivos/metadados')) {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve({}) })
-      }
-    })
+  it('Deve exibir confirmação quando as duas chamadas simuladas têm sucesso', async () => {
+    // Testa o feedback da interface; o contrato das rotas é verificado separadamente.
+    global.fetch = vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ id: 'id-falso-123' }) })
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) })
 
     render(<Enviar />)
     const user = userEvent.setup()
