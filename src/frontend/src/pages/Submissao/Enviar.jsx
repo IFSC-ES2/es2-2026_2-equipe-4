@@ -20,6 +20,10 @@ const mensagensCamposObrigatorios = {
   tecnologias: 'Informe ao menos uma tecnologia (separada por vírgula).',
 }
 
+function separarLista(valor) {
+  return valor.split(',').map(item => item.trim()).filter(Boolean)
+}
+
 function Enviar() {
   const [formulario, setFormulario] = useState(formularioInicial)
   const [imagensSelecionadas, setImagensSelecionadas] = useState([])
@@ -76,7 +80,11 @@ function Enviar() {
     const proximosErros = {}
 
     Object.entries(mensagensCamposObrigatorios).forEach(([campo, mensagemErro]) => {
-      if (!formulario[campo].trim()) {
+      const preenchido = campo === 'autores' || campo === 'tecnologias'
+        ? separarLista(formulario[campo]).length > 0
+        : Boolean(formulario[campo].trim())
+
+      if (!preenchido) {
         proximosErros[campo] = mensagemErro
       }
     })
@@ -132,8 +140,8 @@ function Enviar() {
         titulo: formulario.titulo,
         resumo: formulario.resumo,
         tema: formulario.tema,
-        autores: formulario.autores.split(',').map(item => item.trim()).filter(Boolean),
-        tecnologias: formulario.tecnologias.split(',').map(item => item.trim()).filter(Boolean),
+        autores: separarLista(formulario.autores),
+        tecnologias: separarLista(formulario.tecnologias),
         imagens: idsImagens,
         linkRepositorio: formulario.linkRepositorio,
         linkDemonstracao: formulario.linkDemonstracao,
