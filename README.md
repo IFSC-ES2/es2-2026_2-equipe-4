@@ -129,54 +129,91 @@ Evidências da etapa: PR #46 (correção dos templates), PR #47 (lint no CI), PR
 
 ## 9. Como executar o projeto
 
-### 9.1 Banco de dados (MongoDB)
+Requisitos: Docker com Docker Compose. Para rodar sem Docker (seção 9.2) também são necessários
+o JDK 25 e o Node.js 22 ou superior.
+
+### 9.1 Tudo de uma vez (Docker)
 
 Na raiz do repositório:
 
 ```bash
-docker-compose up -d
+docker-compose up -d --build
 ```
 
-Sobe o MongoDB em `localhost:27017` (usuário `admin`, senha `admin123`).
+Sobe o MongoDB (`localhost:27017`, usuário `admin`, senha `admin123`), o back-end
+(`http://localhost:8080/api/v1`) e o front-end (`http://localhost:5173`).
 
-### 9.2 Back-end (Spring Boot)
+As imagens guardam o código da época do build: depois de alterar o código ou de dar `git pull`,
+rode o mesmo comando de novo para atualizar. Os dados do MongoDB ficam num volume e não se
+perdem ao reconstruir (só `docker-compose down -v` os apaga).
+
+### 9.2 Desenvolvimento: só o banco no Docker
+
+Para editar o código sem reconstruir imagens, suba apenas o MongoDB e rode o back-end e o
+front-end direto na máquina. Pare antes os containers `backend` e `frontend`, para que não
+ocupem as portas 8080 e 5173:
 
 ```bash
-cd src/backend/artigos
+docker-compose up -d mongodb
+docker-compose stop backend frontend
+```
+
+Back-end (Spring Boot), em outro terminal:
+
+```bash
+cd src/backend/projetos
 ./gradlew bootRun
 ```
 
-API disponível em `http://localhost:8080/api/v1`. Requer JDK 25 instalado e configurado.
+API disponível em `http://localhost:8080/api/v1`.
 
-### 9.3 Front-end (React + Vite)
+Front-end (React + Vite):
 
 ```bash
 cd src/frontend
 npm install
-npm install react-router-dom
 npm run dev
 ```
 
 Interface disponível em `http://localhost:5173`.
+
+### 9.3 Acesso à API
+
+A listagem de projetos (`GET /projetos`) é pública. A submissão de projeto exige login: crie uma
+conta em `POST /users/createAccount/0.0.1/novousers`, entre em `POST /auth/login` (devolve um
+token) e envie o token no cabeçalho `Authorization: Bearer <token>`. Os detalhes de cada rota
+estão em [rotas-login.md](src/backend/projetos/rotas-login.md).
 
 ## 10. Como rodar os testes automatizados
 
 ### Back-end
 
 ```bash
-cd src/backend/artigos
+cd src/backend/projetos
 ./gradlew test
 ```
 
+Testes de unidade do service de projetos (`ProjetoServiceTest`, com Mockito) e o teste de
+carga do contexto Spring (`ProjetosApplicationTests`). Mantenha o MongoDB no ar
+(`docker-compose up -d mongodb`), como o CI faz.
 
 ### Front-end
 
 ```bash
 cd src/frontend
-npm test
+npm test -- --run
 ```
 
-Testes do componente de submissão (`Enviar.jsx`).
+`npm test` sem argumentos fica em modo contínuo (watch); com `-- --run` os testes rodam uma vez
+e terminam, como no CI. Testes do formulário de submissão (`pages/Submissao/Enviar.test.jsx`).
+
+### O que o CI executa
+
+A cada pull request para `main` ou `entrega-*`, o GitHub Actions roda o build do back-end
+(`./gradlew build -x test`) e do front-end (`npm run build`), os testes dos dois lados e as
+verificações dos documentos (documentos obrigatórios, links internos e lint de Markdown).
+Para reproduzir o build antes do push: `./gradlew build` em `src/backend/projetos` e
+`npm ci && npm run build` em `src/frontend`.
 
 ## 11. O que funciona hoje (MVP ao final da Sprint 1)
 
