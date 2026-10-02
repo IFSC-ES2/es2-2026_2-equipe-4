@@ -6,10 +6,10 @@ Plataforma web para publicação de artigos acadêmicos com processo de revisão
  
 | Nome | Papel | Matrícula |
 |---|---|---|
-| Bernardo Vieira de Souza | Arquiteto de Software | 202510703707 |
+| Bernardo Vieira de Souza | Arquiteto de Software / Scrum Master | 202510703707 |
 | Marcos Júnior Lemes Ferreira | DevOps / Infra | 202510703657 |
 | Juliano Tavares da Silva | Engenheiro de Qualidade | 202510704909 |
-| Pedro Henrique Bernhardt Valete | DBA / Scrum Master | 202510703675 |
+| Pedro Henrique Bernhardt Valete | DBA | 202510703675 |
 | Gabriel Ferreira de Souza da Silva | Front-end Dev | 202410004990 |
 
 ## 2. Problema
@@ -127,28 +127,57 @@ Evidências da etapa: PR #46 (correção dos templates), PR #47 (lint no CI), PR
 - [`docs/sprints/sprint-1.md`](docs/sprints/sprint-1.md)
 - [ADR-0003](docs/adr/ADR-0003.md).
 
+### 8.7 Métricas por sprint
+
+- [Sprint 1](docs/sprints/sprint-1.md): primeira coleta, usada como referência para as seguintes.
+- [Sprint 2](docs/sprints/sprint-2.md): coleta ao final da Sprint 2, comparada com a Sprint 1.
+
+### 8.8 Artefatos da Entrega 6 (Sprint 2)
+
+- [`docs/sprints/sprint-2.md`](docs/sprints/sprint-2.md): planejamento, métricas e contribuições individuais da Sprint 2.
+- [Registro de riscos](docs/riscos.md): revisão da Sprint 2 na seção 4.
+
 ## 9. Como executar o projeto
 
-### 9.1 Banco de dados (MongoDB)
+Requisitos: Docker com Docker Compose. Para rodar sem Docker (seção 9.2) também são necessários
+o JDK 25 e o Node.js 22 ou superior.
+
+### 9.1 Tudo de uma vez (Docker)
 
 Na raiz do repositório:
 
 ```bash
-docker-compose up -d
+docker-compose up -d --build
 ```
 
-Sobe o MongoDB em `localhost:27017` (usuário `admin`, senha `admin123`).
+Sobe o MongoDB (`localhost:27017`, usuário `admin`, senha `admin123`), o back-end
+(`http://localhost:8080/api/v1`) e o front-end (`http://localhost:5173`).
 
-### 9.2 Back-end (Spring Boot)
+As imagens guardam o código da época do build: depois de alterar o código ou de dar `git pull`,
+rode o mesmo comando de novo para atualizar. Os dados do MongoDB ficam num volume e não se
+perdem ao reconstruir (só `docker-compose down -v` os apaga).
+
+### 9.2 Desenvolvimento: só o banco no Docker
+
+Para editar o código sem reconstruir imagens, suba apenas o MongoDB e rode o back-end e o
+front-end direto na máquina. Pare antes os containers `backend` e `frontend`, para que não
+ocupem as portas 8080 e 5173:
 
 ```bash
-cd src/backend/artigos
+docker-compose up -d mongodb
+docker-compose stop backend frontend
+```
+
+Back-end (Spring Boot), em outro terminal:
+
+```bash
+cd src/backend/projetos
 ./gradlew bootRun
 ```
 
-API disponível em `http://localhost:8080/api/v1`. Requer JDK 25 instalado e configurado.
+API disponível em `http://localhost:8080/api/v1`.
 
-### 9.3 Front-end (React + Vite)
+Front-end (React + Vite):
 
 ```bash
 cd src/frontend
@@ -158,29 +187,59 @@ npm run dev
 
 Interface disponível em `http://localhost:5173`.
 
+### 9.3 Acesso à API
+
+A listagem de projetos (`GET /projetos`) é pública. A submissão de projeto exige login: crie uma
+conta em `POST /users/createAccount/0.0.1/novousers`, entre em `POST /auth/login` (devolve um
+token) e envie o token no cabeçalho `Authorization: Bearer <token>`. Os detalhes de cada rota
+estão em [rotas-login.md](src/backend/projetos/rotas-login.md).
+
 ## 10. Como rodar os testes automatizados
 
 ### Back-end
 
 ```bash
-cd src/backend/artigos
+cd src/backend/projetos
 ./gradlew test
 ```
 
+Testes de unidade do service de projetos (`ProjetoServiceTest`, com Mockito) e o teste de
+carga do contexto Spring (`ProjetosApplicationTests`). Mantenha o MongoDB no ar
+(`docker-compose up -d mongodb`), como o CI faz.
 
 ### Front-end
 
 ```bash
 cd src/frontend
-npm test
+npm test -- --run
 ```
 
-Testes do componente de submissão (`Enviar.jsx`).
+`npm test` sem argumentos fica em modo contínuo (watch); com `-- --run` os testes rodam uma vez
+e terminam, como no CI. Testes do formulário de submissão (`pages/Submissao/Enviar.test.jsx`).
 
-## 11. O que funciona hoje (MVP ao final da Sprint 1)
+### O que o CI executa
 
-- Submissão de artigo com metadados (título, resumo, autores, palavras-chave, área do
-  conhecimento) e anexo de PDF, pelo formulário do front-end
-- Metadados e arquivo persistidos de forma real no MongoDB, o PDF fica em GridFS, e o
-  documento de metadados guarda a referência ao arquivo correspondente
-- CORS configurado, permitindo a comunicação entre front-end (`:5173`) e back-end (`:8080`)
+A cada pull request para `main` ou `entrega-*`, o GitHub Actions roda o build do back-end
+(`./gradlew build -x test`) e do front-end (`npm run build`), os testes dos dois lados e as
+verificações dos documentos (documentos obrigatórios, links internos e lint de Markdown).
+Para reproduzir o build antes do push: `./gradlew build` em `src/backend/projetos` e
+`npm ci && npm run build` em `src/frontend`.
+
+## 11. Estado atual do projeto (ao final da Sprint 2)
+
+O projeto agora é uma vitrine de projetos universitários: qualquer pessoa vê a lista de projetos e só quem tem conta publica.
+
+### O que funciona hoje
+
+- **Contas:** cadastro de usuário (senha com hash e e-mail único), atualização e exclusão de conta.
+- **Login:** `POST /auth/login` devolve um token JWT, exigido nas rotas de envio.
+- **Projetos (back-end):** submissão com título, resumo, tema, autores, tecnologias, imagens opcionais e links de repositório e demonstração, gravada no MongoDB com o autor preenchido a partir do usuário logado. É a evolução da submissão e da persistência da Sprint 1, que eram de artigos. A listagem (`GET /projetos`) e a consulta por id são públicas.
+- **Front-end (React):** páginas de Login, Cadastro e Submissão de projeto, com cabeçalho de navegação.
+- **Infraestrutura:** `docker-compose up -d --build` sobe MongoDB, back-end e front-end, e o CI roda build e testes a cada PR.
+- **Testes automatizados:** testes de unidade e de integração HTTP (login e projetos) no back-end, e testes de submissão, login e cadastro no front-end.
+
+### Ainda fora do MVP
+
+- Telas de listagem e de detalhe de projeto no front-end (a API já existe).
+- Busca de projetos.
+- Exibição das imagens: não há rota para ler uma imagem pelo id, e o limite de upload é o padrão do Spring (1 MB), sem mensagem de erro clara.

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Artigos IFSC – Entrar</title>
+<style>
+  :root { --bg:#f5f6f8; --card:#fff; --text:#1d232b; --muted:#5d6875; --line:#d5dae1;
+          --accent:#1f7a4d; --accent-text:#fff; --err-bg:#fdecec; --err-text:#9b1c1c;
+          --ok-bg:#e6f5ec; --ok-text:#14603a; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#14181d; --card:#1d232b; --text:#eef1f4; --muted:#9aa5b1; --line:#333c47;
+            --accent:#3fb27a; --accent-text:#0d1a13; --err-bg:#3a1c1c; --err-text:#f3b4b4;
+            --ok-bg:#163526; --ok-text:#a8e6c4; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:grid; place-items:center; padding:16px;
+         background:var(--bg); color:var(--text);
+         font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  main { width:100%; max-width:380px; background:var(--card); border:1px solid var(--line);
+         border-radius:10px; padding:24px; }
+  h1 { font-size:1.25rem; margin:0 0 16px; }
+  .tabs { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--line); }
+  .tabs button { flex:1; padding:10px; background:none; border:0; cursor:pointer; color:var(--muted);
+                 font:inherit; border-bottom:2px solid transparent; margin-bottom:-1px; }
+  .tabs button[aria-selected="true"] { color:var(--text); border-bottom-color:var(--accent); font-weight:600; }
+  label { display:block; font-size:.875rem; margin:12px 0 4px; }
+  input { width:100%; padding:10px; font:inherit; color:var(--text); background:var(--bg);
+          border:1px solid var(--line); border-radius:6px; }
+  input:focus-visible, button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .submit { width:100%; margin-top:20px; padding:11px; font:inherit; font-weight:600;
+            background:var(--accent); color:var(--accent-text); border:0; border-radius:6px; cursor:pointer; }
+  .submit:disabled { opacity:.6; cursor:wait; }
+  .msg { margin-top:16px; padding:10px 12px; border-radius:6px; font-size:.875rem; display:none; word-break:break-word; }
+  .msg.err { display:block; background:var(--err-bg); color:var(--err-text); }
+  .msg.ok  { display:block; background:var(--ok-bg);  color:var(--ok-text); }
+  .hidden { display:none; }
+  .token { font-family:ui-monospace,Menlo,monospace; font-size:.75rem; color:var(--muted); word-break:break-all; margin:8px 0 0; }
+  .logout { margin-top:16px; background:none; border:1px solid var(--line); color:var(--text);
+            padding:9px 14px; border-radius:6px; font:inherit; cursor:pointer; }
+  .api-status { margin:0 0 18px; padding:10px 12px; border:1px solid var(--line); border-radius:6px; font-size:.875rem; }
+  .api-status strong { display:inline-flex; align-items:center; gap:7px; }
+  .api-status strong::before { content:""; width:9px; height:9px; border-radius:50%; background:#9b1c1c; }
+  .api-status.online strong::before { background:#1f7a4d; }
+  .api-config { display:flex; gap:6px; margin-top:8px; }
+  .api-config input { min-width:0; padding:7px; font-size:.8rem; }
+  .api-config button { padding:7px 9px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--text); cursor:pointer; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Artigos IFSC</h1>
+
+  <div id="api-status" class="api-status" role="status" aria-live="polite">
+    <strong id="api-status-label">Verificando API…</strong>
+    <div id="api-status-detail">A verificação é repetida a cada 10 segundos.</div>
+    <div class="api-config">
+      <input id="api-url" type="url" aria-label="Endereço base da API" placeholder="http://localhost:8080">
+      <button id="api-url-save" type="button">Usar endereço</button>
+    </div>
+  </div>
+
+  <section id="auth">
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tab-login" aria-selected="true">Entrar</button>
+      <button role="tab" id="tab-signup" aria-selected="false">Criar conta</button>
+    </div>
+
+    <form id="form-login">
+      <label for="login-email">E-mail</label>
+      <input id="login-email" type="email" autocomplete="email" required>
+      <label for="login-password">Senha</label>
+      <input id="login-password" type="password" autocomplete="current-password" required>
+      <button class="submit" type="submit">Entrar</button>
+    </form>
+
+    <form id="form-signup" class="hidden">
+      <label for="signup-nome">Nome</label>
+      <input id="signup-nome" type="text" autocomplete="name" required>
+      <label for="signup-email">E-mail</label>
+      <input id="signup-email" type="email" autocomplete="email" required>
+      <label for="signup-password">Senha</label>
+      <input id="signup-password" type="password" autocomplete="new-password" required>
+      <button class="submit" type="submit">Criar conta</button>
+    </form>
+  </section>
+
+  <section id="logged" class="hidden">
+    <p>Você está conectado.</p>
+    <p class="token" id="token-view"></p>
+    <button class="logout" id="btn-logout" type="button">Sair</button>
+  </section>
+
+  <div id="msg" class="msg" role="status"></div>
+</main>
+
+<script>
+  // ====== CONFIGURAÇÃO ======
+
+
+  const API_PREFIX  = "/api/v1";
+  const LOGIN_PATH  = API_PREFIX + "/auth/login";
+  const SIGNUP_PATH = API_PREFIX + "/users/createAccount/0.0.1/novousers";
+  const TOKEN_PATH  = API_PREFIX + "/auth/token";
+  const STATUS_PATH = API_PREFIX + "/auth/status";
+  const STATUS_INTERVAL_MS = 10000;
+  // ==========================
+
+  const $ = (id) => document.getElementById(id);
+  const msg = $("msg");
+
+  function detectarApiBase() {
+    const informadaNaUrl = new URLSearchParams(location.search).get("api");
+    const salva = localStorage.getItem("apiBase");
+    if (informadaNaUrl) return informadaNaUrl;
+    if (salva) return salva;
+    if (location.protocol === "file:") return "http://localhost:8080";
+    if (["localhost", "127.0.0.1"].includes(location.hostname)) {
+      return location.port === "8080" ? location.origin : "http://localhost:8080";
+    }
+    // Em encaminhamentos como Codespaces, usa o mesmo host com a porta 8080.
+    const hostComPortaDaApi = location.hostname.replace(/-\d+(\.|$)/, "-8080$1");
+    return hostComPortaDaApi !== location.hostname
+      ? location.protocol + "//" + hostComPortaDaApi
+      : location.origin;
+  }
+
+  let apiBase = detectarApiBase().replace(/\/+$/, "");
+  $("api-url").value = apiBase;
+
+  function show(text, type) { msg.textContent = text; msg.className = "msg " + type; }
+  function clearMsg() { msg.className = "msg"; msg.textContent = ""; }
+
+  function selectTab(which) {
+    const login = which === "login";
+    $("form-login").classList.toggle("hidden", !login);
+    $("form-signup").classList.toggle("hidden", login);
+    $("tab-login").setAttribute("aria-selected", login);
+    $("tab-signup").setAttribute("aria-selected", !login);
+    clearMsg();
+  }
+  $("tab-login").onclick = () => selectTab("login");
+  $("tab-signup").onclick = () => selectTab("signup");
+
+  function renderState() {
+    const token = localStorage.getItem("token");
+    $("auth").classList.toggle("hidden", !!token);
+    $("logged").classList.toggle("hidden", !token);
+    $("token-view").textContent = token ? token.slice(0, 40) + "…" : "";
+  }
+
+  async function request(path, { method = "GET", body, token } = {}) {
+    const res = await fetch(apiBase + path, {
+      method,
+      headers: { ...(body ? { "Content-Type": "application/json" } : {}), ...(token ? { "Authorization": "Bearer " + token } : {}) },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    });
+    let data = null;
+    try { data = await res.json(); } catch (_) {}
+    return { ok: res.ok, status: res.status, data };
+  }
+
+  async function verificarApi() {
+    const statusBox = $("api-status");
+    try {
+      const { ok, status } = await request(STATUS_PATH);
+      statusBox.classList.toggle("online", ok);
+      $("api-status-label").textContent = ok ? "API disponível" : "API respondeu com erro";
+      $("api-status-detail").textContent = ok
+        ? "Conectada em " + apiBase
+        : "Endereço: " + apiBase + " (HTTP " + status + "). Confira o endereço da API.";
+    } catch (_) {
+      statusBox.classList.remove("online");
+      $("api-status-label").textContent = "API indisponível";
+      $("api-status-detail").textContent = "Não foi possível acessar " + apiBase + ". Confira o endereço, a API e o CORS.";
+    }
+  }
+
+  $("api-url-save").onclick = () => {
+    const valor = $("api-url").value.trim();
+    try {
+      const url = new URL(valor);
+      if (!["http:", "https:"].includes(url.protocol)) throw new Error("Protocolo inválido");
+      apiBase = url.origin.replace(/\/+$/, "");
+      $("api-url").value = apiBase;
+      localStorage.setItem("apiBase", apiBase);
+      verificarApi();
+    } catch (_) {
+      show("Informe um endereço válido da API, como http://localhost:8080.", "err");
+    }
+  };
+
+  verificarApi();
+  window.setInterval(verificarApi, STATUS_INTERVAL_MS);
+
+  function withLoading(form, fn) {
+    return async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector("button[type=submit]");
+      btn.disabled = true;
+      clearMsg();
+      try { await fn(); }
+      catch (err) { show("Não foi possível conectar à API. Verifique se ela está rodando e se o CORS está liberado.", "err"); }
+      finally { btn.disabled = false; }
+    };
+  }
+
+  $("form-login").onsubmit = withLoading($("form-login"), async () => {
+    const { ok, status, data } = await request(LOGIN_PATH, { method: "POST", body: {
+      email: $("login-email").value.trim(),
+      password: $("login-password").value,
+    } });
+    if (ok && data && data.token) {
+      localStorage.setItem("token", data.token);
+      renderState();
+    } else {
+      show((data && data.erro && Object.values(data.erro)[0]) || (status === 401 ? "E-mail ou senha incorretos." : "Não foi possível entrar (código " + status + ")."), "err");
+    }
+  });
+
+  $("form-signup").onsubmit = withLoading($("form-signup"), async () => {
+    const { ok, status, data } = await request(SIGNUP_PATH, { method: "POST", body: {
+      nome: $("signup-nome").value.trim(),
+      email: $("signup-email").value.trim(),
+      password: $("signup-password").value,
+    } });
+    if (ok) {
+      $("login-email").value = $("signup-email").value.trim();
+      $("form-signup").reset();
+      selectTab("login");
+      show("Conta criada. Agora é só entrar.", "ok");
+    } else {
+      show((data && (data.message || (data.erro && Object.values(data.erro)[0]))) || (status === 409 ? "Este e-mail já está cadastrado." : "Não foi possível criar a conta (código " + status + ")."), "err");
+    }
+  });
+
+  $("btn-logout").onclick = () => { localStorage.removeItem("token"); clearMsg(); renderState(); };
+
+  const savedToken = localStorage.getItem("token");
+  if (savedToken) {
+    request(TOKEN_PATH, { token: savedToken }).then(({ ok }) => {
+      if (!ok) localStorage.removeItem("token");
+      renderState();
+    }).catch(() => renderState());
+  } else {
+    renderState();
+  }
+</script>
+</body>
+</html>

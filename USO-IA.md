@@ -142,3 +142,53 @@ Validação: Leitura e pequenas correções feitas
   Uso: Formatação e ajuda na finalização da documentação da Sprint 1
   Artefato: sprint-1.mds
   Validação: Revisado visualmente e checado no Github
+
+- Data: 22/09/2026
+  Ferramenta: Claude
+  Uso: Apoio na criação dos Dockerfile e ajuda na correção de problemas ao longo do processo
+  Artefato: docker-compose.yml, src/backend/artigos/Dockerfile, src/frontend/Dockerfile, src/backend/artigos/.dockerignore, src/backend/artigos/build.gradle
+  Validação: Após ajuda nas correções, foi revisado e testado ao vivo a aplicação por inteira, enviando um artigo de teste
+
+- Data: 28/09/2026
+  Ferramenta: Claude
+  Uso: Desenvolvimento do script em python para realização dos testes manuais
+  Artefato: testes-manuais-python/*
+  Validação: Revisados e executados.
+  
+- Data: 28/09/2026
+  Ferramenta: copilot  
+  Uso: Desenvolvimento da path de criação de contas, ajustados erros de conexões e erros de importações das classes e ajuda na lógica de alguns endpoints
+  Artefato: ../../backend/artigos/src/main/java/accountcreation/*
+  Validação: Revisados e executados.
+  Observação: O package de cadastro foi reaproveitado de outro projeto, sendo necessario somente a correção de integração para esse projeto e alteração do banco para mango.
+
+- Data: 29/09/2026
+  Ferramenta: codex  
+  Uso: integração dos sistema, conf=iguração do JWT e corrigir erros;
+  Artefato: ../../backend/artigos/src/main/java/accountcreation/* & ../../backend/artigos/src/main/java/login/* (Ele alterar algumas linhas detro desses package, em alguns alterou 1 ou 2 linhas, mas de modo geral ele fez uma revisão nos dois package por está dando alguns erros de integrações, e configurações)
+  Validação: Revisados e executados.
+  Observação: O package de login, assim como o cadastro, foi reaproveitado de outro projeto, sendo necessario somente a correção de integração para esse projeto e alteração do banco para mango.
+
+- Data: 01/10/2026
+  Ferramenta: Claude
+  Uso: apoio na alteração de nomes de pastas e caminhos de arquivos pelo projeto todo
+  Artefato: todos arquivos que continham "artigos"
+  Validação: revisado e testado com build para o projeto
+
+- Data: 01/10/2026
+  Ferramenta: ChatGPT
+  Uso: Apoio na implenetação da ponte (API) de Login e Cadastro.
+  Artefato: Login.jsx e Cadastro.jsx
+  Validação: Código revisado e adaptado.
+  
+  - Data: 01/10/2026
+  Ferramenta: Claude
+  Uso: apoio na criação da documentação da Sprint 2
+  Artefato: docs/sprints/sprint-2.md
+  Validação: revisado manualmente
+
+ - Data: 01/10/2026
+  Ferramenta: ChatGPT
+  Uso: Auxílio na revisão, e estrutura do .md
+  Artefato: docs/metricas/M-02.md
+  Validação: revisado manualmente
