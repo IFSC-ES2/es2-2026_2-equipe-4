@@ -127,6 +127,11 @@ Evidências da etapa: PR #46 (correção dos templates), PR #47 (lint no CI), PR
 - [`docs/sprints/sprint-1.md`](docs/sprints/sprint-1.md)
 - [ADR-0003](docs/adr/ADR-0003.md).
 
+### 8.7 Métricas por sprint
+
+- [Sprint 1](docs/sprints/sprint-1.md): primeira coleta, usada como referência para as seguintes.
+- [Sprint 2](docs/sprints/sprint-2.md): coleta ao final da Sprint 2, comparada com a Sprint 1.
+
 ## 9. Como executar o projeto
 
 Requisitos: Docker com Docker Compose. Para rodar sem Docker (seção 9.2) também são necessários
