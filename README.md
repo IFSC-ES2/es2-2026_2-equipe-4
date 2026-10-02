@@ -215,10 +215,21 @@ verificações dos documentos (documentos obrigatórios, links internos e lint d
 Para reproduzir o build antes do push: `./gradlew build` em `src/backend/projetos` e
 `npm ci && npm run build` em `src/frontend`.
 
-## 11. O que funciona hoje (MVP ao final da Sprint 1)
+## 11. Estado atual do projeto (ao final da Sprint 2)
 
-- Submissão de artigo com metadados (título, resumo, autores, palavras-chave, área do
-  conhecimento) e anexo de PDF, pelo formulário do front-end
-- Metadados e arquivo persistidos de forma real no MongoDB, o PDF fica em GridFS, e o
-  documento de metadados guarda a referência ao arquivo correspondente
-- CORS configurado, permitindo a comunicação entre front-end (`:5173`) e back-end (`:8080`)
+O projeto agora é uma vitrine de projetos universitários: qualquer pessoa vê a lista de projetos e só quem tem conta publica.
+
+### O que funciona hoje
+
+- **Contas:** cadastro de usuário (senha com hash e e-mail único), atualização e exclusão de conta.
+- **Login:** `POST /auth/login` devolve um token JWT, exigido nas rotas de envio.
+- **Projetos (back-end):** submissão com título, resumo, tema, autores, tecnologias, imagens opcionais e links de repositório e demonstração, gravada no MongoDB com o autor preenchido a partir do usuário logado. É a evolução da submissão e da persistência da Sprint 1, que eram de artigos. A listagem (`GET /projetos`) e a consulta por id são públicas.
+- **Front-end (React):** páginas de Login, Cadastro e Submissão de projeto, com cabeçalho de navegação.
+- **Infraestrutura:** `docker-compose up -d --build` sobe MongoDB, back-end e front-end, e o CI roda build e testes a cada PR.
+- **Testes automatizados:** testes de unidade e de integração HTTP (login e projetos) no back-end, e testes de submissão, login e cadastro no front-end.
+
+### Ainda fora do MVP
+
+- Telas de listagem e de detalhe de projeto no front-end (a API já existe).
+- Busca de projetos.
+- Exibição das imagens: não há rota para ler uma imagem pelo id, e o limite de upload é o padrão do Spring (1 MB), sem mensagem de erro clara.
