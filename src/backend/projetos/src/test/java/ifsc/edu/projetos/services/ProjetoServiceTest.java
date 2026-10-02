@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.mock.web.MockMultipartFile;
@@ -90,10 +91,13 @@ class ProjetoServiceTest {
         // Arrange
         Projeto metadadoEntrada = new Projeto();
         metadadoEntrada.setTitulo("Artigo Teste");
+        metadadoEntrada.setId("id-enviado-pelo-cliente");
+        metadadoEntrada.setAutorId("outro-autor");
 
         Projeto metadadoSalvo = new Projeto();
         metadadoSalvo.setId("12345");
         metadadoSalvo.setTitulo("Artigo Teste");
+        metadadoSalvo.setAutorId("u1");
 
         User autor = new User();
         autor.setId("u1");
@@ -106,7 +110,11 @@ class ProjetoServiceTest {
         // Assert
         assertNotNull(resultado.getId());
         assertEquals("Artigo Teste", resultado.getTitulo());
-        verify(repository, times(1)).save(any(Projeto.class));
+        ArgumentCaptor<Projeto> projetoEnviadoAoBanco = ArgumentCaptor.forClass(Projeto.class);
+        verify(userRepository).findIdByEmail("a@a.com");
+        verify(repository).save(projetoEnviadoAoBanco.capture());
+        assertNull(projetoEnviadoAoBanco.getValue().getId());
+        assertEquals("u1", projetoEnviadoAoBanco.getValue().getAutorId());
     }
 
     @Test
@@ -119,5 +127,19 @@ class ProjetoServiceTest {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> projetoService.salvarMetadados(metadadoInvalido, "a@a.com"));
         assertEquals("Nome do arquivo é obrigatório nos metadados", exception.getMessage());
         verify(repository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Não deve salvar projeto quando o usuário do token não existe")
+    void salvarMetadadosSemUsuarioLancaExcecao() {
+        Projeto metadadoEntrada = new Projeto();
+        metadadoEntrada.setTitulo("Projeto Teste");
+        when(userRepository.findIdByEmail("ausente@exemplo.com")).thenReturn(Optional.empty());
+
+        IllegalArgumentException erro = assertThrows(IllegalArgumentException.class,
+                () -> projetoService.salvarMetadados(metadadoEntrada, "ausente@exemplo.com"));
+
+        assertEquals("Usuário autor não encontrado", erro.getMessage());
+        verify(repository, never()).save(any(Projeto.class));
     }
 }
