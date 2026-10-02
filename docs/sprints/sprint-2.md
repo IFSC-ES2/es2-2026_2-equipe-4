@@ -71,7 +71,15 @@ A preencher ao longo da sprint.
 
 ## 7. Contribuições individuais
 
-A preencher ao longo da sprint.
+Levantadas a partir dos commits e dos PRs da `entrega-6`, com dados até 01/10/2026.
+
+| Integrante | Papel (Entrega 1) | Contribuição na Sprint 2 | Evidência |
+|---|---|---|---|
+| Pedro Henrique Bernhardt Valete | DBA | Docker Compose completo; build no CI; remodelagem do banco e do back-end (projetos, autor do projeto); planejamento da Sprint 2; registro de riscos; README (execução e testes, estado atual, métricas); correção do `react-router-dom` no PR do front-end; métricas M-05 e M-08 | PRs #98, #99, #107, #108, #114, #115, #116, #118 e #119; commit no PR #109 |
+| Bernardo Vieira de Souza | Arquiteto de Software / Scrum Master | Métricas M-01 e M-04 | PR #119 |
+| Marcos Júnior Lemes Ferreira | DevOps/Infra | Cadastro de usuários; login com token JWT; métrica M-02 | PRs #102, #105 e #119 |
+| Juliano Tavares da Silva | Engenheiro de Qualidade | Testes automatizados do back-end e do front-end; métricas M-03 e M-06 | PRs #110 (commits do Juliano) e #119 |
+| Gabriel Ferreira de Souza da Silva | Front-end | Páginas de Login, Cadastro e Header e formulário de submissão de projeto; métrica M-07 | PRs #109 e #119 |
 
 ## 8. Marco da sprint
 

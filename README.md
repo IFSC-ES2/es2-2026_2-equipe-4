@@ -6,10 +6,10 @@ Plataforma web para publicação de artigos acadêmicos com processo de revisão
  
 | Nome | Papel | Matrícula |
 |---|---|---|
-| Bernardo Vieira de Souza | Arquiteto de Software | 202510703707 |
+| Bernardo Vieira de Souza | Arquiteto de Software / Scrum Master | 202510703707 |
 | Marcos Júnior Lemes Ferreira | DevOps / Infra | 202510703657 |
 | Juliano Tavares da Silva | Engenheiro de Qualidade | 202510704909 |
-| Pedro Henrique Bernhardt Valete | DBA / Scrum Master | 202510703675 |
+| Pedro Henrique Bernhardt Valete | DBA | 202510703675 |
 | Gabriel Ferreira de Souza da Silva | Front-end Dev | 202410004990 |
 
 ## 2. Problema
@@ -131,6 +131,11 @@ Evidências da etapa: PR #46 (correção dos templates), PR #47 (lint no CI), PR
 
 - [Sprint 1](docs/sprints/sprint-1.md): primeira coleta, usada como referência para as seguintes.
 - [Sprint 2](docs/sprints/sprint-2.md): coleta ao final da Sprint 2, comparada com a Sprint 1.
+
+### 8.8 Artefatos da Entrega 6 (Sprint 2)
+
+- [`docs/sprints/sprint-2.md`](docs/sprints/sprint-2.md): planejamento, métricas e contribuições individuais da Sprint 2.
+- [Registro de riscos](docs/riscos.md): revisão da Sprint 2 na seção 4.
 
 ## 9. Como executar o projeto
 
