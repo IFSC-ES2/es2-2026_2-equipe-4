@@ -1,0 +1,16 @@
+allprojects {
+    afterEvaluate {
+        if (plugins.hasPlugin('java')) {
+            apply plugin: 'jacoco'
+            jacoco { toolVersion = '0.8.14' }
+            tasks.named('jacocoTestReport') {
+                dependsOn tasks.named('test')
+                reports {
+                    xml.required = true
+                    csv.required = true
+                    html.required = true
+                }
+            }
+        }
+    }
+}
