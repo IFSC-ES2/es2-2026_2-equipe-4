@@ -90,3 +90,31 @@ A equipe pretende realizar o acompanhamento dos riscos por meio das seguintes a�
 - **Comunicação contínua entre os membros da equipe:** a cada novo desafio ou feature a ser implementada, os membros devem se comunicar para garantir o entendimento e o alinhamento entre as diferentes partes do projeto.
 - **Atualização deste documento (`docs/riscos.md`):** realizar alterações sempre que houver alguma mudança relevante, mantendo o histórico das decisões tomadas em relação a cada risco.
 - **Distribuição do conhecimento:** evitar que qualquer parte do projeto, mesmo que pequena, como uma única rota da API, fique sob responsabilidade exclusiva de um único integrante. O objetivo é garantir que, na ausência de um membro, pelo menos dois integrantes tenham conhecimento suficiente para desenvolver e dar manutenção em cada componente do projeto.
+
+## 4. Revisão dos riscos na Sprint 2 (01/10/2026)
+
+### 4.1 Riscos da entrega 4
+
+| ID | Status | Prioridade | Evidência | Ação na Sprint 3 |
+|----|--------|:---:|-----------|------------------|
+| R01 | Concretizado | Alta | Mudança de tema em 23/09, a oito dias do prazo (6 itens adicionados, M-08 = 50%; retrabalho M-05 ≈ 43%). O README e o `docs/inception.md` ainda descrevem artigos. | Fechar o escopo do MVP no início da sprint e atualizar README e inception. |
+| R02 | Concretizado | Alta | Escopo funcional definido só depois da baseline; em 01/10, 7 das 18 issues do milestone estavam fechadas. | Estimar os itens em conjunto antes de começar, com margem, incluindo os entregáveis da etapa. |
+| R03 | Ativo | Média | Sem ocorrência. Conhecimento concentrado (JWT feito por uma pessoa) e sub-issues #91 a #95 sem responsável. | Atribuir responsáveis e fazer revisão cruzada dos PRs. |
+| R04 | Concretizado | Média | Erro do `spring.mongodb.uri` (Sprint 1) e correções na integração de Spring Security e JWT (PR #105). | Registrar a decisão de autenticação em ADR e revisar em dupla as tecnologias novas. |
+| R05 | Ativo (mitigado em parte) | Alta | O CI com build e testes (PR #99) já pegou um erro real. Faltam testes de cadastro e login (#86 aberta). | Concluir a #86, com teste de integração de login e envio de projeto (sucesso e 401). |
+| R06 | Ativo (reformulado) | Média (era Baixa) | Os arquivos agora são imagens: sem limite de upload (padrão de 1 MB), sem rota de leitura e sem backup. | Configurar o limite com tratamento de erro, criar a rota de leitura e definir um backup. |
+| R07 | Mitigado | Baixa | Problemas do Docker Compose (porta, jar, `.dockerignore`) corrigidos no PR #98. O CI não constrói as imagens. | Avaliar um job de CI de imagens, se o deploy exigir. |
+
+### 4.2 Riscos novos
+
+| ID | Risco | Probabilidade / Impacto | Prioridade | Mitigação | Responsável |
+|----|-------|:---:|:---:|-----------|-------------|
+| R08 | **Credenciais no repositório:** senha do MongoDB (`admin123`) no compose, no `application.properties`, no README e em scripts, e segredo do JWT com valor padrão fixo. O repositório é público. | Alta / Médio | Alta | Concluir a #100 (`.env` e GitHub Secrets), trocar a senha e exigir o `JWT_SECRET` por variável de ambiente. | A definir |
+| R09 | **Divergência de contrato entre front-end e back-end:** o modelo e as rotas do projeto mudaram sem contrato escrito; entre os PRs #107 e #109 o formulário ficou incompatível com a API. | Média / Médio | Média | Documentar o contrato (campos, rotas e erros) e avisar o front-end a cada mudança de modelo. | A definir |
+| R10 | **Padrões de projeto OO sem issue:** o enunciado da entrega 6 prevê padrões justificados e nenhuma issue do milestone os cobre. | Alta / Alto | Alta | Abrir a issue, escolher os padrões a partir de problemas reais do código e documentar com ADR. | A definir |
+| R11 | **Vulnerabilidade em dependência:** o `npm audit` acusa 1 alta em `brace-expansion` (só ferramentas de desenvolvimento). | Baixa / Baixo | Baixa | `npm audit fix` em issue pequena, com build e testes antes do merge. | A definir |
+
+### 4.3 Riscos críticos agora
+
+- **Alta:** R01, R02, R05, R08 e R10. **Média:** R03, R04, R06 e R09. **Baixa:** R07 e R11.
+- A causa comum dos riscos altos é a mudança de escopo perto do prazo. Próxima revisão: ao final da Sprint 3.
