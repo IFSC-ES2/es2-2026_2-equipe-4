@@ -160,12 +160,14 @@ Validação: Leitura e pequenas correções feitas
   Uso: Desenvolvimento da path de criação de contas, ajustados erros de conexões e erros de importações das classes e ajuda na lógica de alguns endpoints
   Artefato: ../../backend/artigos/src/main/java/accountcreation/*
   Validação: Revisados e executados.
+  Observação: O package de cadastro foi reaproveitado de outro projeto, sendo necessario somente a correção de integração para esse projeto e alteração do banco para mango.
 
 - Data: 29/09/2026
   Ferramenta: codex  
   Uso: integração dos sistema, conf=iguração do JWT e corrigir erros;
   Artefato: ../../backend/artigos/src/main/java/accountcreation/* & ../../backend/artigos/src/main/java/login/* (Ele alterar algumas linhas detro desses package, em alguns alterou 1 ou 2 linhas, mas de modo geral ele fez uma revisão nos dois package por está dando alguns erros de integrações, e configurações)
   Validação: Revisados e executados.
+  Observação: O package de login, assim como o cadastro, foi reaproveitado de outro projeto, sendo necessario somente a correção de integração para esse projeto e alteração do banco para mango.
 
 - Data: 01/10/2026
   Ferramenta: Claude
@@ -183,4 +185,10 @@ Validação: Leitura e pequenas correções feitas
   Ferramenta: Claude
   Uso: apoio na criação da documentação da Sprint 2
   Artefato: docs/sprints/sprint-2.md
+  Validação: revisado manualmente
+
+ - Data: 01/10/2026
+  Ferramenta: ChatGPT
+  Uso: Auxílio na revisão, e estrutura do .md
+  Artefato: docs/metricas/M-02.md
   Validação: revisado manualmente
