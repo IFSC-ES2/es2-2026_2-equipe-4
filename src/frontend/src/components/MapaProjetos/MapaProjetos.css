@@ -1,0 +1,54 @@
+.mapa-container {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.mapa-texto-instrucao {
+  font-size: 14px;
+  color: #526574;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.mapa-svg {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
+}
+
+.grupo-tema {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.grupo-tema:hover rect {
+  stroke: #111;
+  stroke-width: 2;
+  opacity: 1 !important;
+}
+
+.dot-projeto {
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: crosshair;
+}
+
+.dot-projeto:hover {
+  stroke-width: 2.5;
+}
+
+.mapa-tooltip {
+  position: absolute;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transform: translate(-50%, -120%);
+  transition: opacity 0.2s ease;
+}
