@@ -192,3 +192,12 @@ Validação: Leitura e pequenas correções feitas
   Uso: Auxílio na revisão, e estrutura do .md
   Artefato: docs/metricas/M-02.md
   Validação: revisado manualmente
+
+ - Data: 19/10/2026
+  Ferramenta: copilot 
+  Uso: Documentação e injeção de projetos
+  Artefato: src/backend/docs/rotas-publicas-de-listagem-de-projetos.md  
+  docker-compose.yml (esperar o container iniciar)
+  src/backend/projeto/src/test/java/ifsc/edu/projetos/listagens/* - Elaboração total
+  src/backend/projeto/src/main/java/ifsc/edu/projetos/listagens/* - Ajuda na lógica e desenvolvimento
+  Validação: revisado manualmente
