@@ -6,16 +6,17 @@
 }
 
 .mapa-texto-instrucao {
-  font-size: 14px;
-  color: #526574;
+  font-size: 13px;
+  color: #64748b;
   margin-bottom: 16px;
   line-height: 1.5;
+  font-weight: 500;
 }
 
 .mapa-svg {
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.03));
 }
 
 .grupo-tema {
@@ -24,8 +25,8 @@
 }
 
 .grupo-tema:hover rect {
-  stroke: #111;
-  stroke-width: 2;
+  stroke: #0f172a;
+  stroke-width: 1.5;
   opacity: 1 !important;
 }
 
@@ -35,20 +36,23 @@
 }
 
 .dot-projeto:hover {
-  stroke-width: 2.5;
+  stroke-width: 2;
+  stroke: #0f172a;
 }
 
 .mapa-tooltip {
   position: absolute;
-  background: #0f172a;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(4px);
   color: #ffffff;
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-radius: 6px;
   font-size: 13px;
   pointer-events: none;
   white-space: nowrap;
   z-index: 10;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
   transform: translate(-50%, -120%);
   transition: opacity 0.2s ease;
+  border: 1px solid rgba(255,255,255,0.1);
 }

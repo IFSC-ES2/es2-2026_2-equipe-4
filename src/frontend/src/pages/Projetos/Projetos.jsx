@@ -13,11 +13,11 @@ function Projetos() {
   useEffect(() => {
     async function buscarProjetos() {
       try {
-        const resposta = await fetch(`${API_BASE_URL}/api/v1/projetos`);
+        const resposta = await fetch(`${API_BASE_URL}/api/v1/projetos?size=100`);
         if (!resposta.ok) throw new Error('Não foi possível carregar os projetos.');
         
         const dados = await resposta.json();
-        setProjetos(dados);
+        setProjetos(dados.content || []); 
       } catch (err) {
         setErro('Ainda não existem projetos cadastrados ou a API está indisponível.');
       } finally {
@@ -39,7 +39,6 @@ function Projetos() {
         <p style={{ color: '#475569' }}>Filtre pelas áreas de interesse e explore o código.</p>
       </div>
 
-      {/* Exibe o Mapa Interativo se houver projetos, ou o Card de "Vitrine em construção" caso contrário */}
       {!carregando && !erro && (
         <div style={{ marginBottom: '48px' }}>
           {projetos.length > 0 ? (
@@ -61,14 +60,12 @@ function Projetos() {
               <div style={{ fontSize: '40px', marginBottom: '16px' }}>🗺️</div>
               <h3 style={{ color: '#475569', margin: '0 0 8px 0', fontSize: '20px' }}>Vitrine em construção</h3>
               <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5', color: '#64748b' }}>
-                O mapa interativo aparecerá aqui assim que os primeiros projetos forem submetidos no banco de dados.
               </p>
             </div>
           )}
         </div>
       )}
       
-      {/* Botões de Filtro */}
       <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '48px' }}>
         {temas.map((tema) => {
           const isAtivo = temaSelecionado === tema;
@@ -89,7 +86,6 @@ function Projetos() {
       {carregando && <p style={{ textAlign: 'center', color: '#475569' }}>A procurar projetos...</p>}
       {erro && <p style={{ textAlign: 'center', color: '#ef4444' }}>{erro}</p>}
 
-      {/* Grelha de Cartões */}
       {!carregando && !erro && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
           {projetosFiltrados.length === 0 ? (

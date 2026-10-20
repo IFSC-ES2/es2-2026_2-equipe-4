@@ -16,10 +16,10 @@ function Login() {
   useEffect(() => {
     async function carregarProjetosParaMapa() {
       try {
-        const resposta = await fetch(`${API_BASE_URL}/api/v1/projetos`);
+        const resposta = await fetch(`${API_BASE_URL}/api/v1/projetos?size=100`);
         if (resposta.ok) {
           const dados = await resposta.json();
-          setProjetosMapa(dados);
+          setProjetosMapa(dados.content || []);
         }
       } catch (e) {
         console.log("A API ainda não está ligada para carregar o mapa.");
@@ -41,7 +41,6 @@ function Login() {
       });
 
       if (!resposta.ok) {
-        // Se a resposta for 401 ou 404, tratamos como conta inexistente ou credenciais erradas
         if (resposta.status === 401 || resposta.status === 404) {
           throw new Error('Esta conta não existe ou a senha está incorreta.');
         }
@@ -69,7 +68,6 @@ function Login() {
   return (
     <main className="container-auth-split pagina-animada">
       
-      {/* Esquerda: O Cartão Compacto Estilo Amazon */}
       <div className="cartao-auth">
         <h1>Fazer login</h1>
         
@@ -115,7 +113,6 @@ function Login() {
             <div style={{ fontSize: '40px', marginBottom: '16px' }}>🗺️</div>
             <h3 style={{ color: '#475569', margin: '0 0 8px 0' }}>Vitrine em construção</h3>
             <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>
-              O mapa interativo aparecerá aqui assim que os primeiros projetos forem submetidos no banco de dados.
             </p>
           </div>
         )}

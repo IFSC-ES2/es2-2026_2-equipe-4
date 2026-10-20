@@ -201,3 +201,9 @@ Validação: Leitura e pequenas correções feitas
   src/backend/projeto/src/test/java/ifsc/edu/projetos/listagens/* - Elaboração total
   src/backend/projeto/src/main/java/ifsc/edu/projetos/listagens/* - Ajuda na lógica e desenvolvimento
   Validação: revisado manualmente
+
+  - Data: 20/10/2026
+  Ferramenta: ChatGPT
+  Uso: Auxilio na implementação da Vitrine de Projetos
+  Artefato: src/frontend/components/MapaProjetos/MapaProjetos.jsx
+  Validação: revisado manualmente e adaptado.

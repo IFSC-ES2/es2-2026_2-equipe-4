@@ -1,9 +1,10 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './Header.css';
 
 function Header() {
   const navigate = useNavigate();
+  const location = useLocation(); // Força a re-renderização do Header a cada mudança de rota
   const token = localStorage.getItem('token');
   const estaLogado = !!token;
 
@@ -19,21 +20,21 @@ function Header() {
         <nav className="header-nav">
           <Link to="/" className="header-link">Sobre</Link>
           <Link to="/projetos" className="header-link">Projetos</Link>
+          <Link to="/submissao" className="header-link">Submissão</Link>
           
-          {/* Não aparecer Cadastrar quando logado */}
-          {!estaLogado && (
+          {!estaLogado ? (
             <>
               <Link to="/login" className="header-link">Login</Link>
-              <Link to="/cadastro" className="header-link">Cadastro</Link>
+              <Link to="/cadastro" className="header-botao">Cadastro</Link>
             </>
-          )}
-
-          {/* Não aparecer Nova Submissão quando deslogado */}
-          {estaLogado && (
-            <>
-              <Link to="/submissao" className="header-botao">Nova Submissão</Link>
-              <button onClick={terminarSessao} className="header-link" style={{background:'transparent', border:'none', cursor:'pointer'}}>Sair</button>
-            </>
+          ) : (
+            <button 
+              onClick={terminarSessao} 
+              className="header-botao" 
+              style={{ cursor: 'pointer', background: '#ef4444' }}
+            >
+              Sair
+            </button>
           )}
         </nav>
       </div>
