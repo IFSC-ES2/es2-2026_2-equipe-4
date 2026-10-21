@@ -138,18 +138,18 @@ As principais ressalvas são o pequeno atraso na integração final, dois riscos
 - Manter a proteção da `main` e o ruleset de `entrega-*` nas próximas sprints, expandindo o CI para build, testes e verificações do produto quando houver código funcional.
 - Registrar evidências de revisão dos riscos nas próximas retrospectivas, indicando mudanças de probabilidade, impacto, prioridade ou ações realizadas.
 
-## Observações Sobre Uso de IA
-
-O `USO-IA.md` declara uso de IA na Entrega 4 para organização de tabelas em `docs/riscos.md`, apoio na seleção de regras do markdownlint e construção do job de lint em `ci.yml`, apoio na definição dos critérios de qualidade e apoio na estrutura do documento de fluxo de trabalho.
-
-A declaração é compatível com os artefatos entregues e com o histórico observado: os documentos da etapa são fortemente estruturados em Markdown, o CI recebeu job de lint e existe configuração específica em `.markdownlint.jsonc`. O registro também descreve validação humana, com conferência manual e testes locais do linter. Não foram observadas evidências incompatíveis com o uso declarado.
-
 ## Nota da Entrega
 
-- Nota: 4,4 / 5,0
+Nota: 4,4 / 5,0
 
 ## Justificativa da Nota
 
 A entrega atende muito bem à maior parte dos critérios da etapa. Os artefatos obrigatórios foram produzidos, o MVP está coerente, os riscos e critérios de qualidade foram documentados, o fluxo de trabalho foi formalizado, o CI mínimo está ativo, os checks passaram, houve aprovação formal em PR e há enforcement verificável tanto na `main` quanto nas branches `entrega-*`.
 
 A nota não é máxima devido ao atraso pequeno da integração final, aos placeholders de responsáveis em dois riscos, à inconsistência na priorização dos riscos críticos, ao título ambíguo do risco R05 e a lacunas de rastreabilidade no README e no PR final. Ainda assim, a equipe demonstra maturidade processual acima da média nesta entrega, especialmente pela configuração efetiva de proteção e checks obrigatórios.
+
+## Observações sobre Uso de IA
+
+O `USO-IA.md` declara uso de IA na Entrega 4 para organização de tabelas em `docs/riscos.md`, apoio na seleção de regras do markdownlint e construção do job de lint em `ci.yml`, apoio na definição dos critérios de qualidade e apoio na estrutura do documento de fluxo de trabalho.
+
+A declaração é compatível com os artefatos entregues e com o histórico observado: os documentos da etapa são fortemente estruturados em Markdown, o CI recebeu job de lint e existe configuração específica em `.markdownlint.jsonc`. O registro também descreve validação humana, com conferência manual e testes locais do linter. Não foram observadas evidências incompatíveis com o uso declarado.
