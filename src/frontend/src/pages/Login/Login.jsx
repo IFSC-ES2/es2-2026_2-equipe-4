@@ -22,7 +22,7 @@ function Login() {
           setProjetosMapa(dados.content || []);
         }
       } catch (e) {
-        console.log("A API ainda não está ligada para carregar o mapa.");
+        console.log("Erro de conexão: Sistema fora do ar!");
       }
     }
     carregarProjetosParaMapa();
@@ -46,7 +46,7 @@ function Login() {
         }
         
         const erroJson = await resposta.json().catch(() => ({}));
-        throw new Error(erroJson.erro?.mensagem || 'Erro ao realizar login.');
+        throw new Error(erroJson.erro?.mensagem || 'Erro ao realizar login. Tente novamente!');
       }
 
       const dados = await resposta.json();
@@ -56,7 +56,7 @@ function Login() {
 
     } catch (erro) {
       const mensagemErro = erro.message.includes('Failed to fetch') 
-        ? 'Erro de conexão: A API parece estar fora do ar.' 
+        ? 'Erro de conexão: Sistema fora do ar!' 
         : erro.message;
         
       setStatus({ tipo: 'erro', mensagem: mensagemErro });

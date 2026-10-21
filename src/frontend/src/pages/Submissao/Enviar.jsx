@@ -36,7 +36,6 @@ function Enviar() {
   const navigate = useNavigate()
   const API_BASE_URL = 'http://localhost:8080'
 
-  // Proteção de Rota: Se não houver token ativo, redireciona imediatamente para o Login
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (!token) {
@@ -181,7 +180,7 @@ function Enviar() {
 
     } catch (erro) {
       if (erro.message.includes('Failed to fetch')) {
-        setMensagem('Erro de conexão: A API parece estar fora do ar ou o endpoint não existe.')
+        setMensagem('Erro de conexão: Sistema fora do ar!')
       } else {
         setMensagem(`Atenção: ${erro.message}`)
       }

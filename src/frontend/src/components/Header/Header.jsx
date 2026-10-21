@@ -4,7 +4,7 @@ import './Header.css';
 
 function Header() {
   const navigate = useNavigate();
-  const location = useLocation(); // Força a re-renderização do Header a cada mudança de rota
+  const location = useLocation();
   const token = localStorage.getItem('token');
   const estaLogado = !!token;
 
