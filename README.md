@@ -92,6 +92,8 @@ As principais decisões técnicas e arquiteturais do projeto são registradas in
 - [ADR-0002 — Stack Tecnológica do Projeto](docs/adr/ADR-0002.md)
 - [ADR-0003 — Front-end para React](docs/adr/ADR-0003.md)
 
+A [arquitetura real do MVP](docs/ARQUITETURA.md) descreve os componentes e inclui os diagramas de contexto e de contêineres.
+
 ### 8.4 Artefatos da Entrega 3
 
 Os documentos produzidos para a entrega 3 estão organizados nos seguintes arquivos:
