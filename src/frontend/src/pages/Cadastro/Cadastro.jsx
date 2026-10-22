@@ -28,7 +28,13 @@ function Cadastro() {
       }
 
       setStatus({ tipo: 'sucesso', mensagem: 'Conta criada! A redirecionar...' });
+
+      setNome('');
+      setEmail('');
+      setSenha('');
+     
       setTimeout(() => navigate('/login'), 1500);
+
     } catch (erro) {
       setStatus({ tipo: 'erro', mensagem: erro.message.includes('Failed to fetch') ? 'Erro de conexão. Tente novamente!' : erro.message });
     } finally {
