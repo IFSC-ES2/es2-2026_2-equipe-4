@@ -66,7 +66,6 @@ describe('Cadastro', () => {
     await usuario.click(
       screen.getByRole('button', { name: /continuar/i })
     )
-.
     expect(
       await screen.findByText('E-mail já cadastrado.')
     ).toBeInTheDocument()

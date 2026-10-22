@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 import Enviar from './Enviar'
@@ -23,7 +24,11 @@ describe('Submissão de projeto', () => {
   it('mostra os campos obrigatórios e não envia o formulário vazio', async () => {
     const fetchApi = vi.fn()
     vi.stubGlobal('fetch', fetchApi)
-    render(<Enviar />)
+    render(
+      <MemoryRouter>
+        <Enviar />
+      </MemoryRouter>
+    )
 
     await userEvent.setup().click(screen.getByRole('button', { name: /enviar projeto/i }))
 
@@ -38,7 +43,11 @@ describe('Submissão de projeto', () => {
   it('rejeita listas de autores e tecnologias sem nenhum nome', async () => {
     const fetchApi = vi.fn()
     vi.stubGlobal('fetch', fetchApi)
-    render(<Enviar />)
+    render(
+      <MemoryRouter>
+        <Enviar />
+      </MemoryRouter>
+    )
     const usuario = userEvent.setup()
 
     await preencherFormulario(usuario)
@@ -56,7 +65,11 @@ describe('Submissão de projeto', () => {
   it('exige login antes de chamar a API', async () => {
     const fetchApi = vi.fn()
     vi.stubGlobal('fetch', fetchApi)
-    render(<Enviar />)
+    render(
+      <MemoryRouter>
+        <Enviar />
+      </MemoryRouter>
+    )
     const usuario = userEvent.setup()
 
     await preencherFormulario(usuario)
@@ -72,7 +85,11 @@ describe('Submissão de projeto', () => {
       .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'id-img-123' }) })
       .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'id-projeto-123' }) })
     vi.stubGlobal('fetch', fetchApi)
-    render(<Enviar />)
+    render(
+      <MemoryRouter>
+        <Enviar />
+      </MemoryRouter>
+    )
     const usuario = userEvent.setup()
     const imagem = new File(['imagem'], 'capa.png', { type: 'image/png' })
 
@@ -121,7 +138,11 @@ describe('Submissão de projeto', () => {
       json: async () => ({ erro: { mensagem: 'Imagem inválida' } }),
     })
     vi.stubGlobal('fetch', fetchApi)
-    render(<Enviar />)
+    render(
+      <MemoryRouter>
+        <Enviar />
+      </MemoryRouter>
+    )
     const usuario = userEvent.setup()
 
     await preencherFormulario(usuario)
@@ -142,7 +163,11 @@ describe('Submissão de projeto', () => {
       json: async () => ({ erro: 'Dados inválidos' }),
     })
     vi.stubGlobal('fetch', fetchApi)
-    render(<Enviar />)
+    render(
+      <MemoryRouter>
+        <Enviar />
+      </MemoryRouter>
+    )
     const usuario = userEvent.setup()
 
     await preencherFormulario(usuario)
@@ -159,13 +184,17 @@ describe('Submissão de projeto', () => {
     localStorage.setItem('token', 'token-teste')
     const fetchApi = vi.fn().mockRejectedValue(new TypeError('Failed to fetch'))
     vi.stubGlobal('fetch', fetchApi)
-    render(<Enviar />)
+    render(
+      <MemoryRouter>
+        <Enviar />
+      </MemoryRouter>
+    )
     const usuario = userEvent.setup()
 
     await preencherFormulario(usuario)
     await usuario.click(screen.getByRole('button', { name: /enviar projeto/i }))
 
-    expect(await screen.findByText('Erro de conexão: A API parece estar fora do ar ou o endpoint não existe.')).toBeInTheDocument()
+    expect(await screen.findByText('Erro de conexão: Sistema fora do ar!')).toBeInTheDocument()
     await waitFor(() => expect(screen.getByRole('button', { name: /enviar projeto/i })).toBeEnabled())
   })
 })
