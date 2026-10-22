@@ -192,3 +192,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Auxílio na revisão, e estrutura do .md
   Artefato: docs/metricas/M-02.md
   Validação: revisado manualmente
+
+  - Data: 22/10/2026
+  Ferramenta: Claude
+  Uso: Apoio no planejamento da Sprint 3
+  Artefato: docs/sprints/sprint-3.md
+  Validação: Validado visualmente e de acordo com o backlog
