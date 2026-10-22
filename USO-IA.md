@@ -198,3 +198,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio no planejamento da Sprint 3
   Artefato: docs/sprints/sprint-3.md
   Validação: Validado visualmente e de acordo com o backlog
+
+- Data: 22/10/2026
+  Ferramenta: Codex (OpenAI)
+  Uso: Apoio na revisão dos ADRs existentes e redação das decisões sobre projetos e JWT.
+  Artefatos: docs/adr/ADR-0001.md a ADR-0005.md e links do README.md.
+  Validação: Confronto com código, configuração e histórico da entrega-7; verificação de links internos e `git diff --check`.
