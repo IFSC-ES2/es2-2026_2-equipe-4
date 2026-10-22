@@ -18,12 +18,15 @@ async function preencherCadastro(usuario) {
 describe('Cadastro', () => {
   it('envia os dados para a rota de criação e limpa os campos após sucesso', async () => {
     const fetchApi = vi.fn().mockResolvedValue({ ok: true })
+
     vi.stubGlobal('fetch', fetchApi)
+
     render(
       <MemoryRouter>
         <Cadastro />
       </MemoryRouter>
     )
+
     const usuario = userEvent.setup()
 
     await preencherCadastro(usuario)
@@ -43,11 +46,7 @@ describe('Cadastro', () => {
     expect(screen.getByLabelText(/senha/i)).toHaveValue('')
   })
 
-
-
-
   it('avisa quando o e-mail já está cadastrado e preserva os dados', async () => {
-    // Preparar: simular a resposta da API.
     const fetchApi = vi.fn().mockResolvedValue({
       ok: false,
       status: 409,
@@ -63,13 +62,11 @@ describe('Cadastro', () => {
 
     const usuario = userEvent.setup()
 
-    // Agir: preencher e enviar o formulário.
     await preencherCadastro(usuario)
     await usuario.click(
       screen.getByRole('button', { name: /continuar/i })
     )
-
-    // Conferir: mostrar o erro e permitir corrigir os dados.
+.
     expect(
       await screen.findByText('E-mail já cadastrado.')
     ).toBeInTheDocument()
@@ -82,8 +79,6 @@ describe('Cadastro', () => {
       screen.getByRole('button', { name: /continuar/i })
     ).toBeEnabled()
   })
-
-
 
   it('mostra erro de validação retornado pela API', async () => {
     const fetchApi = vi.fn().mockResolvedValue({
