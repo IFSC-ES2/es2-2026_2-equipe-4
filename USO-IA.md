@@ -198,3 +198,10 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio no planejamento da Sprint 3
   Artefato: docs/sprints/sprint-3.md
   Validação: Validado visualmente e de acordo com o backlog
+
+
+- Data: 22/10/2026
+  Ferramenta: Codex
+  Uso: Apoio na separação do armazenamento de arquivos, testes e medição da issue #131.
+  Artefatos: ProjetoService.java, ArmazenamentoArquivoService.java, testes de serviços e upload, scripts/medir_armazenamento.py e docs/REENGENHARIA.md.
+  Validação: 13 testes passaram antes e 21 depois, com JDK 25.0.2 e Gradle 9.7.1. Medição executada nas duas versões. Testes com banco real não executados; revisão da equipe pendente.
