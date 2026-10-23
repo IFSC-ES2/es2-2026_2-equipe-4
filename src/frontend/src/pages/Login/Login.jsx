@@ -1,13 +1,32 @@
-import React, { useState } from 'react';
-import '../Submissao/Enviar.css';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import MapaProjetos from '../../components/MapaProjetos/MapaProjetos';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [carregando, setCarregando] = useState(false);
   const [status, setStatus] = useState({ tipo: '', mensagem: '' });
-
+  const [projetosMapa, setProjetosMapa] = useState([]);
+  const [temaLogin, setTemaLogin] = useState('Todos'); 
+  
+  const navigate = useNavigate();
   const API_BASE_URL = 'http://localhost:8080';
+
+  useEffect(() => {
+    async function carregarProjetosParaMapa() {
+      try {
+        const resposta = await fetch(`${API_BASE_URL}/api/v1/projetos?size=100`);
+        if (resposta.ok) {
+          const dados = await resposta.json();
+          setProjetosMapa(dados.content || []);
+        }
+      } catch (e) {
+        console.log("Erro de conexão: Sistema fora do ar!");
+      }
+    }
+    carregarProjetosParaMapa();
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -17,85 +36,88 @@ function Login() {
     try {
       const resposta = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: email, password: senha }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: senha }),
       });
 
       if (!resposta.ok) {
-        const erroJson = await resposta.json().catch(() => ({}));
-        let msgErro = 'Erro ao realizar login.';
-
-        if (resposta.status === 401) {
-          msgErro = erroJson.erro?.mensagem || 'E-mail ou senha incorretos.';
-        } else if (resposta.status === 400) {
-          msgErro = 'Dados inválidos. Verifique o e-mail e a senha.';
+        if (resposta.status === 401 || resposta.status === 404) {
+          throw new Error('Esta conta não existe ou a senha está incorreta.');
         }
-        throw new Error(msgErro);
+        
+        const erroJson = await resposta.json().catch(() => ({}));
+        throw new Error(erroJson.erro?.mensagem || 'Erro ao realizar login. Tente novamente!');
       }
 
       const dados = await resposta.json();
-
       localStorage.setItem('token', dados.token);
-
       setStatus({ tipo: 'sucesso', mensagem: 'Login realizado com sucesso!' });
+      setTimeout(() => navigate('/'), 1000); 
 
     } catch (erro) {
-      if (erro.message.includes('Failed to fetch')) {
-        setStatus({ tipo: 'erro', mensagem: 'Erro de conexão: A API parece estar fora do ar.' });
-      } else {
-        setStatus({ tipo: 'erro', mensagem: erro.message });
-      }
+      const mensagemErro = erro.message.includes('Failed to fetch') 
+        ? 'Erro de conexão: Sistema fora do ar!' 
+        : erro.message;
+        
+      setStatus({ tipo: 'erro', mensagem: mensagemErro });
     } finally {
       setCarregando(false);
     }
   };
 
   return (
-    <main className="pagina-submissao">
-      <header className="cabecalho-submissao">
-        <p>Acesso ao Sistema</p>
-        <h1>Login</h1>
-      </header>
+    <main className="container-auth-split pagina-animada">
+      
+      <div className="cartao-auth">
+        <h1>Fazer login</h1>
+        
+        {status.mensagem && (
+          <div className={`status-mensagem ${status.tipo}`}>
+            {status.mensagem}
+          </div>
+        )}
 
-      {status.mensagem && (
-        <div style={{ width: 'min(100%, 860px)', margin: '20px auto 0' }} className={`status-mensagem ${status.tipo}`}>
-          {status.mensagem}
-        </div>
-      )}
+        <form onSubmit={handleLogin}>
+          <label className="campo" htmlFor="email">
+            <span>E-mail <strong aria-hidden="true">*</strong></span>
+            <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={carregando} />
+          </label>
 
-      <form className="formulario-submissao" onSubmit={handleLogin}>
-        <label className="campo campo-largo" htmlFor="email">
-          <span>E-mail <strong aria-hidden="true">*</strong></span>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            disabled={carregando}
-          />
-        </label>
+          <label className="campo" htmlFor="senha">
+            <span>Senha <strong aria-hidden="true">*</strong></span>
+            <input id="senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} required disabled={carregando} />
+          </label>
 
-        <label className="campo campo-largo" htmlFor="senha">
-          <span>Senha <strong aria-hidden="true">*</strong></span>
-          <input
-            id="senha"
-            type="password"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            required
-            disabled={carregando}
-          />
-        </label>
-
-        <div className="acoes-formulario campo-largo">
-          <button type="submit" disabled={carregando}>
-            {carregando ? 'Acessando...' : 'Entrar'}
+          <button type="submit" disabled={carregando} style={{ marginTop: '8px' }}>
+            {carregando ? 'A aguardar...' : 'Entrar'}
           </button>
-        </div>
-      </form>
+        </form>
+      </div>
+
+      <div style={{ flex: 1, minWidth: '300px', maxWidth: '600px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        {projetosMapa.length > 0 ? (
+          <MapaProjetos 
+            projetos={projetosMapa} 
+            temaSelecionado={temaLogin} 
+            onTemaClick={setTemaLogin} 
+          />
+        ) : (
+          <div style={{ 
+            textAlign: 'center', 
+            color: '#94a3b8', 
+            padding: '40px', 
+            border: '2px dashed #e2e8f0', 
+            borderRadius: '12px',
+            background: 'rgba(255,255,255,0.5)'
+          }}>
+            <div style={{ fontSize: '40px', marginBottom: '16px' }}>🗺️</div>
+            <h3 style={{ color: '#475569', margin: '0 0 8px 0' }}>Vitrine em construção</h3>
+            <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>
+            </p>
+          </div>
+        )}
+      </div>
+      
     </main>
   );
 }
