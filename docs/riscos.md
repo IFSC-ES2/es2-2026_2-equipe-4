@@ -118,3 +118,29 @@ A equipe pretende realizar o acompanhamento dos riscos por meio das seguintes a�
 
 - **Alta:** R01, R02, R05, R08 e R10. **Média:** R03, R04, R06 e R09. **Baixa:** R07 e R11.
 - A causa comum dos riscos altos é a mudança de escopo perto do prazo. Próxima revisão: ao final da Sprint 3.
+
+## 5. Revisão dos riscos na Sprint 3 (22/10/2026)
+
+Mesmos critérios das seções 2.1 e 2.2. Os responsáveis foram mantidos; os marcados "A definir" seguem pendentes de decisão do time.
+
+### 5.1 Situação dos riscos
+
+| ID | Status | Prioridade | Evidência | Ação na Sprint 4 |
+|----|--------|:---:|-----------|------------------|
+| R01 | Mitigado | Média | Escopo estável (M-08 ≈ 6%), restrito às páginas que já estavam em desenvolvimento. O `docs/inception.md` ainda descreve o escopo de artigos. | Manter o escopo fechado no planejamento e atualizar o inception. |
+| R02 | Concretizado | Alta | A maior parte da documentação e da integração entrou nas últimas 24 horas antes do prazo (PRs #141 a #151, entre 22 e 23/10). | Distribuir os entregáveis com datas intermediárias na sprint. |
+| R03 | Ativo | Média | Os cinco integrantes têm commits ou revisões na sprint, mas cinco dos oito PRs mergeados são de um mesmo integrante. | Um responsável por entregável e revisão cruzada. |
+| R04 | Mitigado | Baixa | Sem dificuldade técnica nova; as decisões de escopo e de login com JWT estão nos ADRs 0004 e 0005. | Monitorar. |
+| R05 | Mitigado em parte | Média | Cobertura de 83% (M-03), 26 testes de front-end e testes como checks obrigatórios. Os testes de integração com banco não rodaram na reengenharia. | Cobrir o upload de imagens com testes na Sprint 4. |
+| R06 | Ativo | Média | Ainda sem limite de upload e sem rota de leitura de arquivo (#19 adiada). A reengenharia isolou o armazenamento no `ArmazenamentoArquivoService`, o que facilita a correção. | Implementar a #19. |
+| R07 | Mitigado | Baixa | Docker Compose estável e CI com build e testes. | Monitorar. |
+| R08 | Ativo | Alta | As credenciais continuam no `docker-compose.yml` e no `application.properties`, embora a #100 tenha sido fechada em 22/10. | Reabrir e concluir a #100. |
+| R09 | Mitigado em parte | Média | As rotas públicas de listagem foram documentadas (`rotas-publicas-de-listagem-de-projetos.md`), mas o formato de erro da API continua duplicado. | Unificar o formato de erro. |
+| R10 | Mitigado | Média | Arquitetura (#129), ADRs (#130) e reengenharia (#131) tiveram issue e PR próprios. | Planejar todos os entregáveis da etapa no início da sprint. |
+| R11 | Ativo | Baixa | As dependências do front-end não foram atualizadas. | Issue pequena para `npm audit fix`. |
+
+### 5.2 Risco novo
+
+| ID | Risco | Probabilidade / Impacto | Prioridade | Mitigação | Responsável |
+|----|-------|:---:|:---:|-----------|-------------|
+| R12 | **Dados de exemplo na vitrine:** o `docker-compose.yml` liga `APP_SEED_PROJETOS_ENABLED`, que cria projetos fictícios quando o banco está vazio (`ListagensDataInitializer`). | Média / Médio | Média | Deixar o seed desligado por padrão e ligar só em desenvolvimento ou demonstração. | A definir |
