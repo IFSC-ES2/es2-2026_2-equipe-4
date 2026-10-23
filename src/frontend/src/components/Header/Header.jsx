@@ -1,10 +1,8 @@
-import React from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Header.css';
 
 function Header() {
   const navigate = useNavigate();
-  const location = useLocation();
   const token = localStorage.getItem('token');
   const estaLogado = !!token;
 
