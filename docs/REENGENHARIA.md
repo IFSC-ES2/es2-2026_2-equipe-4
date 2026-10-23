@@ -18,21 +18,12 @@ pelo usuário autenticado. A falha do banco continua sendo repassada.
 
 ## Medição antes e depois
 
-Antes: commit `19c53da4be9167b7d64ab20137e1c84d5e3aea03`.
-Depois: commit `88c93ba02d201fcb97b7fd60a41d1d84bdf91e5f`.
-
 O [script de medição](../scripts/medir_armazenamento.py) conta os tipos de
 armazenamento usados no corpo de cada classe: `GridFsTemplate`, `Document`
 e `ObjectId`. Textos, comentários e imports ficam fora da contagem.
 Também conta as dependências de tipos do próprio projeto, seguindo o recorte
 da [M-04](metricas/M-04.md). O mesmo script mede as duas versões.
 
-Na raiz do projeto, com Python 3:
-
-```powershell
-python scripts/medir_armazenamento.py --ref 19c53da4be9167b7d64ab20137e1c84d5e3aea03
-python scripts/medir_armazenamento.py --ref 88c93ba02d201fcb97b7fd60a41d1d84bdf91e5f
-```
 
 | Classe | Tipos de armazenamento antes | Depois | Dependências internas antes | Depois |
 |---|---:|---:|---:|---:|
@@ -45,15 +36,8 @@ Os detalhes de gravação ficaram concentrados no novo serviço. O custo foi
 adicionar uma classe e aumentar as ligações internas de 5 para 7.
 A contagem é feita por nomes de tipos e não mede tempo de resposta ou memória.
 
-Identificação dos arquivos medidos depois da mudança:
-`ProjetoService: 8b349d2915baca1ca637bcaea449ded74117294a`;
-`ArmazenamentoArquivoService: 1f5230aa72a6f8a3b85651276df162bbbf144ab8`.
-Esses valores são obtidos com `git hash-object` sobre cada arquivo.
 
 ## Testes executados
-
-Ambiente: Windows, JDK 25.0.2 e Gradle 9.7.1.
-Antes: 13 testes passaram. Depois: 21 passaram, sem falhas ou testes ignorados.
 
 Foram verificados arquivo válido, vazio e nulo, falha de leitura e falha do banco.
 Os testes do controller verificam resposta 201, seus campos, e erro 400 para
@@ -83,7 +67,3 @@ Conforme os [critérios de qualidade](qualidade.md):
 - **Facilidade de uso:** o formulário continua recebendo os mesmos campos e mensagens.
 
 A mudança mantém GridFS e os contratos da API; não exige um novo ADR.
-Na arquitetura da #129, atualizar a dependência de `ProjetoService` para o
-novo serviço e a observação do diagrama de contêineres. Os três contêineres
-continuam os mesmos. A conferência final dos documentos #129 e #130 fica
-para a integração desta mudança.
