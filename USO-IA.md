@@ -207,3 +207,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Auxilio na implementação da Vitrine de Projetos
   Artefato: src/frontend/components/MapaProjetos/MapaProjetos.jsx
   Validação: revisado manualmente e adaptado.
+
+- Data: 22/10/2026
+  Ferramenta: ChatGPT
+  Uso: Apoio na dos testes do frontend; orientação na interpretação de falhas e atualização dos testes de cadastro, login, submissão e do fluxo simulado de login seguido de envio de projeto.
+  Artefatos: src/frontend/src/pages/Cadastro/Cadastro.test.jsx, src/frontend/src/pages/Login/Login.test.jsx, src/frontend/src/pages/Submissao/Enviar.test.jsx, src/frontend/src/Enviar.contract.test.jsx e src/frontend/src/pages/Cadastro/Cadastro.jsx.
+  Validação: Comparação dos testes com o comportamento das telas e da API; execução via Vitest com aprovação dos 3 testes de cadastro, 3 de login e 7 de submissão; As alterações nos testes foram realizadas pelo integrante.
