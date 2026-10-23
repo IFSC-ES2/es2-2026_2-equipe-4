@@ -1,53 +1,58 @@
 .header-principal {
-  background: #eef6f3;
-  border-bottom: 1px solid #dbe2e8;
-  padding: 16px 24px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 16px 32px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
 .header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 860px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
 .header-logo {
   margin: 0;
-  color: #146c5a;
+  color: #0f172a;
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -0.5px;
 }
 
 .header-nav {
   display: flex;
-  gap: 20px;
+  gap: 28px;
   align-items: center;
 }
 
 .header-link {
-  color: #283642;
+  color: #64748b;
   text-decoration: none;
-  font-weight: 650;
-  font-size: 15px;
-  transition: color 150ms ease;
+  font-weight: 500;
+  font-size: 14px;
+  transition: color 0.2s ease;
 }
 
 .header-link:hover {
-  color: #146c5a;
+  color: #0f172a;
 }
 
 .header-botao {
-  background: #146c5a;
+  background: #0f172a;
   color: #ffffff;
-  padding: 8px 16px;
+  padding: 8px 18px;
   border-radius: 6px;
   text-decoration: none;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 14px;
-  transition: background 150ms ease;
+  transition: background 0.2s ease;
 }
 
 .header-botao:hover {
-  background: #0e594a;
+  background: #334155;
 }

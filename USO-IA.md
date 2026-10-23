@@ -193,6 +193,26 @@ Validação: Leitura e pequenas correções feitas
   Artefato: docs/metricas/M-02.md
   Validação: revisado manualmente
 
+ - Data: 19/10/2026
+  Ferramenta: copilot 
+  Uso: Documentação e injeção de projetos
+  Artefato: src/backend/docs/rotas-publicas-de-listagem-de-projetos.md  
+  docker-compose.yml (esperar o container iniciar)
+  src/backend/projeto/src/test/java/ifsc/edu/projetos/listagens/* - Elaboração total
+  src/backend/projeto/src/main/java/ifsc/edu/projetos/listagens/* - Ajuda na lógica e desenvolvimento
+  Validação: revisado manualmente
+
+  - Data: 20/10/2026
+  Ferramenta: ChatGPT
+  Uso: Auxilio na implementação da Vitrine de Projetos
+  Artefato: src/frontend/components/MapaProjetos/MapaProjetos.jsx
+  Validação: revisado manualmente e adaptado.
+
+- Data: 22/10/2026
+  Ferramenta: ChatGPT
+  Uso: Apoio na dos testes do frontend; orientação na interpretação de falhas e atualização dos testes de cadastro, login, submissão e do fluxo simulado de login seguido de envio de projeto.
+  Artefatos: src/frontend/src/pages/Cadastro/Cadastro.test.jsx, src/frontend/src/pages/Login/Login.test.jsx, src/frontend/src/pages/Submissao/Enviar.test.jsx, src/frontend/src/Enviar.contract.test.jsx e src/frontend/src/pages/Cadastro/Cadastro.jsx.
+  Validação: Comparação dos testes com o comportamento das telas e da API; execução via Vitest com aprovação dos 3 testes de cadastro, 3 de login e 7 de submissão; As alterações nos testes foram realizadas pelo integrante.
   - Data: 22/10/2026
   Ferramenta: Claude
   Uso: Apoio no planejamento da Sprint 3
@@ -205,3 +225,8 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio na documentação da arquitetura real do MVP e nos diagramas da issue #129.
   Artefatos: docs/ARQUITETURA.md, docs/diagramas/contexto.md, docs/diagramas/conteineres.md e link no README.md.
   Validação: Conferência por leitura do código e checagem dos links locais. Aplicação não executada; revisão da equipe e conferência após a refatoração #131 pendentes.
+- Data: 22/10/2026
+  Ferramenta: Codex (OpenAI)
+  Uso: Apoio na revisão dos ADRs existentes e redação das decisões sobre projetos e JWT.
+  Artefatos: docs/adr/ADR-0001.md a ADR-0005.md e links do README.md.
+  Validação: Confronto com código, configuração e histórico da entrega-7; verificação de links internos e `git diff --check`.

@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import arquivoImg from '../../assets/arquivo.png'
 import './Enviar.css'
 
@@ -32,7 +33,15 @@ function Enviar() {
   const [mensagem, setMensagem] = useState('')
   const [carregando, setCarregando] = useState(false)
 
-  const API_BASE_URL = 'http://localhost:8080';
+  const navigate = useNavigate()
+  const API_BASE_URL = 'http://localhost:8080'
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      navigate('/login')
+    }
+  }, [navigate])
 
   function limparErro(campo) {
     setErros((errosAtuais) => {
@@ -101,20 +110,21 @@ function Enviar() {
       return
     }
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token')
     if (!token) {
-      setMensagem('Erro: Você precisa estar logado para enviar um projeto.');
-      return;
+      setMensagem('Erro: Você precisa estar logado para enviar um projeto.')
+      navigate('/login')
+      return
     }
 
     setCarregando(true)
     setMensagem('Processando a submissão...')
 
     try {
-      const idsImagens = [];
+      const idsImagens = []
       for (const imagem of imagensSelecionadas) {
-        const formDataImagem = new FormData();
-        formDataImagem.append('arquivo', imagem);
+        const formDataImagem = new FormData()
+        formDataImagem.append('arquivo', imagem)
 
         const respUpload = await fetch(`${API_BASE_URL}/api/v1/projetos/upload`, {
           method: 'POST',
@@ -122,17 +132,17 @@ function Enviar() {
             'Authorization': `Bearer ${token}`
           },
           body: formDataImagem,
-        });
+        })
 
         if (!respUpload.ok) {
-          const erroJson = await respUpload.json().catch(() => ({}));
-          const msg = typeof erroJson.erro === 'object' ? erroJson.erro.mensagem : (erroJson.erro || 'Erro ao enviar imagem');
-          throw new Error(msg);
+          const erroJson = await respUpload.json().catch(() => ({}))
+          const msg = typeof erroJson.erro === 'object' ? erroJson.erro.mensagem : (erroJson.erro || 'Erro ao enviar imagem')
+          throw new Error(msg)
         }
 
-        const dadosUpload = await respUpload.json();
+        const dadosUpload = await respUpload.json()
         if (dadosUpload.id) {
-          idsImagens.push(dadosUpload.id);
+          idsImagens.push(dadosUpload.id)
         }
       }
 
@@ -158,7 +168,7 @@ function Enviar() {
 
       if (!respostaMetadados.ok) {
         const erroJson = await respostaMetadados.json().catch(() => ({}))
-        const msg = typeof erroJson.erro === 'object' ? erroJson.erro.mensagem : (erroJson.erro || `Erro ao salvar dados (Status ${respostaMetadados.status})`);
+        const msg = typeof erroJson.erro === 'object' ? erroJson.erro.mensagem : (erroJson.erro || `Erro ao salvar dados (Status ${respostaMetadados.status})`)
         throw new Error(msg)
       }
 
@@ -170,7 +180,7 @@ function Enviar() {
 
     } catch (erro) {
       if (erro.message.includes('Failed to fetch')) {
-        setMensagem('Erro de conexão: A API parece estar fora do ar ou o endpoint não existe.')
+        setMensagem('Erro de conexão: Sistema fora do ar!')
       } else {
         setMensagem(`Atenção: ${erro.message}`)
       }

@@ -1,5 +1,6 @@
 import { afterEach, expect, it, vi } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 import Login from './pages/Login/Login'
@@ -15,6 +16,13 @@ afterEach(() => {
 it('usa o token do login nas rotas de upload e metadados da API', async () => {
   const fetchApi = vi.fn(async (url) => {
     const caminho = new URL(url).pathname
+
+    if (caminho === '/api/v1/projetos') {
+      return {
+        ok: true,
+        json: async () => ({ content: [] }),
+      }
+    }
     if (caminho === '/api/v1/auth/login') {
       return { ok: true, json: async () => ({ token: 'token-do-login' }) }
     }
@@ -29,14 +37,22 @@ it('usa o token do login nas rotas de upload e metadados da API', async () => {
   vi.stubGlobal('fetch', fetchApi)
   const usuario = userEvent.setup()
 
-  render(<Login />)
+  render(
+    <MemoryRouter>
+      <Login />
+    </MemoryRouter>
+  )
   await usuario.type(screen.getByLabelText(/e-mail/i), 'ana@exemplo.com')
   await usuario.type(screen.getByLabelText(/senha/i), 'senha-segura')
   await usuario.click(screen.getByRole('button', { name: /entrar/i }))
   expect(await screen.findByText('Login realizado com sucesso!')).toBeInTheDocument()
 
   cleanup()
-  render(<Enviar />)
+  render(
+    <MemoryRouter>
+      <Enviar />
+    </MemoryRouter>
+  )
   await usuario.type(screen.getByLabelText(/título/i), 'Projeto de teste')
   await usuario.type(screen.getByLabelText(/resumo/i), 'Resumo de teste')
   await usuario.type(screen.getByLabelText(/tema/i), 'Software')
@@ -48,11 +64,12 @@ it('usa o token do login nas rotas de upload e metadados da API', async () => {
 
   expect(await screen.findByText('Sucesso! Projeto submetido e persistido no banco.')).toBeInTheDocument()
   expect(fetchApi.mock.calls.map(([url]) => new URL(url).pathname)).toEqual([
+    '/api/v1/projetos',
     '/api/v1/auth/login',
     '/api/v1/projetos/upload',
     '/api/v1/projetos/metadados',
   ])
-  expect(fetchApi.mock.calls[1][1].headers.Authorization).toBe('Bearer token-do-login')
   expect(fetchApi.mock.calls[2][1].headers.Authorization).toBe('Bearer token-do-login')
-  expect(JSON.parse(fetchApi.mock.calls[2][1].body).imagens).toEqual(['arquivo-123'])
+  expect(fetchApi.mock.calls[3][1].headers.Authorization).toBe('Bearer token-do-login')
+  expect(JSON.parse(fetchApi.mock.calls[3][1].body).imagens).toEqual(['arquivo-123'])
 })
