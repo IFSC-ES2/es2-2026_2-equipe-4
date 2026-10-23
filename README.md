@@ -94,6 +94,8 @@ As principais decisões técnicas e arquiteturais do projeto são registradas in
 - [ADR-0004 — Vitrine de projetos universitários](docs/adr/ADR-0004.md)
 - [ADR-0005 — Autenticação JWT e leitura pública](docs/adr/ADR-0005.md)
 
+A [arquitetura real do MVP](docs/ARQUITETURA.md) descreve os componentes e inclui os diagramas de contexto e de contêineres.
+
 ### 8.4 Artefatos da Entrega 3
 
 Os documentos produzidos para a entrega 3 estão organizados nos seguintes arquivos:

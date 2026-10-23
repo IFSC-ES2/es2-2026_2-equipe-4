@@ -219,6 +219,12 @@ Validação: Leitura e pequenas correções feitas
   Artefato: docs/sprints/sprint-3.md
   Validação: Validado visualmente e de acordo com o backlog
 
+
+- Data: 22/10/2026
+  Ferramenta: Codex
+  Uso: Apoio na documentação da arquitetura real do MVP e nos diagramas da issue #129.
+  Artefatos: docs/ARQUITETURA.md, docs/diagramas/contexto.md, docs/diagramas/conteineres.md e link no README.md.
+  Validação: Conferência por leitura do código e checagem dos links locais. Aplicação não executada; revisão da equipe e conferência após a refatoração #131 pendentes.
 - Data: 22/10/2026
   Ferramenta: Codex (OpenAI)
   Uso: Apoio na revisão dos ADRs existentes e redação das decisões sobre projetos e JWT.
