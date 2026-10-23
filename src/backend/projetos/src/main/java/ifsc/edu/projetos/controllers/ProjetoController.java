@@ -41,16 +41,6 @@ public class ProjetoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Projeto> buscarPorId(@PathVariable String id){
-        return projetoService.buscarPorId(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping
-    public List<Projeto> listarTodos(){
-        return projetoService.listarTodos();
-    }
-
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> argumentoInvalido(IllegalArgumentException ex) {
         Map<String, Object> body = new LinkedHashMap<>();
