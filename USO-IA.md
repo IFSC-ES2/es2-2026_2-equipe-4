@@ -218,3 +218,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio no planejamento da Sprint 3
   Artefato: docs/sprints/sprint-3.md
   Validação: Validado visualmente e de acordo com o backlog
+
+- Data: 23/10/2026
+  Ferramenta: ChatGPT
+  Uso: Apoio na análise do CI e dos testes da Sprint 3 (#132), explicação de mocks e do MemoryRouter, orientação inicial dos testes essenciais das páginas Projetos e Sobre. Auxílio na redução do escopo dos testes e na priorização das pendências por entrega, sem alterar a configuração do CI.
+  Artefatos: src/frontend/src/pages/Projetos/Projetos.test.tsx e src/frontend/src/pages/Sobre/Sobre.test.jsx.
+  Validação: Comparação dos testes com o comportamento dos componentes; execução de `npm run test -- --run`, com aprovação dos 26 testes do frontend, incluindo 7 de Projetos e 5 de Sobre.
