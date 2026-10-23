@@ -92,6 +92,17 @@ Como indicado nas tabelas acima, Segurança e Capacidade de Interação ainda n�
 
 ---
 
+## 4. Revisão da qualidade na Sprint 3 (22/10/2026)
+
+A seção 1 foi escrita antes do login; a segurança agora inclui autenticação com JWT ([ADR-0005](adr/ADR-0005.md)).
+
+| Atributo | Evidência da Sprint 3 | Limitação e próxima ação |
+|---|---|---|
+| Confiabilidade | Cobertura de 83,39% ([M-03](metricas/M-03.md)); testes de back-end e front-end como checks obrigatórios; PR #151 com os 7 checks verdes. | Testes de integração com banco não rodaram na reengenharia; upload sem limite (R06). |
+| Manutenibilidade | Reengenharia (#131): armazenamento isolado e tipos do GridFS no `ProjetoService` de 3 para 0 ([REENGENHARIA.md](REENGENHARIA.md)); V(G) médio de 1,35 e máximo de 4 ([M-02](metricas/M-02.md)). | O `ProjetoService` ainda tem o maior CBO do back-end, 6 ([M-04](metricas/M-04.md)). |
+| Segurança | Login com JWT e consulta pública de projetos; autoria pelo token preservada na refatoração. | Credenciais no repositório (R08, #100). |
+| Capacidade de interação | Páginas Projetos e Sobre e CSS unificado (#111 a #113); listagem pública sem login. | Sem detalhe do projeto, busca e exibição das imagens enviadas (#19, #21 e #22). |
+
 ## Referências
 
 - [`docs/riscos.md`](riscos.md) — Registro de riscos do projeto.
