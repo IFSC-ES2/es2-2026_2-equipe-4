@@ -73,4 +73,11 @@ A preencher ao longo da sprint.
 
 A preencher ao longo da sprint.
 
-Relacionado: [`sprint-2.md`](sprint-2.md) / [`BASELINE.md`](../BASELINE.md) / [`riscos.md`](../riscos.md) / issue #127
+## 10. Validação dos testes e do CI (#132)
+
+Verificação realizada em 22/10/2026.
+
+- Os testes da listagem na API e da refatoração estão versionados.
+- O CI executa automaticamente em PRs para `main` e `entrega-7`, com testes de backend e frontend, build e verificações da documentação.
+- Uma falha de teste deixa o check vermelho.
+- Os testes de backend e frontend são checks obrigatórios nas regras de `main` e das branches `entrega-*`.
