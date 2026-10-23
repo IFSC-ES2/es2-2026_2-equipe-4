@@ -25,6 +25,11 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: admin123
     volumes:
       - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "mongodb://admin:admin123@localhost:27017/admin?authSource=admin", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   backend:
     build:
@@ -34,9 +39,11 @@ services:
     ports:
       - "8080:8080"
     environment:
+      APP_SEED_PROJETOS_ENABLED: "true"
       SPRING_MONGODB_URI: mongodb://admin:admin123@mongodb:27017/publicaifsc?authSource=admin
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
 
   frontend:
     build:
