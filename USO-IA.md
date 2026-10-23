@@ -5,9 +5,9 @@ Conforme o *Protocolo de uso de inteligência artificial* da disciplina.
 ## Declaração de responsabilidade
 
 > Declaramos que as ferramentas de inteligência artificial utilizadas neste projeto
-> serviram como apoio ao desenvolvimento. Todo código, documentação, decisão técnica e
-> artefato entregue foi revisado, compreendido e validado pela equipe, que assume
-> integral responsabilidade acadêmica e técnica pelo trabalho.
+> servem como apoio ao desenvolvimento. A equipe assume a responsabilidade acadêmica
+> e técnica pelo trabalho e pela revisão, compreensão e validação dos artefatos.
+> As verificações realizadas e as revisões pendentes são indicadas em cada registro.
 
 ## Registros
 
@@ -193,28 +193,20 @@ Validação: Leitura e pequenas correções feitas
   Artefato: docs/metricas/M-02.md
   Validação: revisado manualmente
 
- - Data: 19/10/2026
-  Ferramenta: copilot 
-  Uso: Documentação e injeção de projetos
-  Artefato: src/backend/docs/rotas-publicas-de-listagem-de-projetos.md  
-  docker-compose.yml (esperar o container iniciar)
-  src/backend/projeto/src/test/java/ifsc/edu/projetos/listagens/* - Elaboração total
-  src/backend/projeto/src/main/java/ifsc/edu/projetos/listagens/* - Ajuda na lógica e desenvolvimento
-  Validação: revisado manualmente
+## Sprint 3
 
-  - Data: 20/10/2026
-  Ferramenta: ChatGPT
-  Uso: Auxilio na implementação da Vitrine de Projetos
-  Artefato: src/frontend/components/MapaProjetos/MapaProjetos.jsx
-  Validação: revisado manualmente e adaptado.
+Levantamento confirmado pelo solicitante em 22/10/2026: os integrantes já registraram seus usos de IA.
 
-- Data: 22/10/2026
-  Ferramenta: ChatGPT
-  Uso: Apoio na dos testes do frontend; orientação na interpretação de falhas e atualização dos testes de cadastro, login, submissão e do fluxo simulado de login seguido de envio de projeto.
-  Artefatos: src/frontend/src/pages/Cadastro/Cadastro.test.jsx, src/frontend/src/pages/Login/Login.test.jsx, src/frontend/src/pages/Submissao/Enviar.test.jsx, src/frontend/src/Enviar.contract.test.jsx e src/frontend/src/pages/Cadastro/Cadastro.jsx.
-  Validação: Comparação dos testes com o comportamento das telas e da API; execução via Vitest com aprovação dos 3 testes de cadastro, 3 de login e 7 de submissão; As alterações nos testes foram realizadas pelo integrante.
-  - Data: 22/10/2026
-  Ferramenta: Claude
-  Uso: Apoio no planejamento da Sprint 3
-  Artefato: docs/sprints/sprint-3.md
-  Validação: Validado visualmente e de acordo com o backlog
+| Data | Ferramenta | Finalidade | Artefatos | Revisão e validação realizadas |
+|---|---|---|---|---|
+| 19/10/2026 | Copilot | Apoio à lógica da listagem, dados de exemplo, documentação e espera pelo MongoDB no Compose; elaboração integral dos testes da listagem. | `src/backend/docs/rotas-publicas-de-listagem-de-projetos.md`, `docker-compose.yml`, classes e testes de `listagens`. | Revisão manual informada no registro do integrante. |
+| 20/10/2026 | ChatGPT | Apoio na implementação da vitrine de projetos. | `src/frontend/src/components/MapaProjetos/MapaProjetos.jsx`. | Revisão manual e adaptação informadas no registro do integrante. |
+| 21/10/2026 | Codex | Apoio na elaboração e publicação das issues da Sprint 3 a partir dos escopos fornecidos pelo solicitante. | Issues #127 a #138 no GitHub. | Escopos fornecidos pelo solicitante; criação das issues conferida no GitHub com a conta autorizada. |
+| 22/10/2026 | ChatGPT | Orientação na interpretação de falhas e ajuste dos testes de cadastro, login, submissão e envio após login. | `Cadastro.test.jsx`, `Login.test.jsx`, `Enviar.test.jsx`, `Enviar.contract.test.jsx` e `Cadastro.jsx`, em `src/frontend/src/`. | Conforme o registro do integrante: comparação com telas e API; Vitest aprovou 3 testes de cadastro, 3 de login e 7 de submissão. O integrante realizou as alterações. |
+| 22/10/2026 | Claude | Apoio no planejamento da Sprint 3. | `docs/sprints/sprint-3.md`. | Conferência visual e comparação com o backlog informadas no registro existente. |
+| 22/10/2026 | Codex | Revisão dos ADRs, registro das decisões sobre projetos e JWT e simplificação do ADR-0005 solicitada pelo usuário. | `docs/adr/ADR-0001.md` a `ADR-0005.md`, `README.md` e `USO-IA.md`. [PR #143](https://github.com/IFSC-ES2/es2-2026_2-equipe-4/pull/143). | Leitura do código, conferência de links e formatação pelo assistente. O solicitante pediu ajustes e simplificação. Testes da aplicação não foram executados localmente nessa alteração documental. |
+| 22/10/2026 | Codex | Documentação da arquitetura implementada e criação dos diagramas. | `docs/ARQUITETURA.md`, `docs/diagramas/`, `README.md` e `USO-IA.md`. [PR #144](https://github.com/IFSC-ES2/es2-2026_2-equipe-4/pull/144). | Leitura do código e conferência dos links pelo assistente. A aplicação não foi executada localmente nessa alteração documental. |
+| 22/10/2026 | Codex | Separação do armazenamento de arquivos, criação dos testes e medição antes/depois. | `ProjetoService.java`, `ArmazenamentoArquivoService.java`, testes de serviços e upload, `scripts/medir_armazenamento.py`, `docs/REENGENHARIA.md` e `USO-IA.md`. [PR #147](https://github.com/IFSC-ES2/es2-2026_2-equipe-4/pull/147). | O assistente executou 13 testes antes, 21 depois e 26 após integrar a listagem. MongoDB simulado nos testes locais; não houve teste manual com banco real. Medições executadas e CI aprovado no PR. |
+| 22/10/2026 | Codex | Conferência dos testes, do pipeline e dos checks obrigatórios; registro das verificações. | `docs/sprints/sprint-3.md`. [PR #148](https://github.com/IFSC-ES2/es2-2026_2-equipe-4/pull/148). | Consulta do workflow, das regras de proteção e das execuções aprovadas e com falha no GitHub pelo assistente. |
+| 22/10/2026 | Codex | Atualização objetiva da apresentação, funcionalidades, execução, testes e limitações do produto. | `README.md` e `src/frontend/README.md`. [PR #149](https://github.com/IFSC-ES2/es2-2026_2-equipe-4/pull/149). | O assistente conferiu 19 links internos e a formatação. O solicitante ajustou o texto antes do commit. A aplicação não foi executada localmente nessa alteração documental. |
+| 22/10/2026 | Codex | Consolidação do registro de uso de IA da Sprint 3. | `USO-IA.md`, issue #134. | Comparação com os registros existentes, esta conversa e os PRs; levantamento dos integrantes confirmado pelo solicitante. Revisão deste registro pela equipe pendente. |
