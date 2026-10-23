@@ -5,8 +5,6 @@ import ifsc.edu.projetos.accountcreation.repository.UserRepository;
 import ifsc.edu.projetos.dtos.Projeto;
 import ifsc.edu.projetos.dtos.ProjetoRespostaDTO;
 import ifsc.edu.projetos.repositories.ProjetoRepository;
-import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,15 +12,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 
-import java.io.InputStream;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,7 +27,7 @@ class ProjetoServiceTest {
     private ProjetoRepository repository;
 
     @Mock
-    private GridFsTemplate gridFsTemplate; // Adicionada a simulação do GridFS (MongoDB)
+    private ArmazenamentoArquivoService armazenamentoArquivoService;
 
     @Mock
     private UserRepository userRepository; // Simula a busca do id do usuário logado pelo e-mail
@@ -41,47 +36,30 @@ class ProjetoServiceTest {
     private ProjetoService projetoService;
 
 
-    // testes salvarArquivo
-
     @Test
-    @DisplayName("Deve salvar arquivo no GridFS com sucesso e retornar DTO")
-    void salvarArquivoComSucesso() throws Exception {
-        // Arrange
-        MockMultipartFile mockFile = new MockMultipartFile(
-                "file",
-                "documento.pdf",
-                "application/pdf",
-                "conteudo fake".getBytes()
-        );
+    @DisplayName("Mantém a resposta do serviço de armazenamento")
+    void salvarArquivoMantemResposta() {
+        MockMultipartFile arquivo = new MockMultipartFile("arquivo", new byte[]{1});
+        ProjetoRespostaDTO resposta = new ProjetoRespostaDTO(
+                "id", "imagem.png", "id", 1, "Arquivo salvo com sucesso");
+        when(armazenamentoArquivoService.salvarArquivo(arquivo)).thenReturn(resposta);
 
-        ObjectId mockId = new ObjectId();
-
-        // Simula o comportamento do GridFS retornando um ObjectId
-        when(gridFsTemplate.store(any(InputStream.class), eq("documento.pdf"), eq("application/pdf"), any(Document.class)))
-                .thenReturn(mockId);
-
-        // Act
-        ProjetoRespostaDTO resposta = projetoService.salvarArquivo(mockFile);
-
-        // Assert
-        assertNotNull(resposta);
-        assertEquals("documento.pdf", resposta.getNomeOriginal());
-        assertEquals(mockId.toHexString(), resposta.getId());
-        verify(gridFsTemplate, times(1)).store(any(), any(), any(), any());
+        assertSame(resposta, projetoService.salvarArquivo(arquivo));
+        verify(armazenamentoArquivoService).salvarArquivo(arquivo);
+        verifyNoInteractions(repository, userRepository);
     }
 
     @Test
-    @DisplayName("Deve lançar exceção ao tentar salvar arquivo vazio ou nulo")
-    void salvarArquivoVazioLancaExcecao() {
-        // Arrange
-        MockMultipartFile arquivoVazio = new MockMultipartFile("file", new byte[0]);
+    @DisplayName("Mantém a validação recebida do armazenamento")
+    void salvarArquivoMantemErro() {
+        MockMultipartFile arquivo = new MockMultipartFile("arquivo", new byte[0]);
+        IllegalArgumentException falha = new IllegalArgumentException("Arquivo não pode estar vazio");
+        when(armazenamentoArquivoService.salvarArquivo(arquivo)).thenThrow(falha);
 
-        // Act & Assert
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> projetoService.salvarArquivo(arquivoVazio));
-        assertEquals("Arquivo não pode estar vazio", exception.getMessage());
-        verify(gridFsTemplate, never()).store(any(), any(), any(), any());
+        assertSame(falha, assertThrows(IllegalArgumentException.class,
+                () -> projetoService.salvarArquivo(arquivo)));
+        verifyNoInteractions(repository, userRepository);
     }
-
 
     //teste salvarMetadados
 

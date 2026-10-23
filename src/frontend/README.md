@@ -1,16 +1,35 @@
-# React + Vite
+# Front-end do PublicaIFSC
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface em React e Vite para cadastro, login, publicação e consulta pública
+de projetos universitários.
 
-Currently, two official plugins are available:
+## Executar
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Requisitos: Node.js 24 e API disponível em `http://localhost:8080/api/v1`.
+Na raiz do repositório:
 
-## React Compiler
+```bash
+cd src/frontend
+npm ci
+npm run dev
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Acesse <http://localhost:5173>. A galeria fica em `/projetos`.
 
-## Expanding the ESLint configuration
+## Testes
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Na pasta `src/frontend`:
+
+```bash
+npm test -- --run
+```
+
+## Build
+
+```bash
+npm run build
+npm run preview -- --port 5173
+```
+
+Consulte o [README principal](../../README.md) para subir a API e o banco,
+ver as limitações e acessar a documentação.

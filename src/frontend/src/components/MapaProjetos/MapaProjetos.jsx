@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import './MapaProjetos.css';
 
 function MapaProjetos({ projetos, onTemaClick, temaSelecionado = 'Todos' }) {
