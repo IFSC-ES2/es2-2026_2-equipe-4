@@ -85,10 +85,6 @@ function Login() {
             {carregando ? 'Autenticando...' : 'Entrar na Plataforma'}
           </button>
         </form>
-        
-        <p style={{ textAlign: 'center', marginTop: '24px', fontSize: '14px', color: '#64748b' }}>
-          Novo por aqui? <Link to="/cadastro" style={{ color: '#146c5a', fontWeight: '600', textDecoration: 'none' }}>Crie sua conta</Link>
-        </p>
       </div>
 
       <div style={{ flex: 1, minWidth: '300px', maxWidth: '600px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>

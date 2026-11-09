@@ -71,10 +71,6 @@ const handleCadastro = async (e) => {
             {carregando ? 'Criando conta...' : 'Registrar'}
           </button>
         </form>
-
-        <p style={{ textAlign: 'center', marginTop: '24px', fontSize: '14px', color: '#64748b' }}>
-          Já possui uma conta? <Link to="/login" style={{ color: '#146c5a', fontWeight: '600', textDecoration: 'none' }}>Fazer login</Link>
-        </p>
       </div>
     </main>
   );
