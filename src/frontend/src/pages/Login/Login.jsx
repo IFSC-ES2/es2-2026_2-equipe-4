@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MapaProjetos from '../../components/MapaProjetos/MapaProjetos';
+import { API_BASE_URL } from '../../config/api';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -9,9 +10,9 @@ function Login() {
   const [status, setStatus] = useState({ tipo: '', mensagem: '' });
   const [projetosMapa, setProjetosMapa] = useState([]);
   const [temaLogin, setTemaLogin] = useState('Todos'); 
-  
+
   const navigate = useNavigate();
-  const API_BASE_URL = 'http://localhost:8080';
+  //const API_BASE_URL = 'http://localhost:8080';
 
   useEffect(() => {
     async function carregarProjetosParaMapa() {

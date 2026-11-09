@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import arquivoImg from '../../assets/arquivo.png'
 import './Enviar.css'
+import { API_BASE_URL } from '../../config/api';
 
 const formularioInicial = {
   titulo: '',
@@ -34,7 +35,7 @@ function Enviar() {
   const [carregando, setCarregando] = useState(false)
 
   const navigate = useNavigate()
-  const API_BASE_URL = 'http://localhost:8080'
+  //const API_BASE_URL = 'http://localhost:8080'
 
   useEffect(() => {
     const token = localStorage.getItem('token')

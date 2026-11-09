@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../../config/api';
 
 function Cadastro() {
   const [nome, setNome] = useState('');
@@ -9,7 +10,7 @@ function Cadastro() {
   const [status, setStatus] = useState({ tipo: '', mensagem: '' });
   
   const navigate = useNavigate();
-  const API_BASE_URL = 'http://localhost:8080';
+  //const API_BASE_URL = 'http://localhost:8080';
 
   const handleCadastro = async (e) => {
     e.preventDefault();

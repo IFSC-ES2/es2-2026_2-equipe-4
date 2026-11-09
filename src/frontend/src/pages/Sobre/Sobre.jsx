@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MapaProjetos from '../../components/MapaProjetos/MapaProjetos';
+import { API_BASE_URL } from '../../config/api';
 
 function Sobre() {
   const [projetosAmostra, setProjetosAmostra] = useState([]);
-  const API_BASE_URL = 'http://localhost:8080';
+  //const API_BASE_URL = 'http://localhost:8080';
 
   useEffect(() => {
     async function carregarAmostra() {
