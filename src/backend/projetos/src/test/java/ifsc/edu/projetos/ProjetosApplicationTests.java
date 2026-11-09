@@ -11,7 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @TestPropertySource(properties = {
-        "spring.mongodb.uri=mongodb://localhost:27017/testdb"
+        "spring.mongodb.uri=mongodb://localhost:27017/testdb",
+        "app.jwt.secret=chave-de-teste-com-mais-de-trinta-e-dois-bytes"
 })
 class ProjetosApplicationTests {
 
