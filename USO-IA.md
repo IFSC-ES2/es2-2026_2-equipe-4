@@ -251,3 +251,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Ajuda para os comandos que deveriam ser executados no containers e comandos a serem colocados no docker-compose para usar o .env
   Artefatos: docker-compose.yaml
   Validação: Toda a aplicação foi iniciado mais de 3x para validar o funcionamento de todos as partes.
+
+- Data: 09/11/2026
+  Ferramenta: ChatGPT
+  Uso: Ajuda para melhoramente/atualização da aparencia do site/frontend.
+  Artefatos: Enviar.css
+  Validação: revisado manualmente e adaptado.

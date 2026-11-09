@@ -12,7 +12,7 @@ function Cadastro() {
   const navigate = useNavigate();
   //const API_BASE_URL = 'http://localhost:8080';
 
-  const handleCadastro = async (e) => {
+const handleCadastro = async (e) => {
     e.preventDefault();
     setCarregando(true);
     setStatus({ tipo: '', mensagem: '' });
@@ -25,55 +25,56 @@ function Cadastro() {
       });
 
       if (!resposta.ok) {
-        throw new Error(resposta.status === 409 ? 'E-mail já cadastrado.' : 'Campos inválidos.');
+        throw new Error(resposta.status === 409 ? 'E-mail já está em uso.' : 'Preencha todos os campos corretamente.');
       }
 
-      setStatus({ tipo: 'sucesso', mensagem: 'Conta criada! A redirecionar...' });
-
-      setNome('');
-      setEmail('');
-      setSenha('');
-     
+      setStatus({ tipo: 'sucesso', mensagem: 'Conta criada! Redirecionando para login...' });
       setTimeout(() => navigate('/login'), 1500);
 
     } catch (erro) {
-      setStatus({ tipo: 'erro', mensagem: erro.message.includes('Failed to fetch') ? 'Erro de conexão. Tente novamente!' : erro.message });
-    } finally {
+      setStatus({ tipo: 'erro', mensagem: erro.message.includes('Failed to fetch') ? 'Serviço temporariamente indisponível.' : erro.message });
       setCarregando(false);
     }
   };
 
   return (
-    <main className="container-auth-central pagina-animada">
-      <div className="cartao-auth">
-        <h1>Criar conta</h1>
+    <main className="container-auth-central pagina-animada" style={{ background: '#f8fafc' }}>
+      <div className="cartao-auth" style={{ border: '1px solid #e2e8f0', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.05)', maxWidth: '480px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <h1 style={{ fontSize: '24px', fontWeight: '800', margin: '0 0 8px' }}>Junte-se à Comunidade</h1>
+          <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>Crie sua conta para publicar e interagir com projetos.</p>
+        </div>
 
         {status.mensagem && (
-          <div className={`status-mensagem ${status.tipo}`} style={{ padding: '10px', fontSize: '14px', marginBottom: '16px' }}>
+          <div className={`status-mensagem ${status.tipo}`} style={{ textAlign: 'center' }}>
             {status.mensagem}
           </div>
         )}
 
         <form onSubmit={handleCadastro}>
           <label className="campo" htmlFor="nome">
-            <span>Nome completo <strong aria-hidden="true">*</strong></span>
-            <input id="nome" type="text" value={nome} onChange={(e) => setNome(e.target.value)} required disabled={carregando} />
+            <span style={{ fontSize: '13px', color: '#475569' }}>Nome Completo</span>
+            <input id="nome" type="text" placeholder="Ex: Maria Oliveira" value={nome} onChange={(e) => setNome(e.target.value)} required disabled={carregando} />
           </label>
 
           <label className="campo" htmlFor="email">
-            <span>E-mail <strong aria-hidden="true">*</strong></span>
-            <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={carregando} />
+            <span style={{ fontSize: '13px', color: '#475569' }}>E-mail</span>
+            <input id="email" type="email" placeholder="nome@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={carregando} />
           </label>
 
           <label className="campo" htmlFor="senha">
-            <span>Senha <strong aria-hidden="true">*</strong></span>
-            <input id="senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} required minLength="6" disabled={carregando} />
+            <span style={{ fontSize: '13px', color: '#475569' }}>Criar Senha <small style={{ color: '#94a3b8', fontWeight: 'normal' }}>(mín. 6 caracteres)</small></span>
+            <input id="senha" type="password" placeholder="••••••••" value={senha} onChange={(e) => setSenha(e.target.value)} required minLength="6" disabled={carregando} />
           </label>
 
-          <button type="submit" disabled={carregando} style={{ marginTop: '8px' }}>
-            {carregando ? 'A criar...' : 'Continuar'}
+          <button type="submit" disabled={carregando} style={{ marginTop: '16px', height: '48px', width: '100%' }}>
+            {carregando ? 'Criando conta...' : 'Registrar'}
           </button>
         </form>
+
+        <p style={{ textAlign: 'center', marginTop: '24px', fontSize: '14px', color: '#64748b' }}>
+          Já possui uma conta? <Link to="/login" style={{ color: '#146c5a', fontWeight: '600', textDecoration: 'none' }}>Fazer login</Link>
+        </p>
       </div>
     </main>
   );

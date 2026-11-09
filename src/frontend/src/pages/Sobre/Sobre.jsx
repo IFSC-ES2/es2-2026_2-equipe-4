@@ -23,68 +23,176 @@ function Sobre() {
   }, []);
 
   return (
-    <main className="pagina-animada" style={{ maxWidth: '1000px', margin: '0 auto', padding: '60px 24px' }}>
+    <main className="pagina-animada pagina-produto-container">
       
-      <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-        <div className="badge-tema" style={{ marginBottom: '24px', background: '#e0f2fe', color: '#0369a1' }}>
-          Versão MVP - Sprint 3
+      <section className="secao-hero-produto">
+        <div className="conteudo-hero-produto">
+          <span className="badge-produto-tag">Plataforma Acadêmica Digital</span>
+          <h1 className="titulo-hero-produto">
+            Conhecimento que merece ser <span className="destaque-verde">compartilhado</span>.
+          </h1>
+          <p className="descricao-hero-produto">
+            O PublicaIFSC é a vitrine digital desenvolvida para reunir, organizar e dar visibilidade à produção acadêmica e científica do Instituto Federal de Santa Catarina.
+          </p>
+          <div className="acoes-hero-produto">
+            <Link to="/projetos" className="botao-cta-primario">
+              Explorar Vitrine
+            </Link>
+            <Link to="/submissao" className="botao-cta-secundario">
+              Publicar Projeto
+            </Link>
+          </div>
         </div>
-        <h1 style={{ fontSize: '48px', color: '#0f172a', marginBottom: '20px', fontWeight: '800', letterSpacing: '-1px' }}>
-          Explore o universo acadêmico do <span style={{ color: '#146c5a' }}>PublicaIFSC</span>
-        </h1>
-        <p style={{ fontSize: '18px', color: '#475569', maxWidth: '750px', margin: '0 auto', lineHeight: '1.6' }}>
-          O PublicaIFSC é uma plataforma web para democratizar o acesso e publicação de trabalhos do Instituto Federal de Santa Catarina (IFSC). Esta vitrine interativa possibilita partilhar inovações e artigos científicos, promovendo a colaboração entre pesquisadores, professores e estudantes.
-        </p>
-      </div>
+      </section>
 
-      <div style={{ marginBottom: '48px', animation: 'fadeIn 1s ease-out' }}>
-        {projetosAmostra.length > 0 ? (
-          <MapaProjetos projetos={projetosAmostra} temaSelecionado="Todos" />
-        ) : (
-          <div style={{ 
-            textAlign: 'center', 
-            color: '#94a3b8', 
-            padding: '40px', 
-            border: '2px dashed #e2e8f0', 
-            borderRadius: '12px',
-            background: 'rgba(255,255,255,0.5)'
-          }}>
-            <div style={{ fontSize: '40px', marginBottom: '16px' }}>🗺️</div>
-            <h3 style={{ color: '#475569', margin: '0 0 8px 0' }}>Vitrine em construção</h3>
-            <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>
+      <section className="secao-mapa-banner">
+        <div className="cabecalho-mapa-banner">
+          <span className="subtitulo-secao">Mapeamento em Tempo Real</span>
+          <h2>Explore a rede de conhecimentos do IFSC</h2>
+        </div>
+        <div className="wrapper-mapa-full">
+          {projetosAmostra.length > 0 ? (
+            <MapaProjetos projetos={projetosAmostra} temaSelecionado="Todos" />
+          ) : (
+            <div className="mapa-placeholder-card">
+              <h3>Vitrine em construção</h3>
+              <p>Conectando novos trabalhos da instituição...</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="secao-narrativa-container">
+        <div className="grid-narrativa-dupla">
+          
+          <div className="cartao-narrativa-principal">
+            <span className="tag-categoria">Nossa Proposta</span>
+            <h2>Mais do que armazenar, uma vitrine para ideias reais</h2>
+            <p className="texto-destaque-lead">
+              Acreditamos que o conhecimento produzido dentro das instituições de ensino não deve ficar restrito às salas de aula, aos laboratórios ou aos arquivos armazenados localmente.
+            </p>
+            <p>
+              Cada projeto desenvolvido, cada pesquisa realizada e cada ideia colocada em prática representa uma oportunidade de aprendizado, inovação e transformação. É a partir dessa perspectiva que surge o PublicaIFSC.
+            </p>
+            <p>
+              Nosso propósito é aproximar estudantes, professores, pesquisadores e toda a comunidade interessada no conhecimento produzido dentro da instituição, criando um ambiente acessível para descobrir, compartilhar e reconhecer produções de diferentes cursos e níveis de complexidade.
             </p>
           </div>
-        )}
-      </div>
-        
-      <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginBottom: '80px' }}>
-        <Link to="/projetos" style={{ background: '#0f172a', color: '#fff', padding: '14px 28px', borderRadius: '8px', textDecoration: 'none', fontWeight: '700', transition: 'all 0.2s', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-          Ver Galeria Completa
-        </Link>
-        <Link to="/submissao" style={{ background: '#f1f5f9', color: '#0f172a', padding: '14px 28px', borderRadius: '8px', textDecoration: 'none', fontWeight: '700', transition: 'all 0.2s', border: '1px solid #e2e8f0' }}>
-          Submitar o seu Projeto
-        </Link>
-      </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '32px', marginBottom: '64px' }}>
-        <div className="cartao-projeto" style={{ textAlign: 'center', padding: '32px' }}>
-          <div style={{ fontSize: '40px', marginBottom: '16px' }}>🚀</div>
-          <h3 style={{ color: '#0f172a', marginBottom: '12px' }}>Acesso Democrático</h3>
-          <p style={{ color: '#475569', fontSize: '15px' }}>Tiramos a produção acadêmica de arquivos locais e repositórios pouco intuitivos, oferecendo visibilidade imediata às pesquisas.</p>
-        </div>
-        
-        <div className="cartao-projeto" style={{ textAlign: 'center', padding: '32px' }}>
-          <div style={{ fontSize: '40px', marginBottom: '16px' }}>📂</div>
-          <h3 style={{ color: '#0f172a', marginBottom: '12px' }}>Submissão Simples</h3>
-          <p style={{ color: '#475569', fontSize: '15px' }}>Pesquisadores e alunos registam os trabalhos detalhando metadados essenciais, facilitando a busca por tema, tecnologia ou autor.</p>
-        </div>
+          <div className="cartao-narrativa-destaque">
+            <span className="tag-categoria">Descentralização</span>
+            <h2>Uma nova forma de compartilhar conhecimento</h2>
+            <p>
+              Encontrar trabalhos acadêmicos ou descobrir pesquisas relacionadas a uma área nem sempre é uma tarefa simples. Muitas vezes, essas produções permanecem dispersas em diferentes ambientes e repositórios, dificultando o acesso.
+            </p>
+            <div className="bloco-destaque-interno">
+              <h4>Experiência Unificada</h4>
+              <p>
+                Oferecemos uma plataforma centralizada e um processo de submissão organizado para que alunos e pesquisadores apresentem metadados essenciais, repositórios e demonstrações práticas.
+              </p>
+            </div>
+          </div>
 
-        <div className="cartao-projeto" style={{ textAlign: 'center', padding: '32px' }}>
-          <div style={{ fontSize: '40px', marginBottom: '16px' }}>🔗</div>
-          <h3 style={{ color: '#0f172a', marginBottom: '12px' }}>Conexão Direta</h3>
-          <p style={{ color: '#475569', fontSize: '15px' }}>Um canal unificado para toda a comunidade do IFSC. Explore repositórios, descubra demonstrações reais e estimule o contato com outras equipes.</p>
         </div>
-      </div>
+      </section>
+
+      <section className="secao-pilares-bg">
+        <div className="container-pilares">
+          <div className="cabecalho-secao-centro">
+            <span className="subtitulo-secao">Fundamentos da Plataforma</span>
+            <h2>O que nos move</h2>
+          </div>
+
+          <div className="grid-pilares-cards">
+            
+            <div className="cartao-pilar">
+              <div className="indicador-pilar">01</div>
+              <h3>Democratização do Acesso</h3>
+              <p>
+                Acreditamos que o acesso ao conhecimento deve ser simples e aberto à comunidade. Buscamos reduzir barreiras entre quem produz e quem deseja conhecer a produção acadêmica.
+              </p>
+            </div>
+
+            <div className="cartao-pilar">
+              <div className="indicador-pilar">02</div>
+              <h3>Organização e Descoberta</h3>
+              <p>
+                Reunimos diferentes produções em um único ambiente, estruturando informações como autores, cursos, áreas de conhecimento e tecnologias utilizadas para facilitar a pesquisa.
+              </p>
+            </div>
+
+            <div className="cartao-pilar">
+              <div className="indicador-pilar">03</div>
+              <h3>Valorização Acadêmica</h3>
+              <p>
+                Cada projeto representa o esforço de aprender e criar. Queremos dar visibilidade a essas iniciativas, valorizando o trabalho de estudantes, professores e pesquisadores.
+              </p>
+            </div>
+
+            <div className="cartao-pilar">
+              <div className="indicador-pilar">04</div>
+              <h3>Conexão e Colaboração</h3>
+              <p>
+                O compartilhamento de conhecimento abre portas para novas ideias. Aproximamos pessoas com interesses semelhantes para estimular a troca de experiências e novas parcerias.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <section className="secao-galeria-vitrine">
+        <div className="container-galeria-vitrine">
+          <div className="cabecalho-galeria-flex">
+            <div>
+              <span className="subtitulo-secao">Showcase</span>
+              <h2>Projetos Recentes na Comunidade</h2>
+            </div>
+            <Link to="/projetos" className="link-ver-todos">
+              Ver todos os projetos →
+            </Link>
+          </div>
+          
+          <div className="galeria-behance">
+            {projetosAmostra.slice(0, 8).map(projeto => (
+              <div key={projeto.id} className="cartao-galeria">
+                <div className="imagem-galeria">
+                  {projeto.imagens && projeto.imagens.length > 0 ? (
+                    <img src={projeto.imagens[0]} alt={projeto.titulo} />
+                  ) : (
+                    <div className="placeholder-img">
+                      <span>{projeto.tema || 'Projeto IFSC'}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="info-galeria">
+                  <h4>{projeto.titulo}</h4>
+                  <p className="tecnologias-tag">
+                    {projeto.tecnologias && projeto.tecnologias.length > 0 
+                      ? projeto.tecnologias.join(' • ') 
+                      : 'Projeto Acadêmico'}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="secao-compromisso-banner">
+        <div className="card-compromisso-escuro">
+          <span className="badge-compromisso">Nosso Compromisso</span>
+          <h2>Dando visibilidade às ideias, conectando pessoas e compartilhando conhecimento.</h2>
+          <p>
+            O PublicaIFSC nasce com a proposta de tornar a produção acadêmica mais visível, acessível e conectada. Entendemos que uma instituição de ensino se fortalece quando compartilha aquilo que produz, permitindo que experiências individuais se transformem em conhecimento coletivo.
+          </p>
+          <div className="acoes-compromisso">
+            <Link to="/submissao" className="botao-cta-destaque">
+              Submeter seu Projeto Agora
+            </Link>
+          </div>
+        </div>
+      </section>
 
     </main>
   );

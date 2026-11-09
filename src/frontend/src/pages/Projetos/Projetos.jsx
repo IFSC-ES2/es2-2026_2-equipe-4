@@ -57,11 +57,12 @@ function Projetos() {
 
       if (resposta.ok || resposta.status === 204) {
         setProjetos((prev) => prev.filter((p) => p.id !== id));
+        alert('Projeto apagado com sucesso.');
       } else {
-        setProjetos((prev) => prev.filter((p) => p.id !== id));
+        alert('Acesso negado: Você só pode apagar os projetos que você mesmo criou.');
       }
     } catch (err) {
-      setProjetos((prev) => prev.filter((p) => p.id !== id));
+      alert('Erro de conexão ao tentar apagar o projeto.');
     } finally {
       setIdConfirmandoDelecao(null);
     }
@@ -85,7 +86,6 @@ function Projetos() {
             />
           ) : (
             <div style={{ textAlign: 'center', color: '#94a3b8', padding: '50px 20px', border: '2px dashed #e2e8f0', borderRadius: '12px' }}>
-              <div style={{ fontSize: '40px', marginBottom: '16px' }}>🗺️</div>
               <h3 style={{ color: '#475569' }}>Vitrine em construção</h3>
             </div>
           )}
@@ -148,11 +148,11 @@ function Projetos() {
                       
                       {projeto.imagens && projeto.imagens.length > 0 ? (
                         <button onClick={() => setImagensModal(projeto.imagens)} className="link-acao demo">
-                          👁️ Ver Demo
+                          Ver Demo
                         </button>
                       ) : projeto.linkDemonstracao ? (
                         <a href={projeto.linkDemonstracao} target="_blank" rel="noreferrer" className="link-acao demo">
-                          👁️ Link Demo
+                          Link Demo
                         </a>
                       ) : null}
                     </div>
@@ -170,7 +170,7 @@ function Projetos() {
                             animation: 'fadeIn 0.2s ease-out'
                           }}
                         >
-                          Tens certeza?
+                          Tem certeza?
                         </span>
                       )}
 
@@ -179,9 +179,12 @@ function Projetos() {
                         title={estaConfirmando ? "Clique para confirmar a exclusão" : "Apagar projeto"}
                         style={{
                           background: estaConfirmando ? '#fef2f2' : 'transparent',
-                          border: estaConfirmando ? '1px solid #fecaca' : 'none',
+                          color: estaConfirmando ? '#b91c1c' : '#64748b',
+                          border: estaConfirmando ? '1px solid #fecaca' : '1px solid #e2e8f0',
                           borderRadius: '6px',
-                          padding: '6px 8px',
+                          padding: '6px 12px',
+                          fontSize: '12px',
+                          fontWeight: '600',
                           cursor: 'pointer',
                           minHeight: 'unset',
                           display: 'flex',
@@ -190,7 +193,7 @@ function Projetos() {
                           transition: 'all 0.2s ease'
                         }}
                       >
-                        🗑️
+                        Apagar
                       </button>
                     </div>
 
