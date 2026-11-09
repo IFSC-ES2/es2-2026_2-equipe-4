@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import MapaProjetos from '../../components/MapaProjetos/MapaProjetos';
+import { API_BASE_URL } from '../../config/api';
 
 function Projetos() {
   const [projetos, setProjetos] = useState([]);
@@ -10,7 +11,7 @@ function Projetos() {
   const [imagensModal, setImagensModal] = useState(null);
   const [idConfirmandoDelecao, setIdConfirmandoDelecao] = useState(null);
 
-  const API_BASE_URL = 'http://localhost:8080';
+  //const API_BASE_URL = 'http://localhost:8080';
 
   useEffect(() => {
     async function buscarProjetos() {
