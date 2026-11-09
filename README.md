@@ -18,9 +18,13 @@ MongoDB para os dados e GridFS para os arquivos. O Docker Compose reúne os serv
 
 ## Executar
 
+Consulte [configuração de ambiente e deploy local](docs/DEPLOY.md) para ver as
+variáveis do `.env`, execução direta sem containers, validação e limitações.
+
 ### Com Docker
 
-Requisito: Docker com Compose. Na raiz do repositório:
+Requisito: Docker com Compose. Na primeira execução, copie `.env.example` para
+`.env` e configure os valores locais, conforme `docs/DEPLOY.md`. Na raiz:
 
 ```bash
 docker compose up -d --build
@@ -30,8 +34,10 @@ docker compose up -d --build
 - Galeria: <http://localhost:5173/projetos>
 - API: <http://localhost:8080/api/v1>
 
-O banco usa um volume persistente. O Compose adiciona 30 projetos de exemplo
-quando o banco está vazio. Após atualizar o código, repita o comando de build.
+O banco usa um volume persistente. O seed de projetos fictícios fica desligado
+por padrão. Após atualizar o código ou a URL configurada da API, repita o
+comando de build.
+
 
 ### Desenvolvimento
 
