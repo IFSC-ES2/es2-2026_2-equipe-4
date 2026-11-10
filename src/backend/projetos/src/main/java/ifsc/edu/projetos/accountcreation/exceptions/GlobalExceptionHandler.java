@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -76,6 +77,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResponseErro> handleDataIntegrity(DataIntegrityViolationException ex, HttpServletRequest request) {
         ResponseErro responseErr = new ResponseErro(409, Map.of("mensagem", "Já existe um registro com os dados informados"), request.getRequestURI());
         return ResponseEntity.status(409).body(responseErr);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ResponseErro> handleUploadTooLarge(MaxUploadSizeExceededException ex, HttpServletRequest request) {
+        ResponseErro responseErr = new ResponseErro(413, Map.of("mensagem", "A imagem deve ter no máximo 5 MB"), request.getRequestURI());
+        return ResponseEntity.status(413).body(responseErr);
     }
 
     @ExceptionHandler(Exception.class)
