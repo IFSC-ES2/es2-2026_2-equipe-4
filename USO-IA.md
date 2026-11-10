@@ -251,3 +251,10 @@ Validação: Leitura e pequenas correções feitas
   Uso: Ajuda para os comandos que deveriam ser executados no containers e comandos a serem colocados no docker-compose para usar o .env
   Artefatos: docker-compose.yaml
   Validação: Toda a aplicação foi iniciado mais de 3x para validar o funcionamento de todos as partes.
+
+
+- Data: 10/11/2026
+  Ferramenta: Claude
+  Uso: Apoio na resolução do código de troca de imagem do projeto
+  Artefatos: ProjetoService.java, ProjetoController.java, GlobalExceptionHandler.java, application.properties e src/frontend/public/imagens-padrao/
+  Validação: código rodado e testado, vendo o resultado das imagens nos projetos
