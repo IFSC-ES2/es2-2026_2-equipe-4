@@ -41,6 +41,15 @@ public class ProjetoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 
+    // Rota 3: troca a imagem do projeto (multipart/form-data, campo "arquivo")
+    @PutMapping(value = "/{id}/imagem", consumes = "multipart/form-data")
+    public ResponseEntity<Projeto> trocarImagem(@PathVariable String id,
+            @RequestParam("arquivo") MultipartFile arquivo, Authentication authentication) {
+
+        Projeto atualizado = projetoService.trocarImagem(id, arquivo, authentication.getName());
+        return ResponseEntity.ok(atualizado);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> argumentoInvalido(IllegalArgumentException ex) {
         Map<String, Object> body = new LinkedHashMap<>();

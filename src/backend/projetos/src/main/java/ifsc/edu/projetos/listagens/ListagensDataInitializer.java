@@ -2,6 +2,7 @@ package ifsc.edu.projetos.listagens;
 
 import ifsc.edu.projetos.dtos.Projeto;
 import ifsc.edu.projetos.repositories.ProjetoRepository;
+import ifsc.edu.projetos.services.ProjetoService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -70,7 +71,7 @@ public class ListagensDataInitializer implements ApplicationRunner {
             projeto.setAutores(AUTORES.get(index % AUTORES.size()));
             projeto.setTecnologias(TECNOLOGIAS.get(index % TECNOLOGIAS.size()));
             projeto.setTema(TEMAS[index % TEMAS.length]);
-            projeto.setImagens(List.of());
+            projeto.setImagens(List.of(ProjetoService.imagemPadraoAleatoria()));
             projeto.setLinkRepositorio(String.format(
                     "https://github.com/ifsc-projetos/exemplo-%02d", index + 1));
             projeto.setLinkDemonstracao("");
