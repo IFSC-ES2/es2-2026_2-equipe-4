@@ -9,9 +9,8 @@ function Projetos() {
   const [erro, setErro] = useState('');
   
   const [imagensModal, setImagensModal] = useState(null);
+  const [projetoSelecionado, setProjetoSelecionado] = useState(null);
   const [idConfirmandoDelecao, setIdConfirmandoDelecao] = useState(null);
-
-  //const API_BASE_URL = 'http://localhost:8080';
 
   useEffect(() => {
     async function buscarProjetos() {
@@ -69,150 +68,247 @@ function Projetos() {
   };
 
   return (
-    <main className="pagina-animada" style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 24px', minHeight: '80vh' }}>
+    <main className="pagina-animada" style={{ width: '100%', margin: '0 auto', minHeight: '80vh' }}>
       
-      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-        <h1 style={{ fontSize: '36px', color: '#0f172a', marginBottom: '16px' }}>Galeria de Projetos</h1>
-        <p style={{ color: '#475569' }}>Filtre pelas áreas de conhecimento e explore o código.</p>
-      </div>
-
-      {!carregando && !erro && (
-        <div style={{ marginBottom: '40px' }}>
-          {projetos.length > 0 ? (
-            <MapaProjetos 
-              projetos={projetos} 
-              temaSelecionado={temaSelecionado} 
-              onTemaClick={setTemaSelecionado} 
-            />
-          ) : (
-            <div style={{ textAlign: 'center', color: '#94a3b8', padding: '50px 20px', border: '2px dashed #e2e8f0', borderRadius: '12px' }}>
-              <h3 style={{ color: '#475569' }}>Vitrine em construção</h3>
-            </div>
-          )}
+      <div style={{ background: '#f8fafc', padding: '60px 24px 40px', borderBottom: '1px solid #e2e8f0', textAlign: 'center' }}>
+        <div style={{ maxWidth: '1140px', margin: '0 auto' }}>
+          <h1 style={{ fontSize: '40px', color: '#0f172a', marginBottom: '16px', fontWeight: '800', letterSpacing: '-1px' }}>
+            Showcase de Projetos
+          </h1>
+          <p style={{ color: '#475569', fontSize: '18px', maxWidth: '600px', margin: '0 auto' }}>
+            Descubra inovações, explore o código aberto e veja demonstrações reais do que nossa comunidade está construindo.
+          </p>
         </div>
-      )}
-      
-      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '40px' }}>
-        {temasDinamicos.map((tema) => {
-          const isAtivo = temaSelecionado === tema;
-          const contagem = tema === 'Todos' ? projetos.length : projetos.filter(p => p.tema === tema).length;
-
-          return (
-            <button 
-              key={tema} 
-              onClick={() => setTemaSelecionado(tema)}
-              className={`filtro-btn ${isAtivo ? 'ativo' : ''}`}
-            >
-              {tema} ({contagem})
-            </button>
-          )
-        })}
       </div>
 
-      {carregando && <p style={{ textAlign: 'center', color: '#475569' }}>A procurar inovações...</p>}
-      {erro && <p style={{ textAlign: 'center', color: '#ef4444' }}>{erro}</p>}
+      <div style={{ maxWidth: '1140px', margin: '0 auto', padding: '40px 24px 80px' }}>
+        
+        {!carregando && !erro && (
+          <div style={{ marginBottom: '48px' }}>
+            {projetos.length > 0 ? (
+              <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
+                <MapaProjetos 
+                  projetos={projetos} 
+                  temaSelecionado={temaSelecionado} 
+                  onTemaClick={setTemaSelecionado} 
+                />
+              </div>
+            ) : null}
+          </div>
+        )}
+        
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '48px' }}>
+          {temasDinamicos.map((tema) => {
+            const isAtivo = temaSelecionado === tema;
+            const contagem = tema === 'Todos' ? projetos.length : projetos.filter(p => p.tema === tema).length;
 
-      {!carregando && !erro && (
-        <div className="grelha-horizontal">
-          {projetosFiltrados.length === 0 ? (
-            <div style={{ width: '100%', textAlign: 'center', color: '#94a3b8', padding: '40px' }}>
-              Nenhum projeto encontrado para esta categoria.
-            </div>
-          ) : (
-            projetosFiltrados.map((projeto) => {
-              const estaConfirmando = idConfirmandoDelecao === projeto.id;
+            return (
+              <button 
+                key={tema} 
+                onClick={() => setTemaSelecionado(tema)}
+                className={`filtro-btn ${isAtivo ? 'ativo' : ''}`}
+                style={{
+                  background: isAtivo ? '#0f172a' : '#ffffff',
+                  color: isAtivo ? '#ffffff' : '#475569',
+                  border: isAtivo ? '1px solid #0f172a' : '1px solid #cbd5e1',
+                  borderRadius: '20px',
+                  padding: '6px 16px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                {tema} <span style={{ opacity: isAtivo ? 0.7 : 0.5, marginLeft: '4px' }}>{contagem}</span>
+              </button>
+            )
+          })}
+        </div>
 
-              return (
-                <div key={projeto.id} className="cartao-projeto cartao-compacto">
-                  <span className="badge-tema">{projeto.tema}</span>
-                  <h3 className="titulo-cartao">{projeto.titulo}</h3>
-                  <p className="resumo-cartao">{projeto.resumo}</p>
-                  
-                  <div style={{ marginBottom: '20px', flexGrow: 1 }}>
-                    <small style={{ color: '#64748b', display: 'block', fontWeight: '600' }}>
-                      Autores: <span style={{fontWeight: 'normal'}}>{projeto.autores?.join(', ')}</span>
-                    </small>
-                  </div>
-                  
-                  <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'space-between', 
-                    borderTop: '1px solid #f1f5f9', 
-                    paddingTop: '16px' 
-                  }}>
-                    <div style={{ display: 'flex', gap: '12px' }}>
-                      {projeto.linkRepositorio && (
-                        <a href={projeto.linkRepositorio} target="_blank" rel="noreferrer" className="link-acao rep">{'</>'} Código</a>
-                      )}
-                      
+        {carregando && <p style={{ textAlign: 'center', color: '#475569' }}>Procurando projetos...</p>}
+        {erro && <p style={{ textAlign: 'center', color: '#ef4444' }}>{erro}</p>}
+
+        {!carregando && !erro && (
+          <div className="galeria-behance" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '32px' }}>
+            {projetosFiltrados.length === 0 ? (
+              <div style={{ width: '100%', textAlign: 'center', color: '#94a3b8', padding: '60px', gridColumn: '1 / -1', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+                <h3 style={{ margin: '0 0 8px 0', color: '#64748b' }}>Nenhum projeto encontrado.</h3>
+                <p style={{ margin: 0, fontSize: '14px' }}>Selecione outra categoria ou submeta o seu primeiro projeto.</p>
+              </div>
+            ) : (
+              projetosFiltrados.map((projeto) => {
+                const estaConfirmando = idConfirmandoDelecao === projeto.id;
+
+                return (
+                  <div 
+                    key={projeto.id} 
+                    className="cartao-galeria" 
+                    style={{ height: '100%', cursor: 'pointer' }}
+                    onClick={() => setProjetoSelecionado(projeto)}
+                  >
+                    
+                    <div className="imagem-galeria">
                       {projeto.imagens && projeto.imagens.length > 0 ? (
-                        <button onClick={() => setImagensModal(projeto.imagens)} className="link-acao demo">
-                          Ver Demo
-                        </button>
-                      ) : projeto.linkDemonstracao ? (
-                        <a href={projeto.linkDemonstracao} target="_blank" rel="noreferrer" className="link-acao demo">
-                          Link Demo
-                        </a>
-                      ) : null}
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      {estaConfirmando && (
-                        <span 
-                          onClick={() => handleDeletarProjeto(projeto.id)}
-                          style={{ 
-                            fontSize: '12px', 
-                            color: '#dc2626', 
-                            fontWeight: '700', 
-                            cursor: 'pointer',
-                            whiteSpace: 'nowrap',
-                            animation: 'fadeIn 0.2s ease-out'
-                          }}
-                        >
-                          Tem certeza?
-                        </span>
+                        <img src={projeto.imagens[0]} alt={projeto.titulo} />
+                      ) : (
+                        <div className="placeholder-img">
+                          <span style={{ fontSize: '12px', letterSpacing: '1px' }}>{projeto.tema || 'Projeto'}</span>
+                        </div>
                       )}
-
-                      <button
-                        onClick={() => handleDeletarProjeto(projeto.id)}
-                        title={estaConfirmando ? "Clique para confirmar a exclusão" : "Apagar projeto"}
-                        style={{
-                          background: estaConfirmando ? '#fef2f2' : 'transparent',
-                          color: estaConfirmando ? '#b91c1c' : '#64748b',
-                          border: estaConfirmando ? '1px solid #fecaca' : '1px solid #e2e8f0',
-                          borderRadius: '6px',
-                          padding: '6px 12px',
-                          fontSize: '12px',
-                          fontWeight: '600',
-                          cursor: 'pointer',
-                          minHeight: 'unset',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          transition: 'all 0.2s ease'
-                        }}
-                      >
-                        Apagar
-                      </button>
                     </div>
 
+                    <div style={{ padding: '16px 4px 4px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                      <h4 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '18px', fontWeight: '700' }}>{projeto.titulo}</h4>
+                      
+                      <div style={{ marginTop: 'auto' }}>
+                        <small style={{ color: '#64748b', display: 'block', fontWeight: '500', marginBottom: '16px' }}>
+                          Por <span style={{ color: '#0f172a', fontWeight: '600' }}>{projeto.autores?.join(', ')}</span>
+                        </small>
+                        
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            {projeto.linkRepositorio && (
+                              <a 
+                                href={projeto.linkRepositorio} 
+                                target="_blank" 
+                                rel="noreferrer" 
+                                onClick={(e) => e.stopPropagation()}
+                                style={{ background: '#f1f5f9', color: '#0f172a', padding: '6px 12px', borderRadius: '6px', fontSize: '13px', fontWeight: '600', textDecoration: 'none' }}
+                              >
+                                Código
+                              </a>
+                            )}
+                            
+                            {projeto.imagens && projeto.imagens.length > 0 ? (
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setImagensModal(projeto.imagens);
+                                }} 
+                                style={{ background: '#eef6f3', color: '#146c5a', border: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
+                              >
+                                Ver Demo
+                              </button>
+                            ) : projeto.linkDemonstracao ? (
+                              <a 
+                                href={projeto.linkDemonstracao} 
+                                target="_blank" 
+                                rel="noreferrer" 
+                                onClick={(e) => e.stopPropagation()}
+                                style={{ background: '#eef6f3', color: '#146c5a', padding: '6px 12px', borderRadius: '6px', fontSize: '13px', fontWeight: '600', textDecoration: 'none' }}
+                              >
+                                Acessar
+                              </a>
+                            ) : null}
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeletarProjeto(projeto.id);
+                              }}
+                              style={{
+                                background: estaConfirmando ? '#fef2f2' : 'transparent',
+                                color: estaConfirmando ? '#dc2626' : '#94a3b8',
+                                border: 'none',
+                                padding: '6px',
+                                fontSize: '13px',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                borderRadius: '4px',
+                                transition: 'all 0.2s'
+                              }}
+                            >
+                              {estaConfirmando ? 'Confirmar Exclusão' : 'Apagar'}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              );
-            })
-          )}
+                );
+              })
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* MODAL COM OS DETALHES COMPLETOS DO PROJETO */}
+      {projetoSelecionado && (
+        <div className="modal-overlay" onClick={() => setProjetoSelecionado(null)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ padding: '32px', maxWidth: '700px', borderRadius: '16px' }}>
+            <button className="fechar-modal" onClick={() => setProjetoSelecionado(null)}>X</button>
+            
+            <div style={{ marginBottom: '24px' }}>
+              <span className="badge-produto-tag" style={{ background: '#eef6f3', color: '#146c5a', padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '700', border: '1px solid #d1ebe3' }}>
+                {projetoSelecionado.tema}
+              </span>
+            </div>
+            
+            <h2 style={{ fontSize: '28px', color: '#0f172a', marginBottom: '8px', fontWeight: '800' }}>
+              {projetoSelecionado.titulo}
+            </h2>
+            
+            <p style={{ color: '#64748b', fontSize: '15px', fontWeight: '500', marginBottom: '24px' }}>
+              Desenvolvido por <strong style={{ color: '#0f172a' }}>{projetoSelecionado.autores?.join(', ')}</strong>
+            </p>
+
+            <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', marginBottom: '24px', border: '1px solid #e2e8f0' }}>
+              <h4 style={{ margin: '0 0 12px', color: '#0f172a', fontSize: '16px' }}>Sobre o Projeto</h4>
+              <p style={{ margin: 0, color: '#475569', fontSize: '15px', lineHeight: '1.6' }}>
+                {projetoSelecionado.resumo}
+              </p>
+            </div>
+
+            <div style={{ marginBottom: '32px' }}>
+              <h4 style={{ margin: '0 0 12px', color: '#0f172a', fontSize: '16px' }}>Tecnologias Utilizadas</h4>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {projetoSelecionado.tecnologias?.map((tech, idx) => (
+                  <span key={idx} style={{ background: '#ffffff', border: '1px solid #cbd5e1', color: '#475569', padding: '6px 14px', borderRadius: '6px', fontSize: '13px', fontWeight: '600' }}>
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', borderTop: '1px solid #e2e8f0', paddingTop: '24px' }}>
+              {projetoSelecionado.linkRepositorio && (
+                <a href={projetoSelecionado.linkRepositorio} target="_blank" rel="noreferrer" style={{ background: '#0f172a', color: '#ffffff', padding: '10px 20px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none' }}>
+                  Ver Código Fonte
+                </a>
+              )}
+              {projetoSelecionado.imagens && projetoSelecionado.imagens.length > 0 && (
+                <button 
+                  onClick={() => setImagensModal(projetoSelecionado.imagens)} 
+                  style={{ background: '#f1f5f9', color: '#0f172a', border: '1px solid #cbd5e1', padding: '10px 20px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}
+                >
+                  Galeria de Imagens
+                </button>
+              )}
+              {projetoSelecionado.linkDemonstracao && (
+                <a href={projetoSelecionado.linkDemonstracao} target="_blank" rel="noreferrer" style={{ background: '#eef6f3', color: '#146c5a', border: '1px solid #d1ebe3', padding: '10px 20px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none' }}>
+                  Acessar Plataforma
+                </a>
+              )}
+            </div>
+
+          </div>
         </div>
       )}
 
       {imagensModal && (
-        <div className="modal-overlay" onClick={() => setImagensModal(null)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <button className="fechar-modal" onClick={() => setImagensModal(null)}>X</button>
-            <h3 style={{marginTop: 0}}>Imagens do Projeto</h3>
-            <div className="galeria-imagens">
+        <div className="modal-overlay" style={{ zIndex: 10000 }} onClick={() => setImagensModal(null)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ padding: '24px', maxWidth: '900px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h3 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>Demonstração Visual</h3>
+              <button onClick={() => setImagensModal(null)} style={{ background: '#f1f5f9', border: 'none', width: '32px', height: '32px', borderRadius: '50%', color: '#0f172a', fontWeight: 'bold', cursor: 'pointer' }}>
+                X
+              </button>
+            </div>
+            <div className="galeria-imagens" style={{ gap: '24px' }}>
               {imagensModal.map((img, idx) => (
-                <img key={idx} src={img} alt={`Demonstração ${idx + 1}`} className="imagem-demo" />
+                <img key={idx} src={img} alt={`Demonstração ${idx + 1}`} style={{ width: '100%', borderRadius: '8px', border: '1px solid #e2e8f0' }} />
               ))}
             </div>
           </div>

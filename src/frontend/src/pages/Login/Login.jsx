@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import MapaProjetos from '../../components/MapaProjetos/MapaProjetos';
 import { API_BASE_URL } from '../../config/api';
 
@@ -9,7 +9,7 @@ function Login() {
   const [carregando, setCarregando] = useState(false);
   const [status, setStatus] = useState({ tipo: '', mensagem: '' });
   const [projetosMapa, setProjetosMapa] = useState([]);
-  const [temaLogin, setTemaLogin] = useState('Todos'); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function carregarProjetosParaMapa() {
@@ -46,6 +46,7 @@ function Login() {
       const dados = await resposta.json();
       localStorage.setItem('token', dados.token);
       setStatus({ tipo: 'sucesso', mensagem: 'Acesso liberado!' });
+      
       setTimeout(() => navigate('/'), 800); 
 
     } catch (erro) {
