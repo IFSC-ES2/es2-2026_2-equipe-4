@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import MapaProjetos from '../../components/MapaProjetos/MapaProjetos';
 import { API_BASE_URL } from '../../config/api';
 
@@ -7,8 +8,7 @@ function Projetos() {
   const [temaSelecionado, setTemaSelecionado] = useState('Todos');
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
-  
-  const [imagensModal, setImagensModal] = useState(null);
+
   const [idConfirmandoDelecao, setIdConfirmandoDelecao] = useState(null);
 
   //const API_BASE_URL = 'http://localhost:8080';
@@ -125,7 +125,9 @@ function Projetos() {
               return (
                 <div key={projeto.id} className="cartao-projeto cartao-compacto">
                   <span className="badge-tema">{projeto.tema}</span>
-                  <h3 className="titulo-cartao">{projeto.titulo}</h3>
+                  <h3 className="titulo-cartao">
+                    <Link to={`/projetos/${projeto.id}`} className="link-detalhe">{projeto.titulo}</Link>
+                  </h3>
                   <p className="resumo-cartao">{projeto.resumo}</p>
                   
                   <div style={{ marginBottom: '20px', flexGrow: 1 }}>
@@ -142,19 +144,13 @@ function Projetos() {
                     paddingTop: '16px' 
                   }}>
                     <div style={{ display: 'flex', gap: '12px' }}>
+                      <Link to={`/projetos/${projeto.id}`} className="link-acao detalhes">
+                        Detalhes
+                      </Link>
+
                       {projeto.linkRepositorio && (
                         <a href={projeto.linkRepositorio} target="_blank" rel="noreferrer" className="link-acao rep">{'</>'} Código</a>
                       )}
-                      
-                      {projeto.imagens && projeto.imagens.length > 0 ? (
-                        <button onClick={() => setImagensModal(projeto.imagens)} className="link-acao demo">
-                          👁️ Ver Demo
-                        </button>
-                      ) : projeto.linkDemonstracao ? (
-                        <a href={projeto.linkDemonstracao} target="_blank" rel="noreferrer" className="link-acao demo">
-                          👁️ Link Demo
-                        </a>
-                      ) : null}
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -199,20 +195,6 @@ function Projetos() {
               );
             })
           )}
-        </div>
-      )}
-
-      {imagensModal && (
-        <div className="modal-overlay" onClick={() => setImagensModal(null)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <button className="fechar-modal" onClick={() => setImagensModal(null)}>X</button>
-            <h3 style={{marginTop: 0}}>Imagens do Projeto</h3>
-            <div className="galeria-imagens">
-              {imagensModal.map((img, idx) => (
-                <img key={idx} src={img} alt={`Demonstração ${idx + 1}`} className="imagem-demo" />
-              ))}
-            </div>
-          </div>
         </div>
       )}
     </main>

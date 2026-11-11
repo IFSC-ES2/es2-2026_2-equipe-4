@@ -391,6 +391,15 @@ button:disabled {
   text-overflow: ellipsis;
 }
 
+.titulo-cartao .link-detalhe {
+  color: inherit;
+  text-decoration: none;
+}
+
+.titulo-cartao .link-detalhe:hover {
+  text-decoration: underline;
+}
+
 .resumo-cartao {
   color: #475569;
   font-size: 14px;
@@ -417,6 +426,8 @@ button:disabled {
 .link-acao.rep:hover { background: #d1ebe3; }
 .link-acao.demo { color: #0f172a; background: #f1f5f9; }
 .link-acao.demo:hover { background: #e2e8f0; }
+.link-acao.detalhes { color: #ffffff; background: #0f172a; }
+.link-acao.detalhes:hover { background: #1e293b; }
 
 .modal-overlay {
   position: fixed;
