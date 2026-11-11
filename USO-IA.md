@@ -258,3 +258,10 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio na resolução do código de troca de imagem do projeto
   Artefatos: ProjetoService.java, ProjetoController.java, GlobalExceptionHandler.java, application.properties e src/frontend/public/imagens-padrao/
   Validação: código rodado e testado, vendo o resultado das imagens nos projetos
+
+
+- Data: 10/11/2026
+  Ferramenta: Claude
+  Uso: Apoio na implementação da página de detalhes do projeto, da rota de leitura das imagens e do registro de erros no log (#172).
+  Artefatos: src/frontend/src/pages/ProjetoDetalhe/, Projetos.jsx, ProjetoController.java e GlobalExceptionHandler.java
+  Validação: página conferida no navegador e testes do front-end executados
