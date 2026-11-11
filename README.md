@@ -7,9 +7,13 @@ sem login; estudantes e professores cadastrados podem publicar seus trabalhos.
 
 - Cadastro e login com JWT.
 - Publicação de projetos com título, resumo, autores, tema, tecnologias, imagens e links. A autoria é definida pelo usuário autenticado.
-- Galeria pública com filtro por tema e mensagens de carregamento, lista vazia e erro.
+- Galeria pública de projetos, com filtro por tema e visualização das imagens disponíveis.
 - API com listagem paginada, consulta por identificador e filtro por tecnologias.
-- Página Sobre e navegação entre cadastro, login, galeria e submissão.
+- Página Sobre com informações do projeto e navegação entre cadastro, login, galeria e submissão.
+- Troca da imagem de um projeto pelo próprio autor, com autenticação.
+
+As configurações locais ficam em `.env`, criado a partir de `.env.example`.
+Não versione valores sensíveis; consulte [configuração de ambiente e deploy](docs/DEPLOY.md).
 
 ## Tecnologias
 
@@ -87,23 +91,21 @@ documentação em PRs para `main` e `entrega-*`.
 
 ## Limitações e pendências
 
-- Imagens enviadas ainda não têm rota de leitura e o limite de upload é de 1 MB.
-- A galeria carrega até 100 projetos, tela de detalhe e busca por texto estão pendentes.
+- A galeria carrega até 100 projetos; busca por texto ainda está pendente.
+- Imagens enviadas ao GridFS não têm rota de leitura dedicada; a galeria exibe imagens acessíveis pelas URLs presentes nos dados do projeto.
+- O limite atual de upload de imagem é de 5 MB.
 - A exclusão pela galeria ainda não tem suporte na API.
-- Arquitetura, revisão dos ADRs e refatoração do armazenamento ainda aguardam integração nos PRs indicados abaixo.
 
 ## Documentação e acompanhamento
 
-- [Arquitetura](https://github.com/IFSC-ES2/es2-2026_2-equipe-4/blob/TASK/129-arquitetura-mvp/docs/ARQUITETURA.md) — em revisão no [PR #144](https://github.com/IFSC-ES2/es2-2026_2-equipe-4/pull/144).
-- [ADRs](docs/adr/) e [revisão da Sprint 3 — PR #143](https://github.com/IFSC-ES2/es2-2026_2-equipe-4/pull/143).
-- [Reengenharia e medições](https://github.com/IFSC-ES2/es2-2026_2-equipe-4/blob/TASK/131-armazenamento-arquivos/docs/REENGENHARIA.md) — em revisão no [PR #147](https://github.com/IFSC-ES2/es2-2026_2-equipe-4/pull/147).
-- [Registro da Sprint 3](docs/sprints/sprint-3.md).
+- [Arquitetura](docs/ARQUITETURA.md), [ADRs](docs/adr/) e [reengenharia e medições](docs/REENGENHARIA.md).
+- [Registro da Sprint 3](docs/sprints/sprint-3.md) e [Sprint 4](docs/sprints/sprint-4.md).
 - [Métricas](docs/METRICAS.md) e [fichas](docs/metricas/).
 - [Riscos](docs/riscos.md), [qualidade](docs/qualidade.md) e [DoD](docs/dod.md).
 - [Uso de IA](USO-IA.md) e [fluxo de trabalho](docs/fluxo-de-trabalho.md).
-- Histórico: [Inception](docs/inception.md), [baseline](docs/BASELINE.md), [estimativas](docs/ESTIMATIVAS.md), [Sprint 1](docs/sprints/sprint-1.md) e [Sprint 2](docs/sprints/sprint-2.md).
+- Histórico: [Inception](docs/inception.md), [baseline](docs/BASELINE.md), [estimativas](docs/ESTIMATIVAS.md), [Sprint 1](docs/sprints/sprint-1.md) e [Sprint 2](docs/sprints/sprint-2.md). Inception e baseline registram o escopo inicial de artigos; o produto atual é a vitrine de projetos.
 - [Board](https://github.com/orgs/IFSC-ES2/projects/34) e [backlog](https://github.com/IFSC-ES2/es2-2026_2-equipe-4/issues).
-- API: [login](src/backend/projetos/rotas-login.md), [contas](src/backend/projetos/rotas-de-criacao-de-contas.md) e [listagem pública](src/backend/docs/rotas-publicas-de-listagem-de-projetos.md).
+- API: [login](src/backend/projetos/rotas-login.md), [contas](src/backend/projetos/rotas-de-criacao-de-contas.md) e [listagem pública](src/backend/docs/rotas-publicas-de-listagem-de-projetos.md). A rota autenticada `PUT /api/v1/projetos/{id}/imagem` troca a imagem de um projeto; envie o arquivo multipart no campo `arquivo`.
 
 ## Equipe
 
