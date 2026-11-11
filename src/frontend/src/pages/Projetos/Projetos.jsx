@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import MapaProjetos from '../../components/MapaProjetos/MapaProjetos';
 import { API_BASE_URL } from '../../config/api';
 
@@ -7,9 +8,13 @@ function Projetos() {
   const [temaSelecionado, setTemaSelecionado] = useState('Todos');
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
+<<<<<<< HEAD
   
   const [imagensModal, setImagensModal] = useState(null);
   const [projetoSelecionado, setProjetoSelecionado] = useState(null);
+=======
+
+>>>>>>> origin/entrega-8
   const [idConfirmandoDelecao, setIdConfirmandoDelecao] = useState(null);
 
   useEffect(() => {
@@ -125,6 +130,7 @@ function Projetos() {
           })}
         </div>
 
+<<<<<<< HEAD
         {carregando && <p style={{ textAlign: 'center', color: '#475569' }}>Procurando projetos...</p>}
         {erro && <p style={{ textAlign: 'center', color: '#ef4444' }}>{erro}</p>}
 
@@ -154,6 +160,54 @@ function Projetos() {
                         <div className="placeholder-img">
                           <span style={{ fontSize: '12px', letterSpacing: '1px' }}>{projeto.tema || 'Projeto'}</span>
                         </div>
+=======
+              return (
+                <div key={projeto.id} className="cartao-projeto cartao-compacto">
+                  <span className="badge-tema">{projeto.tema}</span>
+                  <h3 className="titulo-cartao">
+                    <Link to={`/projetos/${projeto.id}`} className="link-detalhe">{projeto.titulo}</Link>
+                  </h3>
+                  <p className="resumo-cartao">{projeto.resumo}</p>
+                  
+                  <div style={{ marginBottom: '20px', flexGrow: 1 }}>
+                    <small style={{ color: '#64748b', display: 'block', fontWeight: '600' }}>
+                      Autores: <span style={{fontWeight: 'normal'}}>{projeto.autores?.join(', ')}</span>
+                    </small>
+                  </div>
+                  
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between', 
+                    borderTop: '1px solid #f1f5f9', 
+                    paddingTop: '16px' 
+                  }}>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <Link to={`/projetos/${projeto.id}`} className="link-acao detalhes">
+                        Detalhes
+                      </Link>
+
+                      {projeto.linkRepositorio && (
+                        <a href={projeto.linkRepositorio} target="_blank" rel="noreferrer" className="link-acao rep">{'</>'} Código</a>
+                      )}
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      {estaConfirmando && (
+                        <span 
+                          onClick={() => handleDeletarProjeto(projeto.id)}
+                          style={{ 
+                            fontSize: '12px', 
+                            color: '#dc2626', 
+                            fontWeight: '700', 
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap',
+                            animation: 'fadeIn 0.2s ease-out'
+                          }}
+                        >
+                          Tens certeza?
+                        </span>
+>>>>>>> origin/entrega-8
                       )}
                     </div>
 
@@ -296,6 +350,7 @@ function Projetos() {
           </div>
         </div>
       )}
+<<<<<<< HEAD
 
       {imagensModal && (
         <div className="modal-overlay" style={{ zIndex: 10000 }} onClick={() => setImagensModal(null)}>
@@ -314,6 +369,8 @@ function Projetos() {
           </div>
         </div>
       )}
+=======
+>>>>>>> origin/entrega-8
     </main>
   );
 }

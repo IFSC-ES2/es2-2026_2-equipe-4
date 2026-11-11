@@ -11,6 +11,7 @@ import Login from './pages/Login/Login.jsx';
 import Cadastro from './pages/Cadastro/Cadastro.jsx';
 import Sobre from './pages/Sobre/Sobre.jsx';
 import Projetos from './pages/Projetos/Projetos.jsx';
+import ProjetoDetalhe from './pages/ProjetoDetalhe/ProjetoDetalhe.jsx';
 
 createRoot(document.getElementById('root')).render(
 <StrictMode>
@@ -20,6 +21,7 @@ createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path="/" element={<Sobre />} />
         <Route path="/projetos" element={<Projetos />} />
+        <Route path="/projetos/:id" element={<ProjetoDetalhe />} />
         <Route path="/login" element={<Login />} />
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/submissao" element={<Enviar />} />
