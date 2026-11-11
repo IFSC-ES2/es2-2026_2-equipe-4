@@ -1,0 +1,380 @@
+/* Página de detalhes do projeto — segue o desenho:
+   título da página, e um quadro com imagem → descrição → tecnologias → links. */
+
+.detalhe-projeto {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+  min-height: 80vh;
+}
+
+.detalhe-voltar {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.detalhe-voltar:hover {
+  color: #0f172a;
+}
+
+.detalhe-mensagem {
+  padding: 60px 0;
+  text-align: center;
+  color: #475569;
+}
+
+.detalhe-erro {
+  color: #ef4444;
+}
+
+/* Título da página */
+.detalhe-cabecalho {
+  margin-bottom: 20px;
+}
+
+.detalhe-cabecalho h1 {
+  margin: 10px 0 6px;
+  font-size: 32px;
+  line-height: 1.2;
+  color: #0f172a;
+}
+
+.detalhe-tema {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #eef6f3;
+  color: #146c5a;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detalhe-autoria {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-top: 14px;
+}
+
+.detalhe-autoria .detalhe-rotulo {
+  margin: 0;
+}
+
+.detalhe-autores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.detalhe-autores li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px 4px 4px;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.detalhe-avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #146c5a;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Quadro principal */
+.detalhe-cartao {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px -12px rgba(15, 23, 42, 0.12);
+}
+
+.detalhe-cartao h2,
+.detalhe-rotulo {
+  margin: 0 0 10px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.detalhe-vazio {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+/* 1. Imagem */
+.detalhe-capa,
+.detalhe-galeria {
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.detalhe-capa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 280px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.14) 0, transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(255, 255, 255, 0.10) 0, transparent 45%),
+    linear-gradient(135deg, #0f172a 0%, #146c5a 100%);
+}
+
+.detalhe-capa-iniciais {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 72px;
+  font-weight: 800;
+  letter-spacing: 4px;
+}
+
+.detalhe-galeria {
+  background: #0f172a;
+}
+
+.detalhe-foto-principal {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+}
+
+.detalhe-foto-principal img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.detalhe-seta {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #0f172a;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.detalhe-seta:hover {
+  background: #ffffff;
+}
+
+.detalhe-seta.anterior { left: 16px; }
+.detalhe-seta.proxima { right: 16px; }
+
+.detalhe-contador {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.75);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.detalhe-miniaturas {
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  background: #1e293b;
+}
+
+.detalhe-miniatura {
+  flex-shrink: 0;
+  width: 88px;
+  height: 60px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  background: #0f172a;
+  overflow: hidden;
+  opacity: 0.6;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.detalhe-miniatura img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detalhe-miniatura:hover,
+.detalhe-miniatura.ativa {
+  opacity: 1;
+}
+
+.detalhe-miniatura.ativa {
+  border-color: #34d399;
+}
+
+/* 2. Descrição */
+.detalhe-descricao {
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.detalhe-descricao p {
+  margin: 0;
+  color: #334155;
+  font-size: 16px;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+/* 3. Tecnologias */
+.detalhe-tecnologias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.detalhe-tecnologias li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border: 1px solid #cfe5de;
+  border-radius: 8px;
+  background: #eef6f3;
+  color: #0f5547;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.detalhe-tecnologias li::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #146c5a;
+}
+
+/* 4. Links */
+.detalhe-links {
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.detalhe-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.detalhe-botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 200px;
+  padding: 12px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.detalhe-botao:hover {
+  border-color: #0f172a;
+  box-shadow: 0 6px 16px -8px rgba(15, 23, 42, 0.35);
+  transform: translateY(-1px);
+}
+
+.detalhe-botao-seta {
+  font-size: 16px;
+  opacity: 0.7;
+}
+
+.detalhe-botao.principal {
+  border-color: #0f172a;
+  background: #0f172a;
+  color: #ffffff;
+}
+
+.detalhe-botao.principal:hover {
+  background: #1e293b;
+}
+
+/* Telas pequenas */
+@media (max-width: 600px) {
+  .detalhe-projeto {
+    padding: 20px 16px 48px;
+  }
+
+  .detalhe-cabecalho h1 {
+    font-size: 26px;
+  }
+
+  .detalhe-cartao {
+    padding: 16px;
+  }
+
+  .detalhe-capa {
+    height: 180px;
+  }
+
+  .detalhe-capa-iniciais {
+    font-size: 56px;
+  }
+
+  .detalhe-foto-principal {
+    height: 240px;
+  }
+
+  .detalhe-seta {
+    width: 36px;
+    height: 36px;
+    font-size: 22px;
+  }
+
+  .detalhe-botao {
+    width: 100%;
+  }
+}
