@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 
 import ifsc.edu.projetos.accountcreation.service.UserService;
 import ifsc.edu.projetos.accountcreation.dtos.CreateUserRequest;
@@ -56,9 +58,16 @@ public class AccountController {
     }
 
     @PutMapping("/atualizar")
-    public final ResponseEntity<UserSummaryResponse> updateUser(@RequestBody @Valid CreateUserRequest UserRequestDTO){
+    public final ResponseEntity<UserSummaryResponse> updateUser(
+            @RequestBody @Valid CreateUserRequest UserRequestDTO,
+            Authentication authentication){
 
-        Optional<User> updatedUser = userService.updateUser(UserRequestDTO);
+        String emailAutenticado = authentication.getName();
+        if (!userService.isOwnerEmail(UserRequestDTO.getEmail(), emailAutenticado)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        Optional<User> updatedUser = userService.updateUser(UserRequestDTO, emailAutenticado);
         int statusResponse = updatedUser.isPresent() ? 200 : 404;
         String message = updatedUser.isPresent()
                 ? "Informações atualizadas com sucesso"
@@ -72,7 +81,11 @@ public class AccountController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public final ResponseEntity<?> deleteUser(@PathVariable("id") String userId){
+    public final ResponseEntity<?> deleteUser(@PathVariable("id") String userId, Authentication authentication){
+
+        if (!userService.isOwner(userId, authentication.getName())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
         if (userService.deleteUser(userId)) {
             return ResponseEntity.noContent().build();
