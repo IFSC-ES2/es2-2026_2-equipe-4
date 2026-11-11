@@ -66,21 +66,52 @@ npm run dev
 
 ## Testes
 
-Mantenha o MongoDB ativo para os testes de integração da API.
-Em `src/backend/projetos`:
+Os testes rodam localmente com JDK 25 (`JAVA_HOME`) e Node.js 24.
+O MongoDB roda no Docker; no Windows, mantenha o Docker Desktop aberto.
+
+### Preparar o ambiente
+
+Na raiz, crie o `.env` apenas se ele ainda não existir: `cp .env.example .env`
+no Bash ou `Copy-Item .env.example .env` no PowerShell. Confira os valores
+conforme [configuração de ambiente](docs/DEPLOY.md) e execute:
+
+```shell
+docker compose up -d --build
+docker compose ps
+```
+
+Aguarde o MongoDB ficar `healthy`.
+
+### Backend
+
+A partir da raiz, no Linux/macOS (Bash):
+
+```bash
+export TEST_MONGODB_URI='mongodb://publicaifsc_local:senha_muito_forte@localhost:27017/publicaifsc_test?authSource=admin'
+cd src/backend/projetos
+./gradlew test
+```
+
+No Windows (PowerShell):
 
 ```powershell
+$env:TEST_MONGODB_URI = 'mongodb://publicaifsc_local:senha_muito_forte@localhost:27017/publicaifsc_test?authSource=admin'
+cd src/backend/projetos
 .\gradlew.bat test
 ```
 
-Em `src/frontend`:
+Se alterou usuário, senha ou porta no `.env`, ajuste a URI e mantenha o banco
+exclusivo `publicaifsc_test`. O Gradle não carrega o `.env` automaticamente;
+a variável vale durante a sessão do terminal.
 
-```bash
-npm ci
-npm test -- --run
-```
+### Frontend
 
-No Linux/macOS, use `./gradlew` no lugar de `.\gradlew.bat`.
+Em outro terminal, a partir da raiz, execute `cd src/frontend` e:
+
+| Terminal | Instalar dependências | Executar testes uma vez |
+|---|---|---|
+| Linux/macOS (Bash) | `npm ci` | `npm test -- --run` |
+| Windows (PowerShell) | `npm.cmd ci` | `npm.cmd test -- --run` |
 
 O [CI](.github/workflows/ci.yml) executa testes, builds e verificações de
 documentação em PRs para `main` e `entrega-*`.
