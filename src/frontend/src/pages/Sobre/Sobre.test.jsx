@@ -32,15 +32,15 @@ describe('Sobre', () => {
         await abrirSobre()
 
         expect(
-            screen.getByRole('heading', { name: /explore o universo acadêmico do PublicaIFSC/i }),
+            screen.getByRole('heading', { name: /conhecimento que merece ser compartilhado/i }),
         ).toBeInTheDocument()
         expect(
-            screen.getByText(/O PublicaIFSC é uma plataforma web/i),
+            screen.getByText(/O PublicaIFSC é a vitrine digital desenvolvida/i),
         ).toBeInTheDocument()
-        expect(screen.getByRole('link', { name: 'Ver Galeria Completa' })).toHaveAttribute(
+        expect(screen.getByRole('link', { name: 'Explorar Vitrine' })).toHaveAttribute(
             'href', '/projetos',
         )
-        expect(screen.getByRole('link', { name: 'Submitar o seu Projeto' })).toHaveAttribute(
+        expect(screen.getByRole('link', { name: 'Publicar Projeto' })).toHaveAttribute(
             'href', '/submissao',
         )
     })
@@ -91,7 +91,7 @@ describe('Sobre', () => {
         await abrirSobre()
 
         expect(screen.getByRole('heading', { name: 'Vitrine em construção' })).toBeInTheDocument()
-        expect(screen.getByRole('link', { name: 'Ver Galeria Completa' })).toHaveAttribute(
+        expect(screen.getByRole('link', { name: 'Explorar Vitrine' })).toHaveAttribute(
             'href', '/projetos',
         )
         expect(
@@ -107,7 +107,7 @@ describe('Sobre', () => {
         await abrirSobre()
 
         expect(screen.getByRole('heading', { name: 'Vitrine em construção' })).toBeInTheDocument()
-        expect(screen.getByRole('link', { name: 'Submitar o seu Projeto' })).toHaveAttribute(
+        expect(screen.getByRole('link', { name: 'Publicar Projeto' })).toHaveAttribute(
             'href', '/submissao',
         )
         expect(
