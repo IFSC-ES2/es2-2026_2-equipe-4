@@ -1,20 +1,15 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import MapaProjetos from '../../components/MapaProjetos/MapaProjetos';
-import { API_BASE_URL } from '../../config/api';
+import { API_BASE_URL, urlImagem } from '../../config/api';
 
 function Projetos() {
+  const navigate = useNavigate();
   const [projetos, setProjetos] = useState([]);
   const [temaSelecionado, setTemaSelecionado] = useState('Todos');
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
-<<<<<<< HEAD
-  
-  const [imagensModal, setImagensModal] = useState(null);
-  const [projetoSelecionado, setProjetoSelecionado] = useState(null);
-=======
 
->>>>>>> origin/entrega-8
   const [idConfirmandoDelecao, setIdConfirmandoDelecao] = useState(null);
 
   useEffect(() => {
@@ -130,7 +125,6 @@ function Projetos() {
           })}
         </div>
 
-<<<<<<< HEAD
         {carregando && <p style={{ textAlign: 'center', color: '#475569' }}>Procurando projetos...</p>}
         {erro && <p style={{ textAlign: 'center', color: '#ef4444' }}>{erro}</p>}
 
@@ -150,64 +144,16 @@ function Projetos() {
                     key={projeto.id} 
                     className="cartao-galeria" 
                     style={{ height: '100%', cursor: 'pointer' }}
-                    onClick={() => setProjetoSelecionado(projeto)}
+                    onClick={() => navigate(`/projetos/${projeto.id}`)}
                   >
-                    
+
                     <div className="imagem-galeria">
                       {projeto.imagens && projeto.imagens.length > 0 ? (
-                        <img src={projeto.imagens[0]} alt={projeto.titulo} />
+                        <img src={urlImagem(projeto.imagens[0])} alt={projeto.titulo} />
                       ) : (
                         <div className="placeholder-img">
                           <span style={{ fontSize: '12px', letterSpacing: '1px' }}>{projeto.tema || 'Projeto'}</span>
                         </div>
-=======
-              return (
-                <div key={projeto.id} className="cartao-projeto cartao-compacto">
-                  <span className="badge-tema">{projeto.tema}</span>
-                  <h3 className="titulo-cartao">
-                    <Link to={`/projetos/${projeto.id}`} className="link-detalhe">{projeto.titulo}</Link>
-                  </h3>
-                  <p className="resumo-cartao">{projeto.resumo}</p>
-                  
-                  <div style={{ marginBottom: '20px', flexGrow: 1 }}>
-                    <small style={{ color: '#64748b', display: 'block', fontWeight: '600' }}>
-                      Autores: <span style={{fontWeight: 'normal'}}>{projeto.autores?.join(', ')}</span>
-                    </small>
-                  </div>
-                  
-                  <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'space-between', 
-                    borderTop: '1px solid #f1f5f9', 
-                    paddingTop: '16px' 
-                  }}>
-                    <div style={{ display: 'flex', gap: '12px' }}>
-                      <Link to={`/projetos/${projeto.id}`} className="link-acao detalhes">
-                        Detalhes
-                      </Link>
-
-                      {projeto.linkRepositorio && (
-                        <a href={projeto.linkRepositorio} target="_blank" rel="noreferrer" className="link-acao rep">{'</>'} Código</a>
-                      )}
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      {estaConfirmando && (
-                        <span 
-                          onClick={() => handleDeletarProjeto(projeto.id)}
-                          style={{ 
-                            fontSize: '12px', 
-                            color: '#dc2626', 
-                            fontWeight: '700', 
-                            cursor: 'pointer',
-                            whiteSpace: 'nowrap',
-                            animation: 'fadeIn 0.2s ease-out'
-                          }}
-                        >
-                          Tens certeza?
-                        </span>
->>>>>>> origin/entrega-8
                       )}
                     </div>
 
@@ -221,6 +167,14 @@ function Projetos() {
                         
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
                           <div style={{ display: 'flex', gap: '8px' }}>
+                            <Link
+                              to={`/projetos/${projeto.id}`}
+                              onClick={(e) => e.stopPropagation()}
+                              style={{ background: '#0f172a', color: '#ffffff', padding: '6px 12px', borderRadius: '6px', fontSize: '13px', fontWeight: '600', textDecoration: 'none' }}
+                            >
+                              Detalhes
+                            </Link>
+
                             {projeto.linkRepositorio && (
                               <a 
                                 href={projeto.linkRepositorio} 
@@ -233,18 +187,8 @@ function Projetos() {
                               </a>
                             )}
                             
-                            {projeto.imagens && projeto.imagens.length > 0 ? (
-                              <button 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setImagensModal(projeto.imagens);
-                                }} 
-                                style={{ background: '#eef6f3', color: '#146c5a', border: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
-                              >
-                                Ver Demo
-                              </button>
-                            ) : projeto.linkDemonstracao ? (
-                              <a 
+                            {projeto.linkDemonstracao && (
+                              <a
                                 href={projeto.linkDemonstracao} 
                                 target="_blank" 
                                 rel="noreferrer" 
@@ -253,7 +197,7 @@ function Projetos() {
                               >
                                 Acessar
                               </a>
-                            ) : null}
+                            )}
                           </div>
 
                           <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -287,90 +231,6 @@ function Projetos() {
           </div>
         )}
       </div>
-
-      {/* MODAL COM OS DETALHES COMPLETOS DO PROJETO */}
-      {projetoSelecionado && (
-        <div className="modal-overlay" onClick={() => setProjetoSelecionado(null)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ padding: '32px', maxWidth: '700px', borderRadius: '16px' }}>
-            <button className="fechar-modal" onClick={() => setProjetoSelecionado(null)}>X</button>
-            
-            <div style={{ marginBottom: '24px' }}>
-              <span className="badge-produto-tag" style={{ background: '#eef6f3', color: '#146c5a', padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '700', border: '1px solid #d1ebe3' }}>
-                {projetoSelecionado.tema}
-              </span>
-            </div>
-            
-            <h2 style={{ fontSize: '28px', color: '#0f172a', marginBottom: '8px', fontWeight: '800' }}>
-              {projetoSelecionado.titulo}
-            </h2>
-            
-            <p style={{ color: '#64748b', fontSize: '15px', fontWeight: '500', marginBottom: '24px' }}>
-              Desenvolvido por <strong style={{ color: '#0f172a' }}>{projetoSelecionado.autores?.join(', ')}</strong>
-            </p>
-
-            <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', marginBottom: '24px', border: '1px solid #e2e8f0' }}>
-              <h4 style={{ margin: '0 0 12px', color: '#0f172a', fontSize: '16px' }}>Sobre o Projeto</h4>
-              <p style={{ margin: 0, color: '#475569', fontSize: '15px', lineHeight: '1.6' }}>
-                {projetoSelecionado.resumo}
-              </p>
-            </div>
-
-            <div style={{ marginBottom: '32px' }}>
-              <h4 style={{ margin: '0 0 12px', color: '#0f172a', fontSize: '16px' }}>Tecnologias Utilizadas</h4>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {projetoSelecionado.tecnologias?.map((tech, idx) => (
-                  <span key={idx} style={{ background: '#ffffff', border: '1px solid #cbd5e1', color: '#475569', padding: '6px 14px', borderRadius: '6px', fontSize: '13px', fontWeight: '600' }}>
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', borderTop: '1px solid #e2e8f0', paddingTop: '24px' }}>
-              {projetoSelecionado.linkRepositorio && (
-                <a href={projetoSelecionado.linkRepositorio} target="_blank" rel="noreferrer" style={{ background: '#0f172a', color: '#ffffff', padding: '10px 20px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none' }}>
-                  Ver Código Fonte
-                </a>
-              )}
-              {projetoSelecionado.imagens && projetoSelecionado.imagens.length > 0 && (
-                <button 
-                  onClick={() => setImagensModal(projetoSelecionado.imagens)} 
-                  style={{ background: '#f1f5f9', color: '#0f172a', border: '1px solid #cbd5e1', padding: '10px 20px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}
-                >
-                  Galeria de Imagens
-                </button>
-              )}
-              {projetoSelecionado.linkDemonstracao && (
-                <a href={projetoSelecionado.linkDemonstracao} target="_blank" rel="noreferrer" style={{ background: '#eef6f3', color: '#146c5a', border: '1px solid #d1ebe3', padding: '10px 20px', borderRadius: '8px', fontSize: '14px', fontWeight: '600', textDecoration: 'none' }}>
-                  Acessar Plataforma
-                </a>
-              )}
-            </div>
-
-          </div>
-        </div>
-      )}
-<<<<<<< HEAD
-
-      {imagensModal && (
-        <div className="modal-overlay" style={{ zIndex: 10000 }} onClick={() => setImagensModal(null)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ padding: '24px', maxWidth: '900px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h3 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>Demonstração Visual</h3>
-              <button onClick={() => setImagensModal(null)} style={{ background: '#f1f5f9', border: 'none', width: '32px', height: '32px', borderRadius: '50%', color: '#0f172a', fontWeight: 'bold', cursor: 'pointer' }}>
-                X
-              </button>
-            </div>
-            <div className="galeria-imagens" style={{ gap: '24px' }}>
-              {imagensModal.map((img, idx) => (
-                <img key={idx} src={img} alt={`Demonstração ${idx + 1}`} style={{ width: '100%', borderRadius: '8px', border: '1px solid #e2e8f0' }} />
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-=======
->>>>>>> origin/entrega-8
     </main>
   );
 }

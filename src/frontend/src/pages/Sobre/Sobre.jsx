@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MapaProjetos from '../../components/MapaProjetos/MapaProjetos';
-import { API_BASE_URL } from '../../config/api';
+import { API_BASE_URL, urlImagem } from '../../config/api';
 
 function Sobre() {
   const [projetosAmostra, setProjetosAmostra] = useState([]);
@@ -155,10 +155,10 @@ function Sobre() {
           
           <div className="galeria-behance">
             {projetosAmostra.slice(0, 8).map(projeto => (
-              <div key={projeto.id} className="cartao-galeria">
+              <Link key={projeto.id} to={`/projetos/${projeto.id}`} className="cartao-galeria" style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div className="imagem-galeria">
                   {projeto.imagens && projeto.imagens.length > 0 ? (
-                    <img src={projeto.imagens[0]} alt={projeto.titulo} />
+                    <img src={urlImagem(projeto.imagens[0])} alt={projeto.titulo} />
                   ) : (
                     <div className="placeholder-img">
                       <span>{projeto.tema || 'Projeto IFSC'}</span>
@@ -173,7 +173,7 @@ function Sobre() {
                       : 'Projeto Acadêmico'}
                   </p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

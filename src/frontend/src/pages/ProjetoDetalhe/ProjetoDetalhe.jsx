@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { API_BASE_URL } from '../../config/api';
+import { API_BASE_URL, urlImagem } from '../../config/api';
 import './ProjetoDetalhe.css';
 
 // Gera as iniciais exibidas na capa e nos autores (ex.: "Horta Inteligente" → "HI").
@@ -11,15 +11,6 @@ function iniciais(texto = '') {
     .slice(0, 2)
     .map((parte) => parte[0].toUpperCase())
     .join('');
-}
-
-// `imagens` do projeto guarda o caminho de uma imagem padrão (servida pelo front-end,
-// ex.: /imagens-padrao/...) ou o ID de um arquivo enviado, que a API devolve nesta rota.
-function urlImagem(imagem) {
-  if (imagem.startsWith('/')) {
-    return imagem;
-  }
-  return `${API_BASE_URL}/api/v1/projetos/imagens/${imagem}`;
 }
 
 // Mostra uma foto grande e, quando houver mais de uma, setas e miniaturas para navegar.
