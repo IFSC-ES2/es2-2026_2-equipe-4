@@ -26,6 +26,14 @@ function separarLista(valor) {
   return valor.split(',').map(item => item.trim()).filter(Boolean)
 }
 
+// Lê a mensagem de erro enviada pela API ({ erro: "..." } ou { erro: { mensagem: "..." } });
+// se a resposta não trouxer uma, usa a mensagem padrão.
+async function mensagemDeErro(resposta, padrao) {
+  const corpo = await resposta.json().catch(() => ({}))
+  const erro = corpo?.erro
+  return (typeof erro === 'object' ? erro?.mensagem : erro) || padrao
+}
+
 function Enviar() {
   const [formulario, setFormulario] = useState(formularioInicial)
   const [imagensSelecionadas, setImagensSelecionadas] = useState([])
@@ -128,7 +136,7 @@ function Enviar() {
           body: formDataImagem,
         })
 
-        if (!respUpload.ok) throw new Error('Falha ao processar imagens.')
+        if (!respUpload.ok) throw new Error(await mensagemDeErro(respUpload, 'Falha ao processar imagens.'))
         
         const dadosUpload = await respUpload.json()
         if (dadosUpload.id) idsImagens.push(dadosUpload.id)
@@ -154,7 +162,7 @@ function Enviar() {
         body: JSON.stringify(payloadMetadados),
       })
 
-      if (!respostaMetadados.ok) throw new Error('Erro ao salvar os metadados do projeto.')
+      if (!respostaMetadados.ok) throw new Error(await mensagemDeErro(respostaMetadados, 'Erro ao salvar os metadados do projeto.'))
 
       setMensagem('Projeto publicado com sucesso na vitrine!')
       setFormulario(formularioInicial)
