@@ -105,7 +105,7 @@ documentação em PRs para `main` e `entrega-*`.
 - [Uso de IA](USO-IA.md) e [fluxo de trabalho](docs/fluxo-de-trabalho.md).
 - Histórico: [Inception](docs/inception.md), [baseline](docs/BASELINE.md), [estimativas](docs/ESTIMATIVAS.md), [Sprint 1](docs/sprints/sprint-1.md) e [Sprint 2](docs/sprints/sprint-2.md). Inception e baseline registram o escopo inicial de artigos; o produto atual é a vitrine de projetos.
 - [Board](https://github.com/orgs/IFSC-ES2/projects/34) e [backlog](https://github.com/IFSC-ES2/es2-2026_2-equipe-4/issues).
-- API: [login](src/backend/projetos/rotas-login.md), [contas](src/backend/projetos/rotas-de-criacao-de-contas.md) e [listagem pública](src/backend/docs/rotas-publicas-de-listagem-de-projetos.md). A rota autenticada `PUT /api/v1/projetos/{id}/imagem` troca a imagem de um projeto; envie o arquivo multipart no campo `arquivo`.
+- API: [login](src/backend/docs/rotas-login.md), [contas](src/backend/docs/rotas-de-criacao-de-contas.md) e [listagem pública](src/backend/docs/rotas-publicas-de-listagem-de-projetos.md). A rota autenticada `PUT /api/v1/projetos/{id}/imagem` troca a imagem de um projeto; envie o arquivo multipart no campo `arquivo`.
 
 ## Equipe
 
