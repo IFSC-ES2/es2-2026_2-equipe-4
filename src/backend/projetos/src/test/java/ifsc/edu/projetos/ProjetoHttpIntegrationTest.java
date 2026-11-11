@@ -30,6 +30,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -47,6 +48,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ProjetoHttpIntegrationTest {
 
     private static final String JWT_SECRET = "chave-de-integracao-com-mais-de-trinta-e-dois-bytes";
+
+    // O Spring considera 1 MB como 1024 * 1024 bytes.
+    private static final int MB = 1024 * 1024;
 
     // PNG de um pixel: permite testar o envio sem depender de um arquivo no computador.
     private static final byte[] IMAGEM_PNG = Base64.getDecoder().decode(
@@ -264,6 +268,95 @@ class ProjetoHttpIntegrationTest {
                 () -> assertEquals(401, resposta.statusCode(), resposta.body()),
                 () -> assertEquals(projeto, salvo, "Os dados do projeto devem permanecer iguais"),
                 () -> assertNull(arquivo, "O arquivo enviado sem token nao deve ser salvo"));
+    }
+
+    @Test
+    @DisplayName("Upload aceita arquivo de 2 MB e preserva o conteudo no GridFS")
+    @Timeout(30)
+    void uploadAceitaArquivoDe2MB() throws Exception {
+        User usuario = novoUsuario();
+        String token = jwtUtil.generateToken(usuario.getEmail());
+        // Os bytes extras servem apenas para atingir o tamanho que queremos testar.
+        byte[] conteudo = Arrays.copyOf(IMAGEM_PNG, 2 * MB);
+
+        HttpResponse<String> resposta = enviarUpload(conteudo, "Bearer " + token);
+
+        assertEquals(201, resposta.statusCode(), resposta.body());
+        conferirArquivoDoUpload(resposta, conteudo);
+    }
+
+    @Test
+    @DisplayName("Upload aceita arquivo com exatamente o limite de 5 MB")
+    @Timeout(30)
+    void uploadAceitaArquivoNoLimiteDe5MB() throws Exception {
+        User usuario = novoUsuario();
+        String token = jwtUtil.generateToken(usuario.getEmail());
+        byte[] conteudo = Arrays.copyOf(IMAGEM_PNG, 5 * MB);
+
+        HttpResponse<String> resposta = enviarUpload(conteudo, "Bearer " + token);
+
+        // O limite anunciado deve valer para o arquivo, sem contar os cabecalhos do envio.
+        assertEquals(201, resposta.statusCode(), resposta.body());
+        conferirArquivoDoUpload(resposta, conteudo);
+    }
+
+    @Test
+    @DisplayName("Upload rejeita arquivo um byte acima de 5 MB sem salvar no GridFS")
+    @Timeout(30)
+    void uploadRejeitaArquivoAcimaDe5MBSemGravar() throws Exception {
+        User usuario = novoUsuario();
+        String token = jwtUtil.generateToken(usuario.getEmail());
+        byte[] conteudo = Arrays.copyOf(IMAGEM_PNG, 5 * MB + 1);
+
+        HttpResponse<String> resposta = enviarUpload(conteudo, "Bearer " + token);
+
+        GridFSFile arquivo = gridFsTemplate.findOne(
+                Query.query(Criteria.where("filename").is(nomeArquivoTeste)));
+        assertAll("O upload deve ser rejeitado sem deixar arquivo salvo",
+                () -> assertEquals(413, resposta.statusCode(), resposta.body()),
+                () -> assertEquals("A imagem deve ter no máximo 5 MB",
+                        JsonPath.read(resposta.body(), "$.erro.mensagem")),
+                () -> assertNull(arquivo, "O arquivo acima do limite nao deve ser salvo"));
+    }
+
+    private void conferirArquivoDoUpload(HttpResponse<String> resposta, byte[] conteudoEsperado)
+            throws IOException {
+        String idArquivo = JsonPath.read(resposta.body(), "$.id");
+        int tamanhoRespondido = JsonPath.read(resposta.body(), "$.tamanhoBytes");
+        assertTrue(ObjectId.isValid(idArquivo), "A resposta deve trazer um ID valido do GridFS");
+        assertEquals(conteudoEsperado.length, tamanhoRespondido);
+
+        GridFSFile arquivo = gridFsTemplate.findOne(
+                Query.query(Criteria.where("_id").is(new ObjectId(idArquivo))));
+        assertNotNull(arquivo, "O arquivo retornado deve existir no GridFS");
+        assertEquals(nomeArquivoTeste, arquivo.getFilename());
+        assertEquals((long) conteudoEsperado.length, arquivo.getLength());
+        try (InputStream conteudoSalvo = gridFsTemplate.getResource(arquivo).getInputStream()) {
+            assertArrayEquals(conteudoEsperado, conteudoSalvo.readAllBytes());
+        }
+    }
+
+    private HttpResponse<String> enviarUpload(byte[] conteudo, String autorizacao)
+            throws IOException, InterruptedException {
+        nomeArquivoTeste = "upload-limite-" + UUID.randomUUID() + ".png";
+        String separador = "teste-" + UUID.randomUUID();
+        String inicio = "--" + separador + "\r\n"
+                + "Content-Disposition: form-data; name=\"arquivo\"; filename=\"" + nomeArquivoTeste + "\"\r\n"
+                + "Content-Type: image/png\r\n\r\n";
+        String fim = "\r\n--" + separador + "--\r\n";
+
+        // concat informa o tamanho total do envio, incluindo arquivo e cabecalhos.
+        HttpRequest.BodyPublisher corpo = HttpRequest.BodyPublishers.concat(
+                HttpRequest.BodyPublishers.ofByteArray(inicio.getBytes(StandardCharsets.UTF_8)),
+                HttpRequest.BodyPublishers.ofByteArray(conteudo),
+                HttpRequest.BodyPublishers.ofByteArray(fim.getBytes(StandardCharsets.UTF_8)));
+        HttpRequest request = HttpRequest.newBuilder(
+                        URI.create("http://127.0.0.1:" + porta + "/api/v1/projetos/upload"))
+                .header("Content-Type", "multipart/form-data; boundary=" + separador)
+                .header("Authorization", autorizacao)
+                .POST(corpo)
+                .build();
+        return http.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 
     private Projeto novoProjetoComImagemPadrao(User autor) {
