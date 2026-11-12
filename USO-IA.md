@@ -268,6 +268,9 @@ Validação: Leitura e pequenas correções feitas
 
 - Data: 11/11/2026
   Ferramenta: Claude
+  Uso: Apoio no fechamento e nas contribuições individuais da Sprint 4 (#168): levantamento de issues, PRs, commits e revisões no GitHub e redação.
+  Artefatos: docs/sprints/sprint-4.md
+  Validação: Dados conferidos com as páginas das issues e dos PRs; markdownlint e links sem erros.
   Uso: Apoio na revisão dos riscos e da qualidade da Sprint 4
   Artefatos: docs/riscos.md e docs/qualidade.md
   Validação: Afirmações conferidas com o código, os PRs, as issues e as métricas
