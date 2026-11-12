@@ -103,6 +103,27 @@ A seção 1 foi escrita antes do login; a segurança agora inclui autenticação
 | Segurança | Login com JWT e consulta pública de projetos; autoria pelo token preservada na refatoração. | Credenciais no repositório (R08, #100). |
 | Capacidade de interação | Páginas Projetos e Sobre e CSS unificado (#111 a #113); listagem pública sem login. | Sem detalhe do projeto, busca e exibição das imagens enviadas (#19, #21 e #22). |
 
+## 5. Revisão da qualidade na Sprint 4 (11/11/2026)
+
+Os atributos da seção 1 se mantêm.
+
+### 5.1 Atributos
+
+| Atributo | Evidência da Sprint 4 | Limitação e próxima ação |
+|---|---|---|
+| Confiabilidade | 92 testes e cobertura de 84,63% ([M-03](metricas/M-03.md)); densidade de 0,53 defeito/KLOC ([M-06](metricas/M-06.md)); limite de upload corrigido no #179 (201 até 5 MB e 413 acima). | Staging sem evidência (R13). |
+| Manutenibilidade | Maior V(G) estimado de 3 nos métodos de imagem ([M-02](metricas/M-02.md)); CI testa em Mongo 8, igual ao compose (PR #180). | A complexidade da Sprint 4 é estimativa manual, só dos métodos novos. |
+| Segurança | Credenciais fora do código (#156); os testes da #173 apontaram a falha de autorização de contas, corrigida no #176. | `admin123` no histórico e em dois testes; no staging usar segredos aleatórios (R08). |
+| Capacidade de interação | Detalhe do projeto com galeria (#172), galeria no Sobre (#182) e imagem padrão em todo projeto (#170). | Sem busca por texto; só filtros por tema e por tecnologia. |
+
+### 5.2 Impacto do staging, do pipeline e do deploy
+
+| Elemento | Efeito na qualidade | Limitação |
+|---|---|---|
+| Pipeline (CI) | Cada PR roda documentos, links, lint, testes e builds; 5 checks obrigatórios impedem o merge com teste quebrado; o job `Docker (Compose)` sobe os três serviços com o `.env.example` e confere a API. Protege a confiabilidade e a manutenibilidade. | `Docker (Compose)` e os builds não são obrigatórios (R14); os testes de integração rodam num Mongo sem senha. |
+| Deploy | Reprodutível com Docker Compose e `.env.example`, documentado em [DEPLOY.md](DEPLOY.md) (variáveis, comandos e validação rápida), com segredos fora do código. Protege a segurança e dá a mesma configuração em qualquer máquina. | Só local: sem deploy automatizado, TLS, backup nem monitoramento. |
+| Staging | Permitiria validar a versão entregue fora das máquinas dos integrantes. | Sem evidência no repositório (R13): hoje a validação é local. |
+
 ## Referências
 
 - [`docs/riscos.md`](riscos.md) — Registro de riscos do projeto.
