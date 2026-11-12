@@ -38,8 +38,8 @@ public class UserService {
         return Optional.of(usuarioRepository.save(newUser));
     }
 
-    public Optional<User> updateUser(CreateUserRequest dataForUpdateUserRequestDTO) {
-        return usuarioRepository.findByEmail(normalizarEmail(dataForUpdateUserRequestDTO.getEmail()))
+    public Optional<User> updateUser(CreateUserRequest dataForUpdateUserRequestDTO, String emailAutenticado) {
+        return usuarioRepository.findByEmail(normalizarEmail(emailAutenticado))
                 .map(user -> {
                     if (dataForUpdateUserRequestDTO.getNome() != null) {
                         user.setNome(dataForUpdateUserRequestDTO.getNome());
@@ -49,6 +49,11 @@ public class UserService {
                     }
                     return usuarioRepository.save(user);
                 });
+    }
+
+    public boolean isOwnerEmail(String emailSolicitado, String emailAutenticado) {
+        return emailSolicitado != null && emailAutenticado != null
+                && normalizarEmail(emailSolicitado).equals(normalizarEmail(emailAutenticado));
     }
 
     private String normalizarEmail(String email) {
@@ -61,5 +66,12 @@ public class UserService {
             return true;
         }
         return false;
+    }
+
+    public boolean isOwner(String userId, String emailAutenticado) {
+        return usuarioRepository.findIdByEmail(emailAutenticado)
+                .map(User::getId)
+                .filter(userId::equals)
+                .isPresent();
     }
 }

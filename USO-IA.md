@@ -241,3 +241,51 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio na análise do CI e dos testes da Sprint 3 (#132), explicação de mocks e do MemoryRouter, orientação inicial dos testes essenciais das páginas Projetos e Sobre. Auxílio na redução do escopo dos testes e na priorização das pendências por entrega, sem alterar a configuração do CI.
   Artefatos: src/frontend/src/pages/Projetos/Projetos.test.tsx e src/frontend/src/pages/Sobre/Sobre.test.jsx.
   Validação: Comparação dos testes com o comportamento dos componentes; execução de `npm run test -- --run`, com aprovação dos 2 testes do frontend, incluindo 7 de Projetos e 5 de Sobre.
+
+- Data: 09/11/2026
+  Ferramenta: Claude
+  Uso: Ajuda para os comandos que deveriam ser executados no containers e comandos a serem colocados no docker-compose para usar o .env
+  Artefatos: docker-compose.yaml
+  Validação: Toda a aplicação foi iniciado mais de 3x para validar o funcionamento de todos as partes.
+
+- Data: 09/11/2026
+  Ferramenta: ChatGPT
+  Uso: Ajuda para melhoramente/atualização da aparencia do site/frontend.
+  Artefatos: Enviar.css
+  Validação: revisado manualmente e adaptado.
+
+- Data: 10/11/2026
+  Ferramenta: Claude
+  Uso: Apoio na resolução do código de troca de imagem do projeto
+  Artefatos: ProjetoService.java, ProjetoController.java, GlobalExceptionHandler.java, application.properties e src/frontend/public/imagens-padrao/
+  Validação: código rodado e testado, vendo o resultado das imagens nos projetos
+
+- Data: 10/11/2026
+  Ferramenta: Claude
+  Uso: Apoio na implementação da página de detalhes do projeto, da rota de leitura das imagens e do registro de erros no log (#172).
+  Artefatos: src/frontend/src/pages/ProjetoDetalhe/, Projetos.jsx, ProjetoController.java e GlobalExceptionHandler.java
+  Validação: página conferida no navegador e testes do front-end executados
+
+- Data: 11/11/2026
+  Ferramenta: Claude
+  Uso: Apoio no preenchimento das fichas M-05 e M-08 da Sprint 4 (levantamento de PRs)
+  Artefatos: docs/metricas/M-05.md e docs/metricas/M-08.md
+  Validação: Contagens conferidas com os PRs e issues do GitHub
+  
+  - Data: 11/11/2026
+  Ferramenta: Claude
+  Uso: Apoio na atualização do README para a Entrega 8 (#167): conferência das rotas e do estado do produto no código e redação.
+  Artefatos: README.md
+  Validação: Funcionalidades e limitações conferidas com as rotas da API, as páginas do front-end e as issues; markdownlint e links sem erros.
+  
+  - Data: 11/11/2026
+  Ferramenta: Claude
+  Uso: Apoio no fechamento e nas contribuições individuais da Sprint 4 (#168): levantamento de issues, PRs, commits e revisões no GitHub e redação.
+  Artefatos: docs/sprints/sprint-4.md
+  Validação: Dados conferidos com as páginas das issues e dos PRs; markdownlint e links sem erros.
+  
+  - Data: 11/11/2026
+  Ferramenta: Claude
+  Uso: Apoio na revisão dos riscos e da qualidade da Sprint 4
+  Artefatos: docs/riscos.md e docs/qualidade.md
+  Validação: Afirmações conferidas com o código, os PRs, as issues e as métricas

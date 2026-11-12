@@ -6,8 +6,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -20,8 +23,11 @@ import ifsc.edu.projetos.login.exceptions.AuthException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @Value("${server.servlet.context-path}")
     private String path;
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ResponseErro> handleValidationErrors(
@@ -78,8 +84,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(409).body(responseErr);
     }
 
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ResponseErro> handleUploadTooLarge(MaxUploadSizeExceededException ex, HttpServletRequest request) {
+        ResponseErro responseErr = new ResponseErro(413, Map.of("mensagem", "A imagem deve ter no máximo 5 MB"), request.getRequestURI());
+        return ResponseEntity.status(413).body(responseErr);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseErro> handleGeneric(Exception ex, HttpServletRequest request) {
+        // Registra a causa real; o cliente recebe apenas a mensagem genérica.
+        log.error("Erro não tratado em {}", request.getRequestURI(), ex);
         ResponseErro responseErr = new ResponseErro(500, Map.of("mensagem", "Erro interno no servidor"), request.getRequestURI());
         return ResponseEntity.status(500).body(responseErr);
     }

@@ -1,32 +1,19 @@
-#version: '3.8' # Comentado pois a versão do Docker Compose não é mais necessária
-# WARN[0000] /workspaces/es2-2026_2-equipe-4/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
-
-
-# Versão previa, deve ser adiciona volume e mais configurações para o MongoDB
-# Apenas para teste e conexão com a API 
-
-# ===========
-
-# Proximos containers a serem adicionados:
-# - API
-# - Frontend
-
-# Dessa forma toda aplicação pode ser iniciada com apenas um comando: docker-compose up -d
-
 services:
   mongodb:
     image: mongo:latest
     container_name: mongodb
-    restart: always
+    restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "${MONGO_PORT:-27017}:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:?Defina MONGO_ROOT_USERNAME no .env}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?Defina MONGO_ROOT_PASSWORD no .env}
     volumes:
       - mongodb_data:/data/db
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "mongodb://admin:admin123@localhost:27017/admin?authSource=admin", "--eval", "db.adminCommand('ping').ok"]
+      test:
+        - CMD-SHELL
+        - mongosh --quiet "mongodb://$${MONGO_INITDB_ROOT_USERNAME}:$${MONGO_INITDB_ROOT_PASSWORD}@localhost:27017/admin?authSource=admin" --eval 'db.adminCommand("ping").ok' | grep -q 1
       interval: 5s
       timeout: 5s
       retries: 10
@@ -35,12 +22,14 @@ services:
     build:
       context: ./src/backend/projetos
     container_name: projetos-backend
-    restart: always
+    restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "${BACKEND_PORT:-8080}:8080"
     environment:
-      APP_SEED_PROJETOS_ENABLED: "true"
-      SPRING_MONGODB_URI: mongodb://admin:admin123@mongodb:27017/publicaifsc?authSource=admin
+      APP_SEED_PROJETOS_ENABLED: ${APP_SEED_PROJETOS_ENABLED:-false}
+      SPRING_MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb:27017/${MONGO_DATABASE:-publicaifsc}?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:?Defina JWT_SECRET no .env}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-3600000}
     depends_on:
       mongodb:
         condition: service_healthy
@@ -48,12 +37,14 @@ services:
   frontend:
     build:
       context: ./src/frontend
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
     container_name: projetos-frontend
-    restart: always
+    restart: unless-stopped
     ports:
-      - "5173:5173"
+      - "${FRONTEND_PORT:-5173}:5173"
     depends_on:
       - backend
 
 volumes:
-  mongodb_data:  
+  mongodb_data:

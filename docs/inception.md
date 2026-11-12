@@ -1,5 +1,13 @@
 # Inception — PublicaIFSC
 
+> **Atualização de escopo:** este documento foi elaborado quando a proposta era
+> publicar artigos acadêmicos. Após a revisão do produto, o PublicaIFSC passou
+> a ser uma vitrine de projetos universitários. O escopo atual contempla
+> publicação e consulta de projetos, com título, resumo, autores, tema,
+> tecnologias, imagens e links. As referências a artigos e PDFs abaixo são
+> registros do planejamento inicial e não descrevem o produto atual.
+
+
 ## 1. Visão do produto
 
 ### Problema
