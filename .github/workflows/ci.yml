@@ -49,7 +49,7 @@ jobs:
 
     services:
       mongodb:
-        image: mongo:6.0
+        image: mongo:8
         ports:
           - 27017:27017
 
@@ -138,3 +138,18 @@ jobs:
         run: npm ci
       - name: Buildar projeto frontend
         run: npm run build
+
+# Valida o Docker: o compose builda e sobe com o modelo .env.example
+
+  docker:
+    name: Docker (Compose)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      - name: Criar o .env a partir do modelo
+        run: cp .env.example .env
+      - name: Buildar e subir os serviços
+        run: docker compose up -d --build --wait
+      - name: Conferir que a API responde
+        run: curl --fail --retry 20 --retry-delay 3 --retry-all-errors http://localhost:8080/api/v1/auth/status

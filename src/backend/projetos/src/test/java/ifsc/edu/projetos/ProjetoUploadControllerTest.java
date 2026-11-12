@@ -19,11 +19,19 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import com.mongodb.client.gridfs.model.GridFSFile;
+import org.bson.BsonObjectId;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.gridfs.GridFsResource;
+
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -87,5 +95,52 @@ class ProjetoUploadControllerTest {
         ServletException erro = assertThrows(ServletException.class,
                 () -> mvc.perform(multipart("/projetos/upload").file(arquivo)));
         assertSame(falha, erro.getCause());
+    }
+
+    // Simula um arquivo salvo no GridFS com o tipo informado no upload
+    private ObjectId simularArquivoSalvo(byte[] conteudo, String contentType) {
+        ObjectId id = new ObjectId();
+        GridFSFile arquivo = new GridFSFile(new BsonObjectId(id), "arquivo", conteudo.length,
+                255 * 1024, new Date(), new Document("_contentType", contentType));
+        when(gridFsTemplate.findOne(any(Query.class))).thenReturn(arquivo);
+        when(gridFsTemplate.getResource(arquivo))
+                .thenReturn(new GridFsResource(arquivo, new ByteArrayInputStream(conteudo)));
+        return id;
+    }
+
+    @Test
+    void buscarImagemDevolveOConteudoComOTipoSalvo() throws Exception {
+        byte[] conteudo = {1, 2, 3, 4};
+        ObjectId id = simularArquivoSalvo(conteudo, "image/png");
+
+        mvc.perform(get("/projetos/imagens/" + id.toHexString()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("image/png"))
+                .andExpect(header().string("X-Content-Type-Options", "nosniff"))
+                .andExpect(content().bytes(conteudo));
+    }
+
+    @Test
+    void buscarImagemInexistenteDevolve404() throws Exception {
+        when(gridFsTemplate.findOne(any(Query.class))).thenReturn(null);
+
+        mvc.perform(get("/projetos/imagens/" + new ObjectId().toHexString()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void buscarImagemComIdInvalidoDevolve404SemConsultarOBanco() throws Exception {
+        mvc.perform(get("/projetos/imagens/id-invalido"))
+                .andExpect(status().isNotFound());
+
+        verifyNoInteractions(gridFsTemplate);
+    }
+
+    @Test
+    void buscarArquivoQueNaoEImagemDevolve404() throws Exception {
+        ObjectId id = simularArquivoSalvo("<script>alert(1)</script>".getBytes(), "text/html");
+
+        mvc.perform(get("/projetos/imagens/" + id.toHexString()))
+                .andExpect(status().isNotFound());
     }
 }

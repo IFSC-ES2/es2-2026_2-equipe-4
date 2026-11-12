@@ -1,18 +1,19 @@
 .header-principal {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
   border-bottom: 1px solid #e2e8f0;
-  padding: 16px 32px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+  padding: 16px 24px;
   position: sticky;
   top: 0;
   z-index: 50;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
 }
 
 .header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1000px;
+  max-width: 1140px;
   margin: 0 auto;
 }
 
@@ -22,37 +23,77 @@
   font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.5px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-logo span {
+  color: #146c5a;
 }
 
 .header-nav {
   display: flex;
-  gap: 28px;
+  gap: 32px;
   align-items: center;
 }
 
 .header-link {
   color: #64748b;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 14px;
   transition: color 0.2s ease;
 }
 
-.header-link:hover {
+.header-link:hover, .header-link.ativo {
   color: #0f172a;
 }
 
 .header-botao {
   background: #0f172a;
   color: #ffffff;
-  padding: 8px 18px;
-  border-radius: 6px;
+  padding: 10px 20px;
+  border-radius: 8px;
   text-decoration: none;
   font-weight: 600;
   font-size: 14px;
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
 }
 
 .header-botao:hover {
-  background: #334155;
+  background: #1e293b;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+  transform: translateY(-1px);
+}
+
+.header-botao-secundario {
+  background: transparent;
+  color: #0f172a;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  border: 1px solid #cbd5e1;
+}
+
+.header-botao-secundario:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.btn-sair {
+  background: #ffffff;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+}
+.btn-sair:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #dc2626;
+  box-shadow: none;
 }

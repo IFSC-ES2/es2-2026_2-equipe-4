@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 import Cadastro from './Cadastro'
@@ -16,23 +16,26 @@ async function preencherCadastro(usuario) {
 }
 
 describe('Cadastro', () => {
-  it('envia os dados para a rota de criação e limpa os campos após sucesso', async () => {
+  it('envia os dados para a rota de criação e aguarda o redirecionamento para login', async () => {
     const fetchApi = vi.fn().mockResolvedValue({ ok: true })
 
     vi.stubGlobal('fetch', fetchApi)
 
     render(
-      <MemoryRouter>
-        <Cadastro />
+      <MemoryRouter initialEntries={['/cadastro']}>
+        <Routes>
+          <Route path="/cadastro" element={<Cadastro />} />
+          <Route path="/login" element={<h1>Página de login</h1>} />
+        </Routes>
       </MemoryRouter>
     )
 
     const usuario = userEvent.setup()
 
     await preencherCadastro(usuario)
-    await usuario.click(screen.getByRole('button', { name: /Continuar/i }))
+    await usuario.click(screen.getByRole('button', { name: /registrar/i }))
 
-    expect(await screen.findByText('Conta criada! A redirecionar...')).toBeInTheDocument()
+    expect(screen.getByText('Conta criada! Redirecionando para login...')).toBeInTheDocument()
     expect(fetchApi).toHaveBeenCalledExactlyOnceWith(
       'http://localhost:8080/api/v1/users/createAccount/0.0.1/novousers',
       {
@@ -41,9 +44,13 @@ describe('Cadastro', () => {
         body: JSON.stringify({ nome: 'Ana Lima', email: 'ana@exemplo.com', password: 'senha-segura' }),
       },
     )
-    expect(screen.getByLabelText(/nome/i)).toHaveValue('')
-    expect(screen.getByLabelText(/e-mail/i)).toHaveValue('')
-    expect(screen.getByLabelText(/senha/i)).toHaveValue('')
+    expect(screen.getByRole('button', { name: /criando conta/i })).toBeDisabled()
+    expect(screen.getByLabelText(/nome completo/i)).toBeDisabled()
+    expect(screen.getByLabelText(/e-mail/i)).toBeDisabled()
+    expect(screen.getByLabelText(/senha/i)).toBeDisabled()
+    expect(screen.queryByRole('heading', { name: 'Página de login' })).not.toBeInTheDocument()
+
+    expect(await screen.findByRole('heading', { name: 'Página de login' }, { timeout: 2500 })).toBeInTheDocument()
   })
 
   it('avisa quando o e-mail já está cadastrado e preserva os dados', async () => {
@@ -64,10 +71,10 @@ describe('Cadastro', () => {
 
     await preencherCadastro(usuario)
     await usuario.click(
-      screen.getByRole('button', { name: /continuar/i })
+      screen.getByRole('button', { name: /registrar/i })
     )
     expect(
-      await screen.findByText('E-mail já cadastrado.')
+      await screen.findByText('E-mail já está em uso.')
     ).toBeInTheDocument()
 
     expect(
@@ -75,7 +82,7 @@ describe('Cadastro', () => {
     ).toHaveValue('ana@exemplo.com')
 
     expect(
-      screen.getByRole('button', { name: /continuar/i })
+      screen.getByRole('button', { name: /registrar/i })
     ).toBeEnabled()
   })
 
@@ -95,9 +102,9 @@ describe('Cadastro', () => {
     const usuario = userEvent.setup()
 
     await preencherCadastro(usuario)
-    await usuario.click(screen.getByRole('button', { name: /Continuar/i }))
+    await usuario.click(screen.getByRole('button', { name: /registrar/i }))
 
-    expect(await screen.findByText('Campos inválidos.')).toBeInTheDocument()
+    expect(await screen.findByText('Preencha todos os campos corretamente.')).toBeInTheDocument()
     expect(screen.getByLabelText(/nome completo/i)).toHaveValue('Ana Lima')
   })
 })

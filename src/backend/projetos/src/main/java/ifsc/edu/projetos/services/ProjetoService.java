@@ -5,6 +5,7 @@ import ifsc.edu.projetos.accountcreation.repository.UserRepository;
 import ifsc.edu.projetos.dtos.Projeto;
 import ifsc.edu.projetos.dtos.ProjetoRespostaDTO;
 import ifsc.edu.projetos.repositories.ProjetoRepository;
+import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,6 +30,10 @@ public class ProjetoService {
 
     public ProjetoRespostaDTO salvarArquivo(MultipartFile arquivo) {
         return armazenamentoArquivoService.salvarArquivo(arquivo);
+    }
+
+    public Optional<GridFsResource> buscarArquivo(String id) {
+        return armazenamentoArquivoService.buscarArquivo(id);
     }
 
     // emailAutor vem do token JWT (authentication.getName() no controller), nunca do corpo da requisição

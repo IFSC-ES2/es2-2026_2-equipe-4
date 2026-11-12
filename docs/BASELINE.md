@@ -1,5 +1,13 @@
 # BASELINE - Planejamento Inicial do Projeto
 
+> **Nota de contexto:** esta baseline registra o escopo original, definido
+> para publicação de artigos acadêmicos. Após a Sprint Review de 23/09/2026,
+> o produto foi redirecionado para uma vitrine de projetos universitários,
+> conforme registrado na Sprint 2 e na ADR-0004. Issues e estimativas abaixo
+> são referências históricas; o escopo atual usa projetos com imagens e links,
+> publicação autenticada e consulta pública.
+
+
 ## 1. Recorte do backlog
 
 O planejamento inicial do projeto foi elaborado a partir do seguinte recorte do backlog, composto pelas funcionalidades consideradas necessárias para a primeira versão do MVP.
