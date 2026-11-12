@@ -265,3 +265,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio na implementação da página de detalhes do projeto, da rota de leitura das imagens e do registro de erros no log (#172).
   Artefatos: src/frontend/src/pages/ProjetoDetalhe/, Projetos.jsx, ProjetoController.java e GlobalExceptionHandler.java
   Validação: página conferida no navegador e testes do front-end executados
+
+- Data: 11/11/2026
+  Ferramenta: Claude
+  Uso: Apoio no fechamento e nas contribuições individuais da Sprint 4 (#168): levantamento de issues, PRs, commits e revisões no GitHub e redação.
+  Artefatos: docs/sprints/sprint-4.md
+  Validação: Dados conferidos com as páginas das issues e dos PRs; markdownlint e links sem erros.
