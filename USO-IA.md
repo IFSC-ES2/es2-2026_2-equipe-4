@@ -265,3 +265,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio na implementação da página de detalhes do projeto, da rota de leitura das imagens e do registro de erros no log (#172).
   Artefatos: src/frontend/src/pages/ProjetoDetalhe/, Projetos.jsx, ProjetoController.java e GlobalExceptionHandler.java
   Validação: página conferida no navegador e testes do front-end executados
+
+- Data: 11/11/2026
+  Ferramenta: Claude
+  Uso: Apoio na atualização do README para a Entrega 8 (#167): conferência das rotas e do estado do produto no código e redação.
+  Artefatos: README.md
+  Validação: Funcionalidades e limitações conferidas com as rotas da API, as páginas do front-end e as issues; markdownlint e links sem erros.
