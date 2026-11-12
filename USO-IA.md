@@ -242,23 +242,23 @@ Validação: Leitura e pequenas correções feitas
   Artefatos: src/frontend/src/pages/Projetos/Projetos.test.tsx e src/frontend/src/pages/Sobre/Sobre.test.jsx.
   Validação: Comparação dos testes com o comportamento dos componentes; execução de `npm run test -- --run`, com aprovação dos 2 testes do frontend, incluindo 7 de Projetos e 5 de Sobre.
 
-
-
-
-
 - Data: 09/11/2026
   Ferramenta: Claude
   Uso: Ajuda para os comandos que deveriam ser executados no containers e comandos a serem colocados no docker-compose para usar o .env
   Artefatos: docker-compose.yaml
   Validação: Toda a aplicação foi iniciado mais de 3x para validar o funcionamento de todos as partes.
 
+- Data: 09/11/2026
+  Ferramenta: ChatGPT
+  Uso: Ajuda para melhoramente/atualização da aparencia do site/frontend.
+  Artefatos: Enviar.css
+  Validação: revisado manualmente e adaptado.
 
 - Data: 10/11/2026
   Ferramenta: Claude
   Uso: Apoio na resolução do código de troca de imagem do projeto
   Artefatos: ProjetoService.java, ProjetoController.java, GlobalExceptionHandler.java, application.properties e src/frontend/public/imagens-padrao/
   Validação: código rodado e testado, vendo o resultado das imagens nos projetos
-
 
 - Data: 10/11/2026
   Ferramenta: Claude
