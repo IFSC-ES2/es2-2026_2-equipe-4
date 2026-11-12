@@ -268,12 +268,24 @@ Validação: Leitura e pequenas correções feitas
 
 - Data: 11/11/2026
   Ferramenta: Claude
+  Uso: Apoio no preenchimento das fichas M-05 e M-08 da Sprint 4 (levantamento de PRs)
+  Artefatos: docs/metricas/M-05.md e docs/metricas/M-08.md
+  Validação: Contagens conferidas com os PRs e issues do GitHub
+  
+  - Data: 11/11/2026
+  Ferramenta: Claude
   Uso: Apoio na atualização do README para a Entrega 8 (#167): conferência das rotas e do estado do produto no código e redação.
   Artefatos: README.md
   Validação: Funcionalidades e limitações conferidas com as rotas da API, as páginas do front-end e as issues; markdownlint e links sem erros.
+  
+  - Data: 11/11/2026
+  Ferramenta: Claude
   Uso: Apoio no fechamento e nas contribuições individuais da Sprint 4 (#168): levantamento de issues, PRs, commits e revisões no GitHub e redação.
   Artefatos: docs/sprints/sprint-4.md
   Validação: Dados conferidos com as páginas das issues e dos PRs; markdownlint e links sem erros.
+  
+  - Data: 11/11/2026
+  Ferramenta: Claude
   Uso: Apoio na revisão dos riscos e da qualidade da Sprint 4
   Artefatos: docs/riscos.md e docs/qualidade.md
   Validação: Afirmações conferidas com o código, os PRs, as issues e as métricas
