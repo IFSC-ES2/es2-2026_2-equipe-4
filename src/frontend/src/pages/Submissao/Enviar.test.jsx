@@ -80,6 +80,76 @@ describe('Submissão de projeto', () => {
     expect(fetchApi).not.toHaveBeenCalled()
   })
 
+  it('interrompe o envio e preserva o formulário quando a API retorna 401 no upload', async () => {
+    localStorage.setItem('token', 'token-expirado')
+    const fetchApi = vi.fn().mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+      json: async () => ({ erro: { mensagem: 'Autenticação necessária ou token inválido/expirado' } }),
+    })
+    vi.stubGlobal('fetch', fetchApi)
+    renderizarEnviar()
+    const usuario = userEvent.setup()
+    const imagem = new File(['imagem'], 'capa.png', { type: 'image/png' })
+
+    await preencherFormulario(usuario)
+    await usuario.upload(document.getElementById('imagens'), imagem)
+    await usuario.click(screen.getByRole('button', { name: /publicar projeto na vitrine/i }))
+
+    expect(await screen.findByText('Autenticação necessária ou token inválido/expirado')).toBeInTheDocument()
+    // Sem autenticação válida, o fluxo deve parar antes de enviar os metadados.
+    expect(fetchApi).toHaveBeenCalledExactlyOnceWith(
+      'http://localhost:8080/api/v1/projetos/upload',
+      expect.objectContaining({
+        method: 'POST',
+        headers: { Authorization: 'Bearer token-expirado' },
+      }),
+    )
+    expect(screen.getByLabelText(/nome do projeto/i)).toHaveValue('Projeto Teste')
+    expect(screen.getByLabelText(/resumo/i)).toHaveValue('Resumo do projeto')
+    expect(screen.getByLabelText(/tema/i)).toHaveValue('Web')
+    expect(screen.getByLabelText(/autores/i)).toHaveValue('Ana Lima, Bruno Reis')
+    expect(screen.getByLabelText(/stack tecnológica/i)).toHaveValue('React, Spring Boot')
+    expect(screen.getByText(/1 arquivo\(s\) anexado\(s\)/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /publicar projeto na vitrine/i })).toBeEnabled()
+    expect(screen.queryByText('Projeto publicado com sucesso na vitrine!')).not.toBeInTheDocument()
+  })
+
+  it('preserva o formulário quando o upload funciona mas os metadados recebem 401', async () => {
+    localStorage.setItem('token', 'token-expirado')
+    const fetchApi = vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'id-img-123' }) })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: async () => ({ erro: { mensagem: 'Autenticação necessária ou token inválido/expirado' } }),
+      })
+    vi.stubGlobal('fetch', fetchApi)
+    renderizarEnviar()
+    const usuario = userEvent.setup()
+    const imagem = new File(['imagem'], 'capa.png', { type: 'image/png' })
+
+    await preencherFormulario(usuario)
+    await usuario.upload(document.getElementById('imagens'), imagem)
+    await usuario.click(screen.getByRole('button', { name: /publicar projeto na vitrine/i }))
+
+    expect(await screen.findByText('Autenticação necessária ou token inválido/expirado')).toBeInTheDocument()
+    // A sessão também pode ser recusada depois que a imagem já foi enviada.
+    expect(fetchApi.mock.calls.map(([url]) => url)).toEqual([
+      'http://localhost:8080/api/v1/projetos/upload',
+      'http://localhost:8080/api/v1/projetos/metadados',
+    ])
+    expect(fetchApi.mock.calls[1][1].headers.Authorization).toBe('Bearer token-expirado')
+    expect(screen.getByLabelText(/nome do projeto/i)).toHaveValue('Projeto Teste')
+    expect(screen.getByLabelText(/resumo/i)).toHaveValue('Resumo do projeto')
+    expect(screen.getByLabelText(/tema/i)).toHaveValue('Web')
+    expect(screen.getByLabelText(/autores/i)).toHaveValue('Ana Lima, Bruno Reis')
+    expect(screen.getByLabelText(/stack tecnológica/i)).toHaveValue('React, Spring Boot')
+    expect(screen.getByText(/1 arquivo\(s\) anexado\(s\)/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /publicar projeto na vitrine/i })).toBeEnabled()
+    expect(screen.queryByText('Projeto publicado com sucesso na vitrine!')).not.toBeInTheDocument()
+  })
+
   it('envia a imagem e os metadados com o token e limpa o formulário após sucesso', async () => {
     const fetchApi = vi.fn()
       .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'id-img-123' }) })
