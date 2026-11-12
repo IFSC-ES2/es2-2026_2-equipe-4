@@ -144,3 +144,31 @@ Mesmos critérios das seções 2.1 e 2.2. Os responsáveis foram mantidos; os ma
 | ID | Risco | Probabilidade / Impacto | Prioridade | Mitigação | Responsável |
 |----|-------|:---:|:---:|-----------|-------------|
 | R12 | **Dados de exemplo na vitrine:** o `docker-compose.yml` liga `APP_SEED_PROJETOS_ENABLED`, que cria projetos fictícios quando o banco está vazio (`ListagensDataInitializer`). | Média / Médio | Média | Deixar o seed desligado por padrão e ligar só em desenvolvimento ou demonstração. | A definir |
+
+## 6. Revisão dos riscos na Sprint 4 (11/11/2026)
+
+Mesmos critérios das seções 2.1 e 2.2. Os responsáveis foram mantidos; os marcados "A definir" seguem pendentes de decisão do time.
+
+### 6.1 Situação dos riscos
+
+| ID | Status | Prob. / Impacto | Prioridade | Evidência | Ação na próxima etapa |
+|----|--------|:---:|:---:|-----------|-----------------------|
+| R01 | Ativo | Média / Médio | Média | O README e o aviso de escopo no `docs/inception.md` e no `docs/BASELINE.md` (#175) descrevem projetos. Itens funcionais entraram depois da baseline (M-08 = 50%): imagens, detalhe do projeto e galeria. | Fechar o escopo funcional no planejamento. |
+| R02 | Ativo | Alta / Alto | Alta | O enunciado da entrega indica 5/11 e o milestone foi definido para 11/11; em 11/11 as issues de documentação e release (#159, #165 a #169) seguiam abertas. O VC registrado em M-07 é 0. | Datas intermediárias por entregável e confirmar o prazo no início da etapa. |
+| R03 | Mitigado | Baixa / Médio | Baixa | Os cinco integrantes tiveram PR mergeado na `entrega-8`, no máximo 2 dos 7 PRs por pessoa (na Sprint 3 eram 5 de 8 de um mesmo integrante). | Manter a revisão cruzada. |
+| R04 | Mitigado | Baixa / Médio | Baixa | O limite de upload exigiu ajuste de Spring e Tomcat (#178), resolvido no #179. Sem outra dificuldade técnica. | Monitorar. |
+| R05 | Mitigado | Baixa / Alto | Média | 92 testes aprovados e cobertura de 84,63% ([M-03](metricas/M-03.md)). Os testes de autorização da #173 apontaram que um usuário alterava e excluía a conta de outro, corrigido no #176. | Manter os testes como checks obrigatórios. |
+| R06 | Ativo | Média / Médio | Média | Limite de upload de 5 MB com resposta 413 (#178 e #179) e rota de leitura das imagens (#172). Ainda sem validação do tipo do arquivo no upload e sem backup. | Validar que o arquivo é imagem e definir backup do volume do MongoDB. |
+| R07 | Mitigado | Baixa / Médio | Baixa | O CI passou a subir o `docker-compose.yml` com o `.env.example` e a testar em Mongo 8, igual ao compose (PR #180). | Monitorar. |
+| R08 | Mitigado em parte | Média / Médio | Média | O #156 (PR #158) tirou as credenciais do código: o compose exige as variáveis `MONGO_ROOT_*` e `JWT_SECRET` do `.env` (ignorado pelo Git) e o `application.properties` exige o `JWT_SECRET`; o modelo é o `.env.example`. A senha antiga `admin123` segue no histórico do Git (repositório público) e como valor padrão de dois testes de integração. | Tirar o `admin123` dos testes e usar valores aleatórios no staging, nunca os do `.env.example`. |
+| R09 | Mitigado em parte | Média / Médio | Média | O formato de erro da API segue duplicado: `ResponseErro` no tratador global e `{status, erro}` nos controllers. O novo 413 usa o primeiro. | Unificar o formato de erro. |
+| R10 | Mitigado | Baixa / Médio | Baixa | Sem mudança: arquitetura, ADRs e reengenharia da Sprint 3 seguem entregues. | Monitorar. |
+| R11 | Ativo | Baixa / Baixo | Baixa | As dependências do front-end não mudaram entre a `entrega-7` e a `entrega-8`. | `npm audit fix` em issue pequena. |
+| R12 | Mitigado em parte | Baixa / Médio | Baixa | O compose desliga o seed por padrão (`:-false`), mas o `.env.example` liga (`True`) e o `docs/DEPLOY.md` diz que o padrão é desligado. | Alinhar o `.env.example` e o `DEPLOY.md`; se o staging usar o seed, registrar como dados de demonstração. |
+
+### 6.2 Riscos novos
+
+| ID | Risco | Probabilidade / Impacto | Prioridade | Mitigação | Responsável |
+|----|-------|:---:|:---:|-----------|-------------|
+| R13 | **Staging sem evidência no repositório:** as issues #161 a #164 foram fechadas em 11/11, mas o `docs/DEPLOY.md` ainda diz que não há staging, e não há URL, workflow de deploy nem deployment registrado no GitHub. O enunciado avalia staging acessível e documentado. | Alta / Alto | Alta | Registrar no `DEPLOY.md` o provedor, a URL, as credenciais de teste (fora do repositório) e como o deploy é feito, e ligar a release `v0.4.0` ao staging. | A definir |
+| R14 | **Pipeline sem todos os checks obrigatórios:** o ruleset da `entrega-*` exige 5 checks; `Docker (Compose)` e os dois builds não são obrigatórios, e a proteção da `main` não pôde ser conferida. | Média / Médio | Média | Marcar os checks como obrigatórios nas regras do repositório (exige administrador) e conferir a proteção da `main`. | A definir |
