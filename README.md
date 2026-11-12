@@ -9,11 +9,17 @@ sem login; estudantes e professores cadastrados podem publicar seus trabalhos.
 - Publicação de projetos com título, resumo, autores, tema, tecnologias, imagens e links. A autoria é definida pelo usuário autenticado.
 - Galeria pública de projetos, com filtro por tema e visualização das imagens disponíveis.
 - API com listagem paginada, consulta por identificador e filtro por tecnologias.
-- Página Sobre com informações do projeto e navegação entre cadastro, login, galeria e submissão.
-- Troca da imagem de um projeto pelo próprio autor, com autenticação.
+- Página de detalhes do projeto (`/projetos/:id`), com galeria de imagens.
+- Página Sobre com informações do projeto, galeria e navegação entre cadastro, login, galeria e submissão.
+- Imagem padrão, sorteada entre três, em todo projeto criado sem imagem.
+- Troca da imagem de um projeto pelo próprio autor, com autenticação, e leitura das imagens enviadas pela API.
 
 As configurações locais ficam em `.env`, criado a partir de `.env.example`.
 Não versione valores sensíveis; consulte [configuração de ambiente e deploy](docs/DEPLOY.md).
+
+## Ambiente de validação
+
+O ambiente de validação é o Docker Compose local, reprodutível, com pré-requisitos, variáveis, comandos e validação rápida em [docs/DEPLOY.md](docs/DEPLOY.md), a interface e a API sobem nos endereços da seção Executar.
 
 ## Tecnologias
 
@@ -123,8 +129,8 @@ documentação em PRs para `main` e `entrega-*`.
 ## Limitações e pendências
 
 - A galeria carrega até 100 projetos; busca por texto ainda está pendente.
-- Imagens enviadas ao GridFS não têm rota de leitura dedicada; a galeria exibe imagens acessíveis pelas URLs presentes nos dados do projeto.
-- O limite atual de upload de imagem é de 5 MB.
+- Staging e deploy automatizado não foram entregues, a validação é feita localmente com Docker Compose.
+- O limite de upload de imagem é de 5 MB, acima disso a API responde 413.
 - A exclusão pela galeria ainda não tem suporte na API.
 
 ## Documentação e acompanhamento
@@ -136,7 +142,7 @@ documentação em PRs para `main` e `entrega-*`.
 - [Uso de IA](USO-IA.md) e [fluxo de trabalho](docs/fluxo-de-trabalho.md).
 - Histórico: [Inception](docs/inception.md), [baseline](docs/BASELINE.md), [estimativas](docs/ESTIMATIVAS.md), [Sprint 1](docs/sprints/sprint-1.md) e [Sprint 2](docs/sprints/sprint-2.md). Inception e baseline registram o escopo inicial de artigos; o produto atual é a vitrine de projetos.
 - [Board](https://github.com/orgs/IFSC-ES2/projects/34) e [backlog](https://github.com/IFSC-ES2/es2-2026_2-equipe-4/issues).
-- API: [login](src/backend/docs/rotas-login.md), [contas](src/backend/docs/rotas-de-criacao-de-contas.md) e [listagem pública](src/backend/docs/rotas-publicas-de-listagem-de-projetos.md). A rota autenticada `PUT /api/v1/projetos/{id}/imagem` troca a imagem de um projeto; envie o arquivo multipart no campo `arquivo`.
+- API: [login](src/backend/docs/rotas-login.md), [contas](src/backend/docs/rotas-de-criacao-de-contas.md) e [listagem pública](src/backend/docs/rotas-publicas-de-listagem-de-projetos.md). A rota autenticada `PUT /api/v1/projetos/{id}/imagem` troca a imagem de um projeto; envie o arquivo multipart no campo `arquivo`. A rota pública `GET /api/v1/projetos/imagens/{id}` devolve uma imagem enviada.
 
 ## Equipe
 
