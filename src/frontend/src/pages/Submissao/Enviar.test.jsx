@@ -127,6 +127,70 @@ describe('Submissão de projeto', () => {
     expect(screen.queryByText(/arquivo\(s\) anexado\(s\)/i)).not.toBeInTheDocument()
   })
 
+  it('envia duas imagens e publica os metadados com os dois IDs retornados', async () => {
+    const fetchApi = vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'id-primeira-imagem' }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'id-segunda-imagem' }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'id-projeto-123' }) })
+    vi.stubGlobal('fetch', fetchApi)
+    renderizarEnviar()
+    const usuario = userEvent.setup()
+    const primeiraImagem = new File(['capa do projeto'], 'capa.png', { type: 'image/png' })
+    const segundaImagem = new File(['tela do projeto'], 'tela.jpg', { type: 'image/jpeg' })
+
+    await preencherFormulario(usuario)
+    await usuario.upload(document.getElementById('imagens'), [primeiraImagem, segundaImagem])
+    await usuario.click(screen.getByRole('button', { name: /publicar projeto na vitrine/i }))
+
+    expect(await screen.findByText('Projeto publicado com sucesso na vitrine!')).toBeInTheDocument()
+    // Os metadados só são enviados depois dos dois uploads.
+    expect(fetchApi.mock.calls.map(([url]) => url)).toEqual([
+      'http://localhost:8080/api/v1/projetos/upload',
+      'http://localhost:8080/api/v1/projetos/upload',
+      'http://localhost:8080/api/v1/projetos/metadados',
+    ])
+    expect(fetchApi.mock.calls[0][1].body.get('arquivo')).toBe(primeiraImagem)
+    expect(fetchApi.mock.calls[1][1].body.get('arquivo')).toBe(segundaImagem)
+    const metadados = JSON.parse(fetchApi.mock.calls[2][1].body)
+    expect(metadados.imagens).toEqual(['id-primeira-imagem', 'id-segunda-imagem'])
+  })
+
+  it('não publica os metadados e preserva o formulário quando o segundo upload falha', async () => {
+    const fetchApi = vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'id-primeira-imagem' }) })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        json: async () => ({ erro: { mensagem: 'Segunda imagem inválida' } }),
+      })
+    vi.stubGlobal('fetch', fetchApi)
+    renderizarEnviar()
+    const usuario = userEvent.setup()
+    const primeiraImagem = new File(['capa do projeto'], 'capa.png', { type: 'image/png' })
+    const segundaImagem = new File(['tela do projeto'], 'tela.jpg', { type: 'image/jpeg' })
+
+    await preencherFormulario(usuario)
+    await usuario.upload(document.getElementById('imagens'), [primeiraImagem, segundaImagem])
+    await usuario.click(screen.getByRole('button', { name: /publicar projeto na vitrine/i }))
+
+    expect(await screen.findByText('Segunda imagem inválida')).toBeInTheDocument()
+    // A falha interrompe o fluxo: não deve existir uma chamada para os metadados.
+    expect(fetchApi.mock.calls.map(([url]) => url)).toEqual([
+      'http://localhost:8080/api/v1/projetos/upload',
+      'http://localhost:8080/api/v1/projetos/upload',
+    ])
+    expect(fetchApi.mock.calls[0][1].body.get('arquivo')).toBe(primeiraImagem)
+    expect(fetchApi.mock.calls[1][1].body.get('arquivo')).toBe(segundaImagem)
+    expect(screen.getByLabelText(/nome do projeto/i)).toHaveValue('Projeto Teste')
+    expect(screen.getByLabelText(/resumo/i)).toHaveValue('Resumo do projeto')
+    expect(screen.getByLabelText(/tema/i)).toHaveValue('Web')
+    expect(screen.getByLabelText(/autores/i)).toHaveValue('Ana Lima, Bruno Reis')
+    expect(screen.getByLabelText(/stack tecnológica/i)).toHaveValue('React, Spring Boot')
+    expect(screen.getByText(/2 arquivo\(s\) anexado\(s\)/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /publicar projeto na vitrine/i })).toBeEnabled()
+    expect(screen.queryByText('Projeto publicado com sucesso na vitrine!')).not.toBeInTheDocument()
+  })
+
   it('interrompe a submissão quando o upload falha', async () => {
     const fetchApi = vi.fn().mockResolvedValue({
       ok: false,
