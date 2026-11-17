@@ -289,3 +289,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio na revisão dos riscos e da qualidade da Sprint 4
   Artefatos: docs/riscos.md e docs/qualidade.md
   Validação: Afirmações conferidas com o código, os PRs, as issues e as métricas
+
+- Data: 17/11/2026
+  Ferramenta: Codex
+  Uso: Implementação do encerramento da sessão expirada e do redirecionamento após `401` na submissão (#194).
+  Artefatos: Sessão, cabeçalho, login e submissão do frontend, com os respectivos testes.
+  Validação: Build e 46 testes do frontend passaram. O lint dos arquivos alterados passou.

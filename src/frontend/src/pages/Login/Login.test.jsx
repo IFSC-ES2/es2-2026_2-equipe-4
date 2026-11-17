@@ -4,6 +4,8 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 import Login from './Login'
+import ProvedorSessao from '../../sessao/ProvedorSessao'
+import { criarTokenTeste } from '../../sessao/tokenTeste'
 
 afterEach(() => {
   localStorage.removeItem('token')
@@ -30,9 +32,10 @@ async function preencherLogin(usuario) {
 
 describe('Login', () => {
   it('envia as credenciais e guarda o token retornado pela API', async () => {
+    const token = criarTokenTeste()
     const fetchApi = simularApiLogin(vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ token: 'token-valido' }),
+      json: async () => ({ token }),
     }))
 
     render(
@@ -41,7 +44,8 @@ describe('Login', () => {
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<h1>Página inicial</h1>} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
+      { wrapper: ProvedorSessao },
     )
 
     const usuario = userEvent.setup()
@@ -50,7 +54,7 @@ describe('Login', () => {
     await usuario.click(screen.getByRole('button', { name: /entrar/i }))
 
     expect(screen.getByText('Acesso liberado!')).toBeInTheDocument()
-    expect(localStorage.getItem('token')).toBe('token-valido')
+    expect(localStorage.getItem('token')).toBe(token)
     expect(fetchApi).toHaveBeenCalledTimes(2)
     expect(fetchApi).toHaveBeenCalledWith(
       'http://localhost:8080/api/v1/auth/login',
@@ -76,7 +80,8 @@ describe('Login', () => {
     render(
       <MemoryRouter>
         <Login />
-      </MemoryRouter>
+      </MemoryRouter>,
+      { wrapper: ProvedorSessao },
     )
     const usuario = userEvent.setup()
 
@@ -94,7 +99,8 @@ describe('Login', () => {
     render(
       <MemoryRouter>
         <Login />
-      </MemoryRouter>
+      </MemoryRouter>,
+      { wrapper: ProvedorSessao },
     )
     const usuario = userEvent.setup()
 
@@ -108,5 +114,17 @@ describe('Login', () => {
     await usuario.click(screen.getByRole('button', { name: /entrar/i }))
     expect(responderLogin).toHaveBeenCalledTimes(2)
     expect(localStorage.getItem('token')).toBeNull()
+  })
+
+  it('orienta a entrar de novo quando o redirecionamento informa sessão expirada', () => {
+    simularApiLogin(vi.fn())
+    render(
+      <MemoryRouter initialEntries={[{ pathname: '/login', state: { sessaoExpirada: true } }]}>
+        <Login />
+      </MemoryRouter>,
+      { wrapper: ProvedorSessao },
+    )
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Entre novamente para publicar um projeto.')
   })
 })

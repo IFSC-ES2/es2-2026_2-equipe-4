@@ -5,8 +5,8 @@ import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 import Login from './pages/Login/Login'
 import Enviar from './pages/Submissao/Enviar'
-
-vi.mock('./assets/arquivo.png', () => ({ default: 'mock-imagem-arquivo' }))
+import ProvedorSessao from './sessao/ProvedorSessao'
+import { criarTokenTeste } from './sessao/tokenTeste'
 
 afterEach(() => {
   localStorage.removeItem('token')
@@ -14,6 +14,7 @@ afterEach(() => {
 })
 
 it('usa o token do login nas rotas de upload e metadados da API', async () => {
+  const token = criarTokenTeste()
   const fetchApi = vi.fn(async (url) => {
     const caminho = new URL(url).pathname
 
@@ -24,7 +25,7 @@ it('usa o token do login nas rotas de upload e metadados da API', async () => {
       }
     }
     if (caminho === '/api/v1/auth/login') {
-      return { ok: true, json: async () => ({ token: 'token-do-login' }) }
+      return { ok: true, json: async () => ({ token }) }
     }
     if (caminho === '/api/v1/projetos/upload') {
       return { ok: true, json: async () => ({ id: 'arquivo-123' }) }
@@ -38,13 +39,15 @@ it('usa o token do login nas rotas de upload e metadados da API', async () => {
   const usuario = userEvent.setup()
 
   render(
-    <MemoryRouter initialEntries={['/login']}>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Link to="/submissao">Publicar meu projeto</Link>} />
-        <Route path="/submissao" element={<Enviar />} />
-      </Routes>
-    </MemoryRouter>
+    <ProvedorSessao>
+      <MemoryRouter initialEntries={['/login']}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Link to="/submissao">Publicar meu projeto</Link>} />
+          <Route path="/submissao" element={<Enviar />} />
+        </Routes>
+      </MemoryRouter>
+    </ProvedorSessao>
   )
   await usuario.type(screen.getByLabelText(/e-mail/i), 'ana@exemplo.com')
   await usuario.type(screen.getByLabelText(/senha/i), 'senha-segura')
@@ -70,7 +73,7 @@ it('usa o token do login nas rotas de upload e metadados da API', async () => {
     '/api/v1/projetos/upload',
     '/api/v1/projetos/metadados',
   ])
-  expect(fetchApi.mock.calls[2][1].headers.Authorization).toBe('Bearer token-do-login')
-  expect(fetchApi.mock.calls[3][1].headers.Authorization).toBe('Bearer token-do-login')
+  expect(fetchApi.mock.calls[2][1].headers.Authorization).toBe(`Bearer ${token}`)
+  expect(fetchApi.mock.calls[3][1].headers.Authorization).toBe(`Bearer ${token}`)
   expect(JSON.parse(fetchApi.mock.calls[3][1].body).imagens).toEqual(['arquivo-123'])
 })

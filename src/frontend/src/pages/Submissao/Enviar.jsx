@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import arquivoImg from '../../assets/arquivo.png'
+import { useState } from 'react'
+import { Navigate } from 'react-router-dom'
 import './Enviar.css'
 import { API_BASE_URL } from '../../config/api';
+import { useSessao } from '../../sessao/contextoSessao'
 
 const formularioInicial = {
   titulo: '',
@@ -42,15 +42,7 @@ function Enviar() {
   const [mensagem, setMensagem] = useState('')
   const [carregando, setCarregando] = useState(false)
 
-  const navigate = useNavigate()
-  //const API_BASE_URL = 'http://localhost:8080'
-
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (!token) {
-      navigate('/login')
-    }
-  }, [navigate])
+  const { token, expiraEm, expirada, invalidarSessao } = useSessao()
 
   function limparErro(campo) {
     setErros((errosAtuais) => {
@@ -110,14 +102,19 @@ function Enviar() {
   async function enviarFormulario(event) {
     event.preventDefault()
 
-    if (!validarFormulario()) {
-      setMensagem('')
+    function interromperSessao() {
+      if (!invalidarSessao(token)) {
+        setMensagem('A sessão usada nesta publicação expirou. Tente novamente.')
+      }
+    }
+
+    if (Date.now() >= expiraEm) {
+      interromperSessao()
       return
     }
 
-    const token = localStorage.getItem('token')
-    if (!token) {
-      navigate('/login')
+    if (!validarFormulario()) {
+      setMensagem('')
       return
     }
 
@@ -136,6 +133,10 @@ function Enviar() {
           body: formDataImagem,
         })
 
+        if (respUpload.status === 401) {
+          interromperSessao()
+          return
+        }
         if (!respUpload.ok) throw new Error(await mensagemDeErro(respUpload, 'Falha ao processar imagens.'))
         
         const dadosUpload = await respUpload.json()
@@ -162,6 +163,10 @@ function Enviar() {
         body: JSON.stringify(payloadMetadados),
       })
 
+      if (respostaMetadados.status === 401) {
+        interromperSessao()
+        return
+      }
       if (!respostaMetadados.ok) throw new Error(await mensagemDeErro(respostaMetadados, 'Erro ao salvar os metadados do projeto.'))
 
       setMensagem('Projeto publicado com sucesso na vitrine!')
@@ -175,6 +180,10 @@ function Enviar() {
     } finally {
       setCarregando(false)
     }
+  }
+
+  if (!token) {
+    return <Navigate to="/login" replace state={expirada ? { sessaoExpirada: true } : undefined} />
   }
 
   return (
