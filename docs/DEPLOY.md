@@ -1,8 +1,73 @@
-# Configuração de ambiente e deploy local
+# Configuração de ambiente e deploy
 
-Este procedimento documenta o ambiente local do PublicaIFSC com Docker Compose.
-Ele serve para desenvolvimento e testes rápidos; não é uma configuração de
-produção. Não há provedor nem ambiente de staging configurado neste repositório.
+## Ambiente de execução no Render
+
+- Frontend (Render Static Site) em <https://publicaifsc.onrender.com/>.
+- API (Render Web Service) em <https://publicaifsc-api.onrender.com/api/v1>.
+- Banco de dados no MongoDB Atlas, acessado pela API.
+
+### Configurar o Static Site
+
+1. No [painel do Render](https://dashboard.render.com/), selecione **New → Static Site**
+   e conecte o repositório `IFSC-ES2/es2-2026_2-equipe-4`. Para atualizar a
+   configuração existente, abra o serviço **publicaifsc**.
+2. Preencha os campos de **Build & Deploy**.
+
+   | Campo | Valor |
+   |---|---|
+   | Branch | `main` |
+   | Root Directory | `src/frontend` |
+   | Build Command | `npm ci && npm run build` |
+   | Publish Directory | `dist` |
+
+3. Em **Environment Variables**, configure as variáveis do build.
+
+   | Variável | Valor |
+   |---|---|
+   | `NODE_VERSION` | `24` |
+   | `VITE_API_BASE_URL` | `https://publicaifsc-api.onrender.com` |
+
+   O frontend acrescenta `/api/v1` ao montar as requisições. Informe apenas
+   a origem HTTPS da API em `VITE_API_BASE_URL`. O Vite incorpora esse valor
+   ao JavaScript publicado, por isso ele deve conter somente informação pública.
+4. Crie o site ou salve as alterações e acompanhe o build na aba **Deploys**.
+   Com **Auto-Deploy** habilitado, mudanças em `src/frontend` na `main`
+   disparam um novo deploy. Ao alterar `VITE_API_BASE_URL`, faça um novo build
+   pelo painel para aplicar o valor ao site publicado.
+
+
+### Configurar o acesso direto às rotas
+
+No serviço **publicaifsc**, vá a **Redirects/Rewrites → Add Rule**, configure
+os campos abaixo e salve em **Save Changes**.
+
+| Campo | Valor |
+|---|---|
+| Source | `/*` |
+| Destination | `/index.html` |
+| Action | **Rewrite** |
+
+Com essa regra, o Render entrega `index.html` mantendo a URL solicitada.
+O React Router resolve caminhos como `/projetos`, `/projetos/<id>` e `/login`
+ao abrir um link direto ou recarregar a página.
+
+### Validar o deploy
+
+1. Abra a [página inicial](https://publicaifsc.onrender.com/) e a
+   [galeria](https://publicaifsc.onrender.com/projetos). Confirme que a lista
+   carrega e abra o detalhe de um projeto existente.
+2. Copie a URL do detalhe, abra em outra aba e recarregue a página.
+   Repita o acesso direto em `/login` e `/cadastro` para verificar a regra.
+3. Nas ferramentas do navegador, confira se a requisição para
+   `/api/v1/projetos` vai para a API publicada e retorna HTTP 200, sem erro de
+   CORS. O [endpoint público da listagem](https://publicaifsc-api.onrender.com/api/v1/projetos?size=1)
+   também pode ser consultado diretamente.
+4. Para validar o fluxo autenticado, use uma conta de teste e confira o
+   cadastro, o login, a submissão com imagem e a exibição da imagem no detalhe.
+
+## Ambiente local com Docker Compose
+
+As instruções a seguir se aplicam ao desenvolvimento e aos testes locais.
 
 ## Pré-requisitos
 
@@ -143,8 +208,6 @@ npm run dev
 - Esta configuração destina-se a desenvolvimento local e testes rápidos.
 - O `.env` local contém credenciais de conveniência para este workspace e está
   ignorado pelo Git, sendo as informações contida em `.env.example` 
-- Ainda não há staging, deploy remoto, backup/restauração automatizados, TLS,
- ou monitoramento configurados.
 - URLs da API são compiladas no bundle do frontend; alterar `VITE_API_BASE_URL`
   exige rebuild do frontend.
 - A carga inicial de dados de demonstração é opcional e cria dados fictícios;
