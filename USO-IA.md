@@ -295,3 +295,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Remoção da exclusão sem suporte da galeria e ajuste do teste da #193.
   Artefatos: `Projetos.jsx` e `Projetos.test.tsx`.
   Validação: Build e 43 testes do frontend passaram.
+
+- Data: 17/11/2026
+  Ferramenta: Codex
+  Uso: Atualização do título da aba e criação do favicon do PublicaIFSC (#198).
+  Artefatos: `src/frontend/index.html` e `src/frontend/public/favicon-publicaifsc.svg`.
+  Validação: Build do frontend e verificação do título e do SVG na página inicial e em uma rota interna no preview de produção.
