@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import userEvent from '@testing-library/user-event'
 import Projetos from './Projetos'
@@ -136,39 +136,20 @@ describe('Projetos', () => {
         expect(screen.queryByText('Procurando projetos...')).not.toBeInTheDocument()
     })
 
-    it('exige confirmação e exclui apenas o projeto escolhido usando o token', async () => {
-        localStorage.setItem('token', 'token-teste')
-        const alerta = vi.spyOn(window, 'alert').mockImplementation(() => {})
-        const fetchApi = simularBusca([projetoTecnologia, projetoSaude])
-        const usuario = userEvent.setup()
+    it.each([
+        { perfil: 'visitante', token: null },
+        { perfil: 'usuário autenticado', token: 'token-teste' },
+    ])('não oferece exclusão de projeto para $perfil', async ({ token }) => {
+        if (token) localStorage.setItem('token', token)
+        const fetchApi = simularBusca()
 
         renderizarProjetos()
-        await screen.findByRole('heading', { name: 'Aplicativo de saúde' })
-
-        fetchApi.mockResolvedValueOnce({ ok: true, status: 204 })
-        await usuario.click(screen.getAllByRole('button', { name: 'Apagar' })[0])
-
-        expect(screen.getByRole('button', { name: 'Confirmar Exclusão' })).toBeInTheDocument()
-        // O primeiro clique apenas pede confirmação, sem enviar o DELETE.
-        expect(fetchApi).toHaveBeenCalledTimes(1)
-
-        await usuario.click(screen.getByRole('button', { name: 'Confirmar Exclusão' }))
-
-        await waitFor(() => {
-            expect(
-                screen.queryByRole('heading', { name: 'Horta inteligente' }),
-            ).not.toBeInTheDocument()
-        })
-
-        expect(fetchApi).toHaveBeenLastCalledWith(
-            'http://localhost:8080/api/v1/projetos/projeto-1',
-            {
-                method: 'DELETE',
-                headers: { Authorization: 'Bearer token-teste' },
-            },
+        expect(await screen.findByRole('link', { name: 'Detalhes' })).toHaveAttribute(
+            'href', '/projetos/projeto-1',
         )
-        expect(alerta).toHaveBeenCalledExactlyOnceWith('Projeto apagado com sucesso.')
-        expect(screen.getByRole('heading', { name: 'Aplicativo de saúde' })).toBeInTheDocument()
-        expect(screen.getByRole('button', { name: 'Todos 1' })).toBeInTheDocument()
+        expect(screen.queryByRole('button', { name: /apagar|excluir|exclusão|🗑️/i })).not.toBeInTheDocument()
+        expect(fetchApi).toHaveBeenCalledExactlyOnceWith(
+            'http://localhost:8080/api/v1/projetos?size=100',
+        )
     })
 })
