@@ -104,7 +104,7 @@ function Enviar() {
 
     function interromperSessao() {
       if (!invalidarSessao(token)) {
-        setMensagem('A sessão usada nesta publicação expirou. Tente novamente.')
+        setMensagem('Sua sessão mudou. Tente publicar o projeto novamente.')
       }
     }
 

@@ -125,6 +125,6 @@ describe('Login', () => {
       { wrapper: ProvedorSessao },
     )
 
-    expect(screen.getByRole('alert')).toHaveTextContent('Entre novamente para publicar um projeto.')
+    expect(screen.getByRole('alert')).toHaveTextContent('Sua sessão terminou. Entre novamente para publicar seu projeto.')
   })
 })

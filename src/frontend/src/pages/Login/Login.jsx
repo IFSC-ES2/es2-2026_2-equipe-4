@@ -48,7 +48,7 @@ function Login() {
       }
 
       const dados = await resposta.json();
-      if (!iniciarSessao(dados.token)) throw new Error('A API não retornou uma sessão válida. Tente entrar novamente.');
+      if (!iniciarSessao(dados.token)) throw new Error('Não foi possível iniciar sua sessão. Tente entrar novamente.');
       setStatus({ tipo: 'sucesso', mensagem: 'Acesso liberado!' });
       
       setTimeout(() => navigate('/'), 800); 
@@ -71,7 +71,7 @@ function Login() {
         
         {!status.mensagem && state?.sessaoExpirada && (
           <div className="status-mensagem erro" role="alert">
-            Sua sessão expirou ou é inválida. Entre novamente para publicar um projeto.
+            Sua sessão terminou. Entre novamente para publicar seu projeto.
           </div>
         )}
 
