@@ -292,6 +292,12 @@ Validação: Leitura e pequenas correções feitas
 
 - Data: 17/11/2026
   Ferramenta: Codex
+  Uso: Implementação da paginação da galeria e dos testes de carregamento e recuperação de falha (#195).
+  Artefatos: `Projetos.jsx` e `Projetos.test.tsx`.
+  Validação: Build e 45 testes do frontend passaram.
+
+- Data: 17/11/2026
+  Ferramenta: Codex
   Uso: Remoção da exclusão sem suporte da galeria e ajuste do teste da #193.
   Artefatos: `Projetos.jsx` e `Projetos.test.tsx`.
   Validação: Build e 43 testes do frontend passaram.
