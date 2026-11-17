@@ -10,8 +10,6 @@ function Projetos() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
 
-  const [idConfirmandoDelecao, setIdConfirmandoDelecao] = useState(null);
-
   useEffect(() => {
     async function buscarProjetos() {
       try {
@@ -20,7 +18,7 @@ function Projetos() {
         
         const dados = await resposta.json();
         setProjetos(dados.content || []); 
-      } catch (err) {
+      } catch {
         setErro('Erro de conexão: Sistema fora do ar!');
       } finally {
         setCarregando(false);
@@ -37,35 +35,6 @@ function Projetos() {
   const projetosFiltrados = temaSelecionado === 'Todos' 
     ? projetos 
     : projetos.filter(p => p.tema === temaSelecionado);
-
-  const handleDeletarProjeto = async (id) => {
-    if (idConfirmandoDelecao !== id) {
-      setIdConfirmandoDelecao(id);
-      return;
-    }
-
-    const token = localStorage.getItem('token');
-
-    try {
-      const resposta = await fetch(`${API_BASE_URL}/api/v1/projetos/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': token ? `Bearer ${token}` : ''
-        }
-      });
-
-      if (resposta.ok || resposta.status === 204) {
-        setProjetos((prev) => prev.filter((p) => p.id !== id));
-        alert('Projeto apagado com sucesso.');
-      } else {
-        alert('Acesso negado: Você só pode apagar os projetos que você mesmo criou.');
-      }
-    } catch (err) {
-      alert('Erro de conexão ao tentar apagar o projeto.');
-    } finally {
-      setIdConfirmandoDelecao(null);
-    }
-  };
 
   return (
     <main className="pagina-animada" style={{ width: '100%', margin: '0 auto', minHeight: '80vh' }}>
@@ -137,8 +106,6 @@ function Projetos() {
               </div>
             ) : (
               projetosFiltrados.map((projeto) => {
-                const estaConfirmando = idConfirmandoDelecao === projeto.id;
-
                 return (
                   <div 
                     key={projeto.id} 
@@ -165,7 +132,7 @@ function Projetos() {
                           Por <span style={{ color: '#0f172a', fontWeight: '600' }}>{projeto.autores?.join(', ')}</span>
                         </small>
                         
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
                           <div style={{ display: 'flex', gap: '8px' }}>
                             <Link
                               to={`/projetos/${projeto.id}`}
@@ -198,28 +165,6 @@ function Projetos() {
                                 Acessar
                               </a>
                             )}
-                          </div>
-
-                          <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeletarProjeto(projeto.id);
-                              }}
-                              style={{
-                                background: estaConfirmando ? '#fef2f2' : 'transparent',
-                                color: estaConfirmando ? '#dc2626' : '#94a3b8',
-                                border: 'none',
-                                padding: '6px',
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                borderRadius: '4px',
-                                transition: 'all 0.2s'
-                              }}
-                            >
-                              {estaConfirmando ? 'Confirmar Exclusão' : 'Apagar'}
-                            </button>
                           </div>
                         </div>
                       </div>
