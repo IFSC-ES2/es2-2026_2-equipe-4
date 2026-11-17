@@ -295,3 +295,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Remoção da exclusão sem suporte da galeria e ajuste do teste da #193.
   Artefatos: `Projetos.jsx` e `Projetos.test.tsx`.
   Validação: Build e 43 testes do frontend passaram.
+
+- Data: 17/11/2026
+  Ferramenta: Codex
+  Uso: Validação de imagens, mensagens de erro e reaproveitamento de uploads na submissão (#196).
+  Artefatos: Página de submissão, estilos e testes do frontend.
+  Validação: Build, testes do frontend e ESLint da submissão passaram.
