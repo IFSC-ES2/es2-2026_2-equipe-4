@@ -289,3 +289,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio na revisão dos riscos e da qualidade da Sprint 4
   Artefatos: docs/riscos.md e docs/qualidade.md
   Validação: Afirmações conferidas com o código, os PRs, as issues e as métricas
+
+- Data: 17/11/2026
+  Ferramenta: Codex
+  Uso: Remoção da exclusão sem suporte da galeria e ajuste do teste da #193.
+  Artefatos: `Projetos.jsx` e `Projetos.test.tsx`.
+  Validação: Build e 43 testes do frontend passaram.
