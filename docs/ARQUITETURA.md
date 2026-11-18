@@ -31,11 +31,14 @@ do Spring Security.
 
 ## Comunicação e rotas principais
 
-O [Docker Compose](../docker-compose.yml) reúne frontend (5173), API (8080) e
-MongoDB (27017), com volume persistente. O navegador carrega a interface e
-chama a API em `/api/v1`; dentro do Compose, a API encontra o banco pelo nome
-`mongodb`. O ambiente documentado e reprodutível é local; não há staging nem
-deploy remoto configurado ([DEPLOY](DEPLOY.md)).
+O ambiente publicado usa Render Static Site para o frontend e Render Web
+Service para a API, com MongoDB Atlas para persistência. O navegador carrega a
+interface em `https://publicaifsc.onrender.com/` e chama a API em
+`https://publicaifsc-api.onrender.com/api/v1`. O [Docker Compose](../docker-compose.yml)
+continua disponível para desenvolvimento local e reúne frontend (5173), API
+(8080) e MongoDB (27017), com volume persistente. No Compose, a API encontra o
+banco pelo nome `mongodb`. Configuração do Render, Atlas e execução local:
+[DEPLOY](DEPLOY.md).
 
 | Rota relativa a `/api/v1` | Acesso e finalidade |
 |---|---|
@@ -59,7 +62,8 @@ autenticada para definir `autorId`, sem confiar na autoria enviada pelo
 cliente. O uso de `localStorage` mantém risco caso scripts maliciosos sejam
 executados no navegador.
 
-As credenciais foram removidas da configuração versionada pelo PR #158,
+As credenciais foram removidas da configuração versionada pelo PR #158, mas
+`admin123` permanece no histórico público do Git e como valor padrão em dois
 testes de integração (R08 em [riscos](riscos.md)).
 
 ## Plano inicial e produto entregue
@@ -74,5 +78,5 @@ testes de integração (R08 em [riscos](riscos.md)).
 | Armazenamento separado (#131) | `ArmazenamentoArquivoService` encapsula GridFS, conforme [reengenharia](REENGENHARIA.md). |
 
 As decisões e sua evolução constam em [ADRs](adr/) e na
-[retrospectiva](RETROSPECTIVA.md). A arquitetura de implantação remota não se
-aplica: a entrega não possui ambiente de staging configurado.
+[retrospectiva](RETROSPECTIVA.md). O ambiente publicado não possui staging,
+backup automatizado nem monitoramento configurado ([DEPLOY](DEPLOY.md)).

@@ -1,8 +1,9 @@
 # Release Candidate v1.0.0-rc.1
 
-Texto-base para a descrição da release candidata. O repositório local
-consultado está no merge do PR #188 (`e7685a5`, 11/11/2026); criação e
-publicação da tag `v1.0.0-rc.1` não estão comprovadas por esse estado local.
+Texto-base para a descrição da release candidata. A implantação publicada está
+disponível no Render, com persistência no MongoDB Atlas; configuração e acesso
+de avaliação estão em [DEPLOY](../DEPLOY.md). A criação e publicação da tag
+`v1.0.0-rc.1` não estão comprovadas por este documento.
 
 ## Resumo
 
@@ -29,17 +30,17 @@ troca autenticada de imagem e leitura pública das imagens.
 
 ## Ambiente de teste
 
-Não há staging nem deploy remoto. A aplicação pode ser reproduzida localmente
-com Docker Compose, seguindo [DEPLOY.md](../DEPLOY.md). Interface:
-`http://localhost:5173`; API: `http://localhost:8080/api/v1`. Crie credenciais
-locais por meio da tela de cadastro; não há credenciais de demonstração
-compartilhadas documentadas.
+O ambiente publicado e as credenciais de avaliação estão descritos em
+[DEPLOY.md](../DEPLOY.md). A execução local também pode ser reproduzida com
+Docker Compose: interface `http://localhost:5173`, API
+`http://localhost:8080/api/v1`.
 
 ## Limitações conhecidas
 
 - Busca textual não disponível; a galeria apresenta até 100 projetos.
-- Exclusão de projeto pela galeria/API. [Não implementado]
-- Staging, deploy remoto, TLS, monitoramento e backup automatizado. [Em processo]
+- Exclusão de projeto pela galeria/API não foi localizada.
+- Sem staging, monitoramento ou backup automatizado; consulte as limitações do
+  [ambiente publicado](../DEPLOY.md).
 - Upload não valida o tipo real do arquivo; limite de 5 MB.
 - A senha `admin123` permanece no histórico Git e em dois valores padrão de
   testes de integração; consulte R08 em [riscos](../riscos.md).

@@ -20,10 +20,8 @@ por React ([ADR-0003](adr/ADR-0003.md)).
 | MySQL | Removida do escopo | Foi alternativa no plano; MongoDB é o banco implementado. |
 | Busca por texto | Pendente | Não disponível na galeria. |
 | Exclusão de projeto pela galeria/API | Pendente | Não foi localizada rota de exclusão de projeto; a exclusão citada na Sprint 4 refere-se à conta do próprio usuário. |
-| Staging e deploy automatizado | Removida da entrega atual | Issues #161 a #164 foram fechadas como não planejadas em 11/11; ambiente local reproduzível via Compose. |
+| Staging e deploy automatizado | Removida da Sprint 4 | Issues #161 a #164 foram fechadas como não planejadas em 11/11. Depois da Sprint 4,  publicou o site e a API no Render e configurou o MongoDB Atlas; não há staging separado. Consulte [DEPLOY](DEPLOY.md). |
 | Backup e validação do tipo da imagem | Pendente | Limitações registradas no risco R06. |
-
-O processo de deploy está em andamento, mas até determinado commit as alterações ainda não constam no GitHub.
 
 ## Indicadores observados
 

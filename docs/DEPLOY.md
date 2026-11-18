@@ -17,7 +17,7 @@
   e um projeto publicado pelo usuário de teste.
 
 A API usa o plano gratuito do Render e dorme após 15 minutos sem uso. A primeira
-requisição depois disso pode levar cerca de 1 minuto
+requisição depois disso pode levar cerca de 1 minuto.
 
 ### Configuração dos serviços
 

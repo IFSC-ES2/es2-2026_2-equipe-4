@@ -19,7 +19,7 @@ Não versione valores sensíveis; consulte [configuração de ambiente e deploy]
 
 ## Ambiente de validação
 
-O ambiente de validação é o Docker Compose local, reprodutível, com pré-requisitos, variáveis, comandos e validação rápida em [docs/DEPLOY.md](docs/DEPLOY.md), a interface e a API sobem nos endereços da seção Executar.
+O ambiente publicado usa Render para o site e a API e MongoDB Atlas para os dados. Acesse o [site do PublicaIFSC](https://publicaifsc.onrender.com/) e a [API](https://publicaifsc-api.onrender.com/api/v1). O ambiente local com Docker Compose também é reprodutível. Configuração, credenciais de avaliação e validação estão em [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Tecnologias
 
@@ -128,16 +128,11 @@ documentação em PRs para `main` e `entrega-*`.
 
 ## MVP entregue e limitações
 
-O MVP do RC é a vitrine de projetos universitários com cadastro/login, publicação autenticada, galeria pública e páginas de detalhe. A versão candidata prevista é `v1.0.0-rc.1`; consulte o [resumo da release](docs/entregas/release-candidate.md). O ambiente de avaliação reproduzível é local, via Docker Compose; 
-
-`não há staging nem deploy remoto.` ( Até o momento, não possui um ambiente em nuvem. A implementação está em andamento. )
-
-Crie um usuário pela tela de cadastro para testar as rotas protegidas; não há credenciais compartilhadas de demonstração.
+O MVP é uma vitrine de projetos universitários com cadastro/login, publicação autenticada, galeria pública e páginas de detalhe. Consulte o [resumo da release](docs/entregas/release-candidate.md). O ambiente publicado e o ambiente local de avaliação estão descritos em [docs/DEPLOY.md](docs/DEPLOY.md). A API usa o plano gratuito do Render e pode levar cerca de um minuto para responder após ficar inativa.
 
 - A galeria carrega até 100 projetos; busca por texto ainda está pendente.
-- Staging e deploy automatizado não foram entregues, a validação é feita localmente com Docker Compose.
+- Não há ambiente de staging, backup automatizado ou monitoramento configurado.
 - O limite de upload de imagem é de 5 MB, acima disso a API responde 413.
-- A exclusão de projetos pela galeria/API não foi localizada na implementação. A exclusão de conta do usuário autenticado é outra operação e não equivale à exclusão de projeto. [Em andamento]
 
 ## Documentação e acompanhamento
 
