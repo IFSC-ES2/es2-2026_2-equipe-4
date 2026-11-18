@@ -30,4 +30,10 @@ public class AuthService {
 
         return jwtUtil.generateToken(usuario.getEmail());
     }
+
+    public String buscarIdUsuario(String email) {
+        return usuarioRepository.findIdByEmail(email)
+                .map(User::getId)
+                .orElseThrow(() -> new AuthException("Sessão inválida"));
+    }
 }

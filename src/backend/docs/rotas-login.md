@@ -40,7 +40,7 @@ Campos ausentes, e-mail inválido ou senha fora do tamanho permitido retornam `4
 
 ### `GET /api/v1/auth/token`
 
-Valida o JWT apresentado no cabeçalho `Authorization: Bearer <JWT>`. Retorna `200` com `{"mensagem":"Token válido"}` quando válido; sem token, expirado ou inválido retorna `401`.
+Valida o JWT apresentado no cabeçalho `Authorization: Bearer <JWT>`. Para um token válido, retorna `200` com `{"mensagem":"Token válido","userId":"<id do usuário autenticado>"}`. Requisições sem token, com token expirado ou inválido recebem `401`.
 
 ## Criação e gerenciamento de contas
 

@@ -1,21 +1,26 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import userEvent from '@testing-library/user-event'
 import Projetos from './Projetos'
 import { MemoryRouter } from 'react-router-dom'
+import ProvedorSessao from '../../sessao/ProvedorSessao'
+import { criarTokenTeste } from '../../sessao/tokenTeste'
 
 // A página usa <Link>, então precisa de um router nos testes.
 function renderizarProjetos() {
     render(
         <MemoryRouter>
-            <Projetos />
+            <ProvedorSessao>
+                <Projetos />
+            </ProvedorSessao>
         </MemoryRouter>,
     )
 }
 
 const projetoTecnologia = {
     id: 'projeto-1',
+    autorId: 'autor-1',
     titulo: 'Horta inteligente',
     resumo: 'Sistema para monitorar uma horta.',
     tema: 'Tecnologia',
@@ -26,6 +31,7 @@ const projetoTecnologia = {
 const projetoSaude = {
     ...projetoTecnologia,
     id: 'projeto-2',
+    autorId: 'autor-2',
     titulo: 'Aplicativo de saúde',
     resumo: 'Sistema para monitorar a saúde de pacientes.',
     tema: 'Saúde',
@@ -41,6 +47,22 @@ function simularBusca(projetos = [projetoTecnologia]) {
 
     vi.stubGlobal('fetch', fetchApi)
     return fetchApi
+}
+
+function simularSessao(projetos = [projetoTecnologia, projetoSaude], usuarioId = 'autor-1') {
+    const token = criarTokenTeste()
+    localStorage.setItem('token', token)
+    const excluir = vi.fn().mockResolvedValue({ status: 204 })
+    const listar = vi.fn().mockResolvedValue(respostaPagina(projetos))
+    const fetchApi = vi.fn((url: string, opcoes: RequestInit) => {
+        if (url.endsWith('/auth/token')) {
+            return Promise.resolve({ ok: true, json: async () => ({ userId: usuarioId }) })
+        }
+        if (opcoes.method === 'DELETE') return excluir(url, opcoes)
+        return listar(url, opcoes)
+    })
+    vi.stubGlobal('fetch', fetchApi)
+    return { fetchApi, excluir, listar, token }
 }
 
 afterEach(() => {
@@ -195,11 +217,7 @@ describe('Projetos', () => {
         expect(fetchApi.mock.calls.map(([url]) => new URL(url).searchParams.get('page'))).toEqual(['0', '1', '1'])
     })
 
-    it.each([
-        { perfil: 'visitante', token: null },
-        { perfil: 'usuário autenticado', token: 'token-teste' },
-    ])('não oferece exclusão de projeto para $perfil', async ({ token }) => {
-        if (token) localStorage.setItem('token', token)
+    it('não oferece exclusão a visitantes', async () => {
         const fetchApi = simularBusca()
 
         renderizarProjetos()
@@ -211,5 +229,102 @@ describe('Projetos', () => {
             'http://localhost:8080/api/v1/projetos?page=0&size=100',
             expect.objectContaining({ signal: expect.any(AbortSignal) }),
         )
+    })
+
+    it('oferece Apagar apenas nos projetos da conta atual', async () => {
+        const { fetchApi, token } = simularSessao()
+        renderizarProjetos()
+
+        expect(await screen.findByRole('button', { name: 'Apagar Horta inteligente' })).toBeInTheDocument()
+        expect(screen.getByRole('heading', { name: 'Aplicativo de saúde' })).toBeInTheDocument()
+        expect(screen.queryByRole('button', { name: 'Apagar Aplicativo de saúde' })).not.toBeInTheDocument()
+        expect(fetchApi).toHaveBeenCalledWith(
+            'http://localhost:8080/api/v1/auth/token',
+            expect.objectContaining({ headers: { Authorization: `Bearer ${token}` } }),
+        )
+    })
+
+    it('mantém o projeto quando o autor cancela a confirmação', async () => {
+        const { excluir } = simularSessao()
+        const confirmar = vi.spyOn(window, 'confirm').mockReturnValue(false)
+        const usuario = userEvent.setup()
+        renderizarProjetos()
+
+        await usuario.click(await screen.findByRole('button', { name: 'Apagar Horta inteligente' }))
+
+        expect(confirmar).toHaveBeenCalledWith('Apagar o projeto "Horta inteligente"?')
+        expect(excluir).not.toHaveBeenCalled()
+        expect(screen.getByRole('heading', { name: 'Horta inteligente' })).toBeInTheDocument()
+    })
+
+    it('envia o token e remove o projeto e seu filtro após a API confirmar a exclusão', async () => {
+        const { excluir, token } = simularSessao()
+        vi.spyOn(window, 'confirm').mockReturnValue(true)
+        const usuario = userEvent.setup()
+        renderizarProjetos()
+        await usuario.click(await screen.findByRole('button', { name: 'Tecnologia 1' }))
+
+        await usuario.click(await screen.findByRole('button', { name: 'Apagar Horta inteligente' }))
+
+        expect(excluir).toHaveBeenCalledExactlyOnceWith('http://localhost:8080/api/v1/projetos/projeto-1', {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` },
+        })
+        expect(await screen.findByRole('heading', { name: 'Aplicativo de saúde' })).toBeInTheDocument()
+        expect(screen.queryByRole('heading', { name: 'Horta inteligente' })).not.toBeInTheDocument()
+        expect(screen.getByRole('button', { name: 'Todos 1' })).toHaveClass('ativo')
+    })
+
+    it.each([
+        { status: 403, mensagem: 'Apenas o autor pode apagar este projeto.' },
+        { status: 405, mensagem: 'Não foi possível apagar o projeto. Tente novamente.' },
+        { status: null, mensagem: 'Não foi possível apagar o projeto. Verifique sua conexão e tente novamente.' },
+    ])('mantém o projeto se a exclusão falhar ($status)', async ({ status, mensagem }) => {
+        const { excluir } = simularSessao()
+        if (status === null) excluir.mockRejectedValueOnce(new TypeError('Failed to fetch'))
+        else excluir.mockResolvedValueOnce({ status })
+        vi.spyOn(window, 'confirm').mockReturnValue(true)
+        const usuario = userEvent.setup()
+        renderizarProjetos()
+
+        await usuario.click(await screen.findByRole('button', { name: 'Apagar Horta inteligente' }))
+
+        expect(await screen.findByRole('alert')).toHaveTextContent(mensagem)
+        expect(screen.getByRole('heading', { name: 'Horta inteligente' })).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: 'Apagar Horta inteligente' })).toBeEnabled()
+    })
+
+    it('encerra a sessão e mantém o projeto quando a exclusão retorna 401', async () => {
+        const { excluir } = simularSessao()
+        excluir.mockResolvedValueOnce({ status: 401 })
+        vi.spyOn(window, 'confirm').mockReturnValue(true)
+        const usuario = userEvent.setup()
+        renderizarProjetos()
+
+        await usuario.click(await screen.findByRole('button', { name: 'Apagar Horta inteligente' }))
+
+        expect(await screen.findByRole('alert')).toHaveTextContent('Sua sessão terminou.')
+        expect(screen.getByRole('heading', { name: 'Horta inteligente' })).toBeInTheDocument()
+        expect(screen.queryByRole('button', { name: /Apagar/ })).not.toBeInTheDocument()
+        expect(localStorage.getItem('token')).toBeNull()
+    })
+
+    it('preenche a lacuna na paginação antes de carregar mais após uma exclusão', async () => {
+        const { listar } = simularSessao()
+        listar
+            .mockResolvedValueOnce(respostaPagina([projetoTecnologia], 0, false))
+            .mockResolvedValueOnce(respostaPagina([projetoSaude], 0, false))
+            .mockResolvedValueOnce(respostaPagina([{ ...projetoSaude, id: 'projeto-3', titulo: 'Terceiro projeto' }], 1))
+        vi.spyOn(window, 'confirm').mockReturnValue(true)
+        const usuario = userEvent.setup()
+        renderizarProjetos()
+
+        await usuario.click(await screen.findByRole('button', { name: 'Apagar Horta inteligente' }))
+        expect(await screen.findByRole('heading', { name: 'Aplicativo de saúde' })).toBeInTheDocument()
+        await usuario.click(screen.getByRole('button', { name: 'Carregar mais projetos' }))
+
+        expect(await screen.findByRole('heading', { name: 'Terceiro projeto' })).toBeInTheDocument()
+        await waitFor(() => expect(listar.mock.calls.map(([url]) => new URL(url).searchParams.get('page')))
+            .toEqual(['0', '0', '1']))
     })
 })
