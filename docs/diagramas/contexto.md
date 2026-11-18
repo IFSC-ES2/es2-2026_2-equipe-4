@@ -1,20 +1,18 @@
 # Visão de contexto
 
-Estado da `entrega-7` no commit `19c53da`.
-A consulta pública está disponível na API; a tela ainda está pendente.
+Visão do PublicaIFSC integrada na `main` em 11/11/2026 (merge do PR #188).
+Visitantes consultam projetos; usuários cadastrados autenticam-se e publicam.
 
 ```mermaid
 flowchart LR
-    visitante["Visitante sem conta"]
-    autor["Usuário cadastrado"]
+    visitante["Visitante"]
+    usuario["Estudante ou professor cadastrado"]
     subgraph sistema["Fronteira do PublicaIFSC"]
-        vitrine["Vitrine de projetos universitários"]
+        publica["Vitrine de projetos"]
     end
-    visitante -->|"Consulta projetos pela API"| vitrine
-    autor -->|"Faz login e publica projetos"| vitrine
+    visitante -->|"Consulta galeria e detalhes"| publica
+    usuario -->|"Cadastra-se, entra e publica"| publica
 ```
 
-Cadastro é público. A publicação exige autenticação; não há perfil de revisor
-nem fluxo de revisão por pares implementado.
-
-[Voltar à arquitetura](../ARQUITETURA.md).
+Cadastro é público e publicação exige autenticação JWT. O MVP não implementa
+revisão por pares. [Voltar à arquitetura](../ARQUITETURA.md).
