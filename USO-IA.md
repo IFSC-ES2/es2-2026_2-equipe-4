@@ -376,3 +376,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Remoção do texto do mapa de projetos e dos links sem destino no rodapé (#216).
   Artefatos: `MapaProjetos.jsx`, `MapaProjetos.css` e `Footer.jsx`.
   Validação: Build e ESLint do frontend passaram.
+
+- Data: 18/11/2026
+  Ferramenta: Claude
+  Uso: Apoio no preenchimento das fichas M-05 e M-08 da Sprint 5
+  Artefatos: docs/metricas/M-05.md e docs/metricas/M-08.md
+  Validação: Contagens conferidas com os PRs mergeados na entrega-9 e as datas de criação das issues no GitHub
