@@ -1,14 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 import Enviar from './Enviar'
-
-vi.mock('../../assets/arquivo.png', () => ({ default: 'mock-imagem-arquivo' }))
+import Header from '../../components/Header/Header'
+import ProvedorSessao from '../../sessao/ProvedorSessao'
+import { criarTokenTeste } from '../../sessao/tokenTeste'
 
 beforeEach(() => {
-  localStorage.setItem('token', 'token-teste')
+  localStorage.setItem('token', criarTokenTeste())
 })
 
 afterEach(() => {
@@ -16,14 +17,23 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
+function PaginaLoginTeste() {
+  const { state } = useLocation()
+  return (
+    <h1>{state?.sessaoExpirada ? 'Página de login após sessão expirada' : 'Página de login'}</h1>
+  )
+}
+
 function renderizarEnviar() {
   render(
     <MemoryRouter initialEntries={['/submissao']}>
+      <Header />
       <Routes>
         <Route path="/submissao" element={<Enviar />} />
-        <Route path="/login" element={<h1>Página de login</h1>} />
+        <Route path="/login" element={<PaginaLoginTeste />} />
       </Routes>
-    </MemoryRouter>
+    </MemoryRouter>,
+    { wrapper: ProvedorSessao },
   )
 }
 
@@ -80,8 +90,20 @@ describe('Submissão de projeto', () => {
     expect(fetchApi).not.toHaveBeenCalled()
   })
 
-  it('interrompe o envio e preserva o formulário quando a API retorna 401 no upload', async () => {
-    localStorage.setItem('token', 'token-expirado')
+  it('bloqueia o acesso direto à submissão quando o JWT já expirou', async () => {
+    localStorage.setItem('token', criarTokenTeste(Math.floor(Date.now() / 1000) - 1))
+    const fetchApi = vi.fn()
+    vi.stubGlobal('fetch', fetchApi)
+    renderizarEnviar()
+
+    expect(await screen.findByRole('heading', { name: 'Página de login após sessão expirada' })).toBeInTheDocument()
+    expect(localStorage.getItem('token')).toBeNull()
+    expect(screen.queryByLabelText(/nome do projeto/i)).not.toBeInTheDocument()
+    expect(fetchApi).not.toHaveBeenCalled()
+  })
+
+  it('interrompe o envio e encerra a sessão quando a API retorna 401 no upload', async () => {
+    const token = localStorage.getItem('token')
     const fetchApi = vi.fn().mockResolvedValueOnce({
       ok: false,
       status: 401,
@@ -96,27 +118,23 @@ describe('Submissão de projeto', () => {
     await usuario.upload(document.getElementById('imagens'), imagem)
     await usuario.click(screen.getByRole('button', { name: /publicar projeto na vitrine/i }))
 
-    expect(await screen.findByText('Autenticação necessária ou token inválido/expirado')).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Página de login após sessão expirada' })).toBeInTheDocument()
     // Sem autenticação válida, o fluxo deve parar antes de enviar os metadados.
     expect(fetchApi).toHaveBeenCalledExactlyOnceWith(
       'http://localhost:8080/api/v1/projetos/upload',
       expect.objectContaining({
         method: 'POST',
-        headers: { Authorization: 'Bearer token-expirado' },
+        headers: { Authorization: `Bearer ${token}` },
       }),
     )
-    expect(screen.getByLabelText(/nome do projeto/i)).toHaveValue('Projeto Teste')
-    expect(screen.getByLabelText(/resumo/i)).toHaveValue('Resumo do projeto')
-    expect(screen.getByLabelText(/tema/i)).toHaveValue('Web')
-    expect(screen.getByLabelText(/autores/i)).toHaveValue('Ana Lima, Bruno Reis')
-    expect(screen.getByLabelText(/stack tecnológica/i)).toHaveValue('React, Spring Boot')
-    expect(screen.getByText(/1 arquivo\(s\) anexado\(s\)/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /publicar projeto na vitrine/i })).toBeEnabled()
-    expect(screen.queryByText('Projeto publicado com sucesso na vitrine!')).not.toBeInTheDocument()
+    expect(localStorage.getItem('token')).toBeNull()
+    expect(screen.getByRole('link', { name: 'Entrar' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Criar Conta' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Sair' })).not.toBeInTheDocument()
   })
 
-  it('preserva o formulário quando o upload funciona mas os metadados recebem 401', async () => {
-    localStorage.setItem('token', 'token-expirado')
+  it('encerra a sessão quando o upload funciona mas os metadados recebem 401', async () => {
+    const token = localStorage.getItem('token')
     const fetchApi = vi.fn()
       .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'id-img-123' }) })
       .mockResolvedValueOnce({
@@ -133,24 +151,21 @@ describe('Submissão de projeto', () => {
     await usuario.upload(document.getElementById('imagens'), imagem)
     await usuario.click(screen.getByRole('button', { name: /publicar projeto na vitrine/i }))
 
-    expect(await screen.findByText('Autenticação necessária ou token inválido/expirado')).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Página de login após sessão expirada' })).toBeInTheDocument()
     // A sessão também pode ser recusada depois que a imagem já foi enviada.
     expect(fetchApi.mock.calls.map(([url]) => url)).toEqual([
       'http://localhost:8080/api/v1/projetos/upload',
       'http://localhost:8080/api/v1/projetos/metadados',
     ])
-    expect(fetchApi.mock.calls[1][1].headers.Authorization).toBe('Bearer token-expirado')
-    expect(screen.getByLabelText(/nome do projeto/i)).toHaveValue('Projeto Teste')
-    expect(screen.getByLabelText(/resumo/i)).toHaveValue('Resumo do projeto')
-    expect(screen.getByLabelText(/tema/i)).toHaveValue('Web')
-    expect(screen.getByLabelText(/autores/i)).toHaveValue('Ana Lima, Bruno Reis')
-    expect(screen.getByLabelText(/stack tecnológica/i)).toHaveValue('React, Spring Boot')
-    expect(screen.getByText(/1 arquivo\(s\) anexado\(s\)/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /publicar projeto na vitrine/i })).toBeEnabled()
-    expect(screen.queryByText('Projeto publicado com sucesso na vitrine!')).not.toBeInTheDocument()
+    expect(fetchApi.mock.calls[1][1].headers.Authorization).toBe(`Bearer ${token}`)
+    expect(localStorage.getItem('token')).toBeNull()
+    expect(screen.getByRole('link', { name: 'Entrar' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Criar Conta' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Sair' })).not.toBeInTheDocument()
   })
 
   it('envia a imagem e os metadados com o token e limpa o formulário após sucesso', async () => {
+    const token = localStorage.getItem('token')
     const fetchApi = vi.fn()
       .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'id-img-123' }) })
       .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'id-projeto-123' }) })
@@ -171,7 +186,7 @@ describe('Submissão de projeto', () => {
     const [urlUpload, opcoesUpload] = fetchApi.mock.calls[0]
     expect(urlUpload).toBe('http://localhost:8080/api/v1/projetos/upload')
     expect(opcoesUpload.method).toBe('POST')
-    expect(opcoesUpload.headers.Authorization).toBe('Bearer token-teste')
+    expect(opcoesUpload.headers.Authorization).toBe(`Bearer ${token}`)
     expect(opcoesUpload.headers).not.toHaveProperty('Content-Type')
     expect(opcoesUpload.body).toBeInstanceOf(FormData)
     expect(opcoesUpload.body.get('arquivo')).toEqual(imagem)
@@ -181,7 +196,7 @@ describe('Submissão de projeto', () => {
     expect(opcoesMetadados.method).toBe('POST')
     expect(opcoesMetadados.headers).toEqual({
       'Content-Type': 'application/json',
-      Authorization: 'Bearer token-teste',
+      Authorization: `Bearer ${token}`,
     })
     expect(JSON.parse(opcoesMetadados.body)).toEqual({
       titulo: 'Projeto Teste',
