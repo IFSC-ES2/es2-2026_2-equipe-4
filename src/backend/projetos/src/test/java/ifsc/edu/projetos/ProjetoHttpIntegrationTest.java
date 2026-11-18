@@ -379,6 +379,43 @@ class ProjetoHttpIntegrationTest {
                 () -> assertNull(arquivo, "O arquivo acima do limite nao deve ser salvo"));
     }
 
+    @Test
+    @Timeout(30)
+    void publicaProjetoComImagemEnviadaEPermiteConsultaPublica() throws Exception {
+        User autor = novoUsuario();
+        tituloTeste = "Projeto com imagem " + UUID.randomUUID();
+        String autorizacao = "Bearer " + jwtUtil.generateToken(autor.getEmail());
+
+        HttpResponse<String> upload = enviarUpload(IMAGEM_PNG, autorizacao);
+        assertEquals(201, upload.statusCode(), upload.body());
+        String idImagem = JsonPath.read(upload.body(), "$.id");
+        assertTrue(ObjectId.isValid(idImagem), "O upload deve retornar o ID da imagem no GridFS");
+
+        String metadados = """
+                {"titulo":"%s","resumo":"Resumo de teste","tema":"Tecnologia",
+                 "autores":["Ana"],"tecnologias":["Java"],"imagens":["%s"]}
+                """.formatted(tituloTeste, idImagem);
+        HttpResponse<String> publicacao = publicar(autorizacao, metadados);
+        assertEquals(201, publicacao.statusCode(), publicacao.body());
+        String idProjeto = JsonPath.read(publicacao.body(), "$.id");
+        assertNotNull(idProjeto);
+
+        HttpResponse<String> projeto = consultarSemToken("/projetos/" + idProjeto);
+        assertEquals(200, projeto.statusCode(), projeto.body());
+        assertEquals(idProjeto, JsonPath.read(projeto.body(), "$.id"));
+        assertEquals(autor.getId(), JsonPath.read(projeto.body(), "$.autorId"));
+        assertEquals(List.of(idImagem), JsonPath.read(projeto.body(), "$.imagens"));
+
+        HttpRequest consultaImagem = HttpRequest.newBuilder(
+                URI.create("http://127.0.0.1:" + porta + "/api/v1/projetos/imagens/" + idImagem))
+                .GET()
+                .build();
+        HttpResponse<byte[]> imagem = http.send(consultaImagem, HttpResponse.BodyHandlers.ofByteArray());
+        assertEquals(200, imagem.statusCode());
+        assertEquals("image/png", imagem.headers().firstValue("Content-Type").orElseThrow());
+        assertArrayEquals(IMAGEM_PNG, imagem.body());
+    }
+
     private void conferirArquivoDoUpload(HttpResponse<String> resposta, byte[] conteudoEsperado)
             throws IOException {
         String idArquivo = JsonPath.read(resposta.body(), "$.id");
