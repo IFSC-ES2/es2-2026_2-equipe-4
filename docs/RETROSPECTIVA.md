@@ -19,10 +19,10 @@ por React ([ADR-0003](adr/ADR-0003.md)).
 | Revisão por pares | Removida do escopo | Não integra o fluxo atual do MVP. |
 | MySQL | Removida do escopo | Foi alternativa no plano; MongoDB é o banco implementado. |
 | Busca por texto | Pendente | Não disponível na galeria. |
-| Exclusão de projeto pelo autor | Concluída | Rota `DELETE /projetos/{id}` restrita ao autor e botão Apagar na galeria (#211, PR #212; #210, PR #213). |
-| Edição de projeto pelo autor | Pendente | Em andamento na #217; a interface ainda não oferece edição. |
+| Exclusão de projeto pelo autor | Concluída | Rota `DELETE /projetos/{id}` restrita ao autor e botão Apagar no detalhe do projeto (#211, PR #212; #210, PR #213; movido no PR #220). |
+| Edição de projeto pelo autor | Concluída | Rota `PUT /projetos/{id}` restrita ao autor e edição dos dados e da imagem no detalhe (#217, PR #220). |
 | Ambiente publicado e deploy automatizado | Concluída na Entrega 9 | Removidos da Sprint 4 (#161 a #164, não planejadas em 11/11). Na Entrega 9 a equipe publicou o site e a API no Render, com banco no MongoDB Atlas e deploy a partir da `main` (#189, #190, #191). Não há staging separado. Consulte [DEPLOY](DEPLOY.md). |
-| Backup e validação do tipo da imagem | Parcial | A interface valida as imagens antes do envio (#196, PR #205); o backend não valida o tipo no upload e não há backup (R06). |
+| Backup e validação do tipo da imagem | Parcial | A interface valida as imagens antes do envio (#196, PR #205) e a publicação valida os campos obrigatórios (#201, PR #218); o backend não valida o tipo no upload e não há backup (R06). |
 
 ## Indicadores observados
 
@@ -45,8 +45,8 @@ escopo na Sprint 3 coincidiu com queda da taxa, mas o crescimento de escopo na
 Sprint 4 trouxe novamente ajustes corretivos. As contribuições da Sprint 4
 estão associadas a PRs e revisões em [sprint-4.md](sprints/sprint-4.md).
 
-Na Entrega 9 o foco foi consolidar: correções de front-end, exclusão pelo
-autor e o ambiente publicado no Render, além do Compose local reproduzível.
+Na Entrega 9 o foco foi consolidar: correções de front-end, edição e exclusão
+pelo autor, testes e verificações no CI e o ambiente publicado no Render, além do Compose local reproduzível.
 As contribuições individuais desta entrega estão na
 [release candidate](entregas/release-candidate.md). Permanecem riscos de backup,
 validação do tipo das imagens no backend, `admin123` no histórico e checks não
