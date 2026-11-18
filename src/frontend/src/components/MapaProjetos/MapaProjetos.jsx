@@ -47,10 +47,6 @@ function MapaProjetos({ projetos, onTemaClick, temaSelecionado = 'Todos' }) {
 
   return (
     <div className="mapa-container">
-      <p className="mapa-texto-instrucao">
-        FineWeb Style: Explorando dados textuais. Clique num tema para isolar os projetos ou clique num ponto para detalhes.
-      </p>
-      
       <svg className="mapa-svg" viewBox="0 0 1000 450" preserveAspectRatio="xMidYMid meet">
         {projetosMapeados.map((p) => {
           if (!p.cx) return null;

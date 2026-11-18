@@ -358,3 +358,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Implementação das melhorias de QA do MVP (#201), com validações de publicação e login, testes de imagens e gestão da conta, índice único de e-mail e verificações no CI.
   Artefatos: Código e testes em `src/backend/projetos` e `src/frontend`, além de `.github/workflows/ci.yml`.
   Validação: 59 testes do backend passaram com MongoDB 8 isolado e 65 testes do frontend passaram. ESLint, builds e verificações HTTP do Docker Compose passaram localmente.
+
+- Data: 18/11/2026
+  Ferramenta: Codex
+  Uso: Remoção do texto do mapa de projetos e dos links sem destino no rodapé (#216).
+  Artefatos: `MapaProjetos.jsx`, `MapaProjetos.css` e `Footer.jsx`.
+  Validação: Build e ESLint do frontend passaram.

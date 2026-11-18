@@ -18,11 +18,6 @@ function Footer() {
         <div style={{ color: '#0f172a', fontWeight: '700', fontSize: '15px' }}>
           Publica<span style={{ color: '#146c5a' }}>IFSC</span>
         </div>
-        <div style={{ display: 'flex', gap: '24px', fontSize: '13px', color: '#64748b', fontWeight: '500' }}>
-          <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Política de Privacidade</a>
-          <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Termos de Serviço</a>
-          <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Diretrizes da Comunidade</a>
-        </div>
       </div>
     </footer>
   );
