@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Navigate } from 'react-router-dom'
 import './Enviar.css'
 import { API_BASE_URL } from '../../config/api';
@@ -22,6 +22,20 @@ const mensagensCamposObrigatorios = {
   tecnologias: 'Informe ao menos uma tecnologia.',
 }
 
+const limiteImagemMB = 5
+const limiteImagemBytes = limiteImagemMB * 1024 * 1024
+const formatosImagem = ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/avif']
+const nomesFormatosImagem = 'PNG, JPG, WebP, GIF ou AVIF'
+
+function validarImagem(arquivo) {
+  const tipo = arquivo.type.toLowerCase()
+  if (tipo === 'image/svg+xml' || /\.svgz?$/i.test(arquivo.name)) return 'arquivos SVG não são aceitos.'
+  if (!formatosImagem.includes(tipo)) return `formato incompatível. Use ${nomesFormatosImagem}.`
+  if (arquivo.size === 0) return 'o arquivo está vazio.'
+  if (arquivo.size > limiteImagemBytes) return `a imagem ultrapassa o limite de ${limiteImagemMB} MB.`
+  return ''
+}
+
 function separarLista(valor) {
   return valor.split(',').map(item => item.trim()).filter(Boolean)
 }
@@ -37,10 +51,13 @@ async function mensagemDeErro(resposta, padrao) {
 function Enviar() {
   const [formulario, setFormulario] = useState(formularioInicial)
   const [imagensSelecionadas, setImagensSelecionadas] = useState([])
+  const [errosImagens, setErrosImagens] = useState([])
   const [arrastando, setArrastando] = useState(false)
   const [erros, setErros] = useState({})
   const [mensagem, setMensagem] = useState('')
   const [carregando, setCarregando] = useState(false)
+  const proximaChaveImagem = useRef(0)
+  const envioEmAndamento = useRef(false)
 
   const { token, expiraEm, expirada, invalidarSessao } = useSessao()
 
@@ -63,15 +80,38 @@ function Enviar() {
     setMensagem('')
   }
 
+  function adicionarImagens(arquivos) {
+    const novasImagens = []
+    const novosErros = []
+
+    for (const arquivo of arquivos || []) {
+      const erro = validarImagem(arquivo)
+      if (erro) {
+        novosErros.push(`${arquivo.name}: ${erro}`)
+      } else {
+        const chave = proximaChaveImagem.current++
+        novasImagens.push({ arquivo, chave, idUpload: null })
+      }
+    }
+
+    setImagensSelecionadas(atuais => [...atuais, ...novasImagens])
+    setErrosImagens(novosErros)
+    setMensagem('')
+  }
+
   function selecionarImagens(event) {
-    const arquivos = Array.from(event.target.files || [])
-    setImagensSelecionadas(arquivos)
+    adicionarImagens(event.target.files)
+    event.target.value = ''
+  }
+
+  function removerImagem(chave) {
+    setImagensSelecionadas(atuais => atuais.filter(imagem => imagem.chave !== chave))
     setMensagem('')
   }
 
   function arrastarSobre(event) {
     event.preventDefault()
-    setArrastando(true)
+    if (!carregando) setArrastando(true)
   }
 
   function sairDaArea(event) {
@@ -82,8 +122,7 @@ function Enviar() {
   function soltarImagens(event) {
     event.preventDefault()
     setArrastando(false)
-    const arquivos = Array.from(event.dataTransfer.files || [])
-    setImagensSelecionadas(arquivos)
+    if (!carregando) adicionarImagens(event.dataTransfer.files)
   }
 
   function validarFormulario() {
@@ -101,6 +140,7 @@ function Enviar() {
 
   async function enviarFormulario(event) {
     event.preventDefault()
+    if (envioEmAndamento.current) return
 
     function interromperSessao() {
       if (!invalidarSessao(token)) {
@@ -118,14 +158,20 @@ function Enviar() {
       return
     }
 
+    envioEmAndamento.current = true
     setCarregando(true)
     setMensagem('Processando a submissão, aguarde...')
 
     try {
       const idsImagens = []
       for (const imagem of imagensSelecionadas) {
+        if (imagem.idUpload) {
+          idsImagens.push(imagem.idUpload)
+          continue
+        }
+
         const formDataImagem = new FormData()
-        formDataImagem.append('arquivo', imagem)
+        formDataImagem.append('arquivo', imagem.arquivo)
 
         const respUpload = await fetch(`${API_BASE_URL}/api/v1/projetos/upload`, {
           method: 'POST',
@@ -137,10 +183,20 @@ function Enviar() {
           interromperSessao()
           return
         }
+        if (respUpload.status === 413) {
+          throw new Error(`${imagem.arquivo.name}: o envio ultrapassou o limite permitido. Reduza o tamanho da imagem e tente novamente.`)
+        }
         if (!respUpload.ok) throw new Error(await mensagemDeErro(respUpload, 'Falha ao processar imagens.'))
-        
-        const dadosUpload = await respUpload.json()
-        if (dadosUpload.id) idsImagens.push(dadosUpload.id)
+
+        const { id } = await respUpload.json()
+        if (typeof id !== 'string' || !id.trim()) {
+          throw new Error(`Não foi possível confirmar o envio de ${imagem.arquivo.name}. Tente novamente.`)
+        }
+
+        setImagensSelecionadas(atuais => atuais.map(item => (
+          item.chave === imagem.chave ? { ...item, idUpload: id } : item
+        )))
+        idsImagens.push(id)
       }
 
       const payloadMetadados = {
@@ -172,12 +228,14 @@ function Enviar() {
       setMensagem('Projeto publicado com sucesso na vitrine!')
       setFormulario(formularioInicial)
       setImagensSelecionadas([])
+      setErrosImagens([])
       setErros({})
       event.target.reset()
 
     } catch (erro) {
       setMensagem(erro.message.includes('Failed to fetch') ? 'Erro de conexão: Sistema fora do ar!' : erro.message)
     } finally {
+      envioEmAndamento.current = false
       setCarregando(false)
     }
   }
@@ -250,20 +308,43 @@ function Enviar() {
           <label
             className={`enviar ${arrastando ? 'arrastando' : ''} ${carregando ? 'desabilitado' : ''}`}
             htmlFor="imagens"
-            onDragOver={carregando ? undefined : arrastarSobre}
-            onDragLeave={carregando ? undefined : sairDaArea}
-            onDrop={carregando ? undefined : soltarImagens}
+            onDragOver={arrastarSobre}
+            onDragLeave={sairDaArea}
+            onDrop={soltarImagens}
             style={{ padding: '32px', background: '#f8fafc', border: '2px dashed #cbd5e1' }}
           >
             <div style={{ fontSize: '32px', marginBottom: '12px', opacity: 0.5 }}>📸</div>
             <strong style={{ color: '#0f172a' }}>Clique para selecionar imagens</strong>
-            <span style={{ color: '#64748b' }}>ou arraste e solte arquivos aqui (PNG, JPG)</span>
+            <span id="formatos-imagens" style={{ color: '#64748b' }}>
+              Ou arraste e solte arquivos aqui. {nomesFormatosImagem}, até {limiteImagemMB} MB por imagem.
+            </span>
           </label>
-          <input id="imagens" className="arquivo-input" name="imagens" type="file" multiple accept="image/*" onChange={selecionarImagens} disabled={carregando} />
+          <input id="imagens" className="arquivo-input" name="imagens" type="file" multiple accept={formatosImagem.join(',')} aria-describedby="formatos-imagens" onChange={selecionarImagens} disabled={carregando} />
+
+          {errosImagens.length > 0 && (
+            <ul role="alert" className="erros-imagens">
+              {errosImagens.map((erro, indice) => <li key={indice}>{erro}</li>)}
+            </ul>
+          )}
           
           {imagensSelecionadas.length > 0 && (
             <div style={{ marginTop: '12px', background: '#eef6f3', color: '#146c5a', padding: '12px', borderRadius: '6px', fontSize: '13px', fontWeight: '600' }}>
-              ✓ {imagensSelecionadas.length} arquivo(s) anexado(s) e prontos para envio.
+              {imagensSelecionadas.length} arquivo(s) anexado(s).
+              <ul className="lista-imagens-selecionadas">
+                {imagensSelecionadas.map(({ arquivo, chave }) => (
+                  <li key={chave}>
+                    <span>{arquivo.name}</span>
+                    <button
+                      type="button"
+                      aria-label={`Remover ${arquivo.name}`}
+                      onClick={() => removerImagem(chave)}
+                      disabled={carregando}
+                    >
+                      Remover
+                    </button>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </div>
@@ -274,7 +355,7 @@ function Enviar() {
           </button>
           
           {mensagem && (
-            <div style={{ marginTop: '16px', padding: '16px', borderRadius: '8px', background: mensagem.includes('sucesso') ? '#f0fdf4' : '#fef2f2', color: mensagem.includes('sucesso') ? '#15803d' : '#b91c1c', border: `1px solid ${mensagem.includes('sucesso') ? '#bbf7d0' : '#fecaca'}`, textAlign: 'center', fontWeight: '500', fontSize: '14px' }}>
+            <div role="status" style={{ marginTop: '16px', padding: '16px', borderRadius: '8px', background: mensagem.includes('sucesso') ? '#f0fdf4' : '#fef2f2', color: mensagem.includes('sucesso') ? '#15803d' : '#b91c1c', border: `1px solid ${mensagem.includes('sucesso') ? '#bbf7d0' : '#fecaca'}`, textAlign: 'center', fontWeight: '500', fontSize: '14px' }}>
               {mensagem}
             </div>
           )}

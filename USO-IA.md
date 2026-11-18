@@ -307,3 +307,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Implementação do encerramento da sessão expirada e do redirecionamento após `401` na submissão (#194).
   Artefatos: Sessão, cabeçalho, login e submissão do frontend, com os respectivos testes.
   Validação: Build e 46 testes do frontend passaram. O lint dos arquivos alterados passou.
+
+- Data: 17/11/2026
+  Ferramenta: Codex
+  Uso: Validação de imagens, mensagens de erro e reaproveitamento de uploads na submissão (#196).
+  Artefatos: Página de submissão, estilos e testes do frontend.
+  Validação: Build, testes do frontend e ESLint da submissão passaram.
