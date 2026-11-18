@@ -352,3 +352,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Implementação do botão Apagar na galeria para o autor do projeto, com identificação pela sessão e confirmação da exclusão (#210).
   Artefatos: Página e testes da galeria, rota de autenticação, documentação e testes do backend.
   Validação: Build e 60 testes do frontend passaram. Os 50 testes do backend passaram, assim como os testes HTTP de autenticação e exclusão em uma cópia local com o PR #212.
+
+- Data: 18/11/2026
+  Ferramenta: Codex
+  Uso: Implementação das melhorias de QA do MVP (#201), com validações de publicação e login, testes de imagens e gestão da conta, índice único de e-mail e verificações no CI.
+  Artefatos: Código e testes em `src/backend/projetos` e `src/frontend`, além de `.github/workflows/ci.yml`.
+  Validação: 59 testes do backend passaram com MongoDB 8 isolado e 65 testes do frontend passaram. ESLint, builds e verificações HTTP do Docker Compose passaram localmente.
