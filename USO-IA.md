@@ -352,3 +352,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Implementação do botão Apagar na galeria para o autor do projeto, com identificação pela sessão e confirmação da exclusão (#210).
   Artefatos: Página e testes da galeria, rota de autenticação, documentação e testes do backend.
   Validação: Build e 60 testes do frontend passaram. Os 50 testes do backend passaram, assim como os testes HTTP de autenticação e exclusão em uma cópia local com o PR #212.
+
+- Data: 18/11/2026
+  Ferramenta: Claude
+  Uso: Apoio na atualização da release candidate, da retrospectiva e do README e no levantamento da contribuição individual da Entrega 9 (#215).
+  Artefatos: docs/entregas/release-candidate.md, docs/RETROSPECTIVA.md e README.md
+  Validação: PRs, autores, revisores e issues conferidos no GitHub, comportamento da galeria conferido no código
