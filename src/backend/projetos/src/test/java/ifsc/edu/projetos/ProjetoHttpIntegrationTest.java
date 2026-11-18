@@ -205,6 +205,25 @@ class ProjetoHttpIntegrationTest {
     }
 
     @Test
+    void rejeitaCamposObrigatoriosAusentesOuVaziosSemGravarProjeto() throws Exception {
+        User usuario = novoUsuario();
+        tituloTeste = "Projeto incompleto " + UUID.randomUUID();
+        String autorizacao = "Bearer " + jwtUtil.generateToken(usuario.getEmail());
+        String corpo = """
+                {"titulo":"%s","resumo":" ","autores":[],"tecnologias":[" "]}
+                """.formatted(tituloTeste);
+
+        HttpResponse<String> resposta = publicar(autorizacao, corpo);
+
+        assertEquals(400, resposta.statusCode(), resposta.body());
+        for (String campo : List.of("resumo", "autores", "tecnologias[0]", "tema")) {
+            assertNotNull(JsonPath.read(resposta.body(), "$.erro['" + campo + "']"), campo);
+        }
+        assertFalse(projetoRepository.findAll().stream()
+                .anyMatch(projeto -> tituloTeste.equals(projeto.getTitulo())));
+    }
+
+    @Test
     void rejeitaPublicacaoSemTokenSemGravarProjeto() throws Exception {
         tituloTeste = "Projeto sem token " + UUID.randomUUID();
 
@@ -445,7 +464,13 @@ class ProjetoHttpIntegrationTest {
 
     private HttpResponse<String> publicar(String autorizacao) throws IOException, InterruptedException {
         String corpo = "{\"id\":\"id-enviado-pelo-cliente\",\"autorId\":\"outro-autor\","
-                + "\"titulo\":\"" + tituloTeste + "\",\"resumo\":\"Resumo de teste\"}";
+                + "\"titulo\":\"" + tituloTeste + "\",\"resumo\":\"Resumo de teste\","
+                + "\"tema\":\"Tecnologia\",\"autores\":[\"Ana\"],\"tecnologias\":[\"Java\"]}";
+        return publicar(autorizacao, corpo);
+    }
+
+    private HttpResponse<String> publicar(String autorizacao, String corpo)
+            throws IOException, InterruptedException {
         HttpRequest.Builder request = HttpRequest.newBuilder(
                         URI.create("http://127.0.0.1:" + porta + "/api/v1/projetos/metadados"))
                 .header("Content-Type", "application/json")
