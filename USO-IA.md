@@ -304,6 +304,12 @@ Validação: Leitura e pequenas correções feitas
 
 - Data: 17/11/2026
   Ferramenta: Codex
+  Uso: Atualização do título da aba e criação do favicon do PublicaIFSC (#198).
+  Artefatos: `src/frontend/index.html` e `src/frontend/public/favicon-publicaifsc.svg`.
+  Validação: Build do frontend e verificação do título e do SVG na página inicial e em uma rota interna no preview de produção.
+
+- Data: 17/11/2026
+  Ferramenta: Codex
   Uso: Implementação do encerramento da sessão expirada e do redirecionamento após `401` na submissão (#194).
   Artefatos: Sessão, cabeçalho, login e submissão do frontend, com os respectivos testes.
   Validação: Build e 46 testes do frontend passaram. O lint dos arquivos alterados passou.
