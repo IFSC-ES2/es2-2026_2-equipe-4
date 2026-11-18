@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { API_BASE_URL, urlImagem } from '../../config/api';
 import { useSessao } from '../../sessao/contextoSessao';
 import { useUsuarioId } from '../../sessao/useUsuarioId';
+import Enviar from '../Submissao/Enviar';
 import './ProjetoDetalhe.css';
 
 // Gera as iniciais exibidas na capa e nos autores (ex.: "Horta Inteligente" → "HI").
@@ -87,6 +88,7 @@ function Detalhe({ id }) {
   const [projeto, setProjeto] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
+  const [tokenEdicao, setTokenEdicao] = useState(null);
   const [apagando, setApagando] = useState(false);
   const [erroExclusao, setErroExclusao] = useState('');
 
@@ -151,6 +153,16 @@ function Detalhe({ id }) {
     }
   }
 
+  if (tokenEdicao && (!token || token === tokenEdicao)) {
+    return (
+      <Enviar
+        projeto={projeto}
+        onAtualizarProjeto={setProjeto}
+        onFecharEdicao={() => setTokenEdicao(null)}
+      />
+    );
+  }
+
   return (
     <main className="pagina-animada detalhe-projeto">
       <Link to="/projetos" className="detalhe-voltar">← Voltar para os projetos</Link>
@@ -181,6 +193,14 @@ function Detalhe({ id }) {
             </div>
             {podeGerenciar && (
               <div className="detalhe-botoes detalhe-acoes">
+                <button
+                  type="button"
+                  className="detalhe-botao"
+                  disabled={apagando}
+                  onClick={() => setTokenEdicao(token)}
+                >
+                  Editar
+                </button>
                 <button
                   type="button"
                   className="detalhe-botao apagar"

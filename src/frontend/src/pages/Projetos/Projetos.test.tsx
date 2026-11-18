@@ -243,7 +243,7 @@ describe('Projetos', () => {
         )
     })
 
-    it('oferece o lápis apenas nos projetos da conta atual e abre Apagar no detalhe', async () => {
+    it('oferece o lápis apenas nos projetos da conta atual e abre as ações no detalhe', async () => {
         const { fetchApi, token } = simularSessao()
         const usuario = userEvent.setup()
         renderizarProjetos()
@@ -257,6 +257,7 @@ describe('Projetos', () => {
             expect.objectContaining({ headers: { Authorization: `Bearer ${token}` } }),
         )
         expect(await abrirDetalheDoAutor(usuario)).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: 'Editar' })).toBeInTheDocument()
     })
 
     it('mantém o projeto quando o autor cancela a confirmação', async () => {
