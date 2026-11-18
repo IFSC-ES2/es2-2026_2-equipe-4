@@ -124,14 +124,15 @@ Em outro terminal, a partir da raiz, execute `cd src/frontend` e:
 | Windows (PowerShell) | `npm.cmd ci` | `npm.cmd test -- --run` |
 
 O [CI](.github/workflows/ci.yml) executa testes, builds e verificações de
-documentação em PRs para `main` e `entrega-*`.
+documentação em PRs para `main` e `entrega-*` e em pushes para a `main`.
 
 ## MVP entregue e limitações
 
 O MVP é uma vitrine de projetos universitários com cadastro/login, publicação autenticada, galeria pública e páginas de detalhe. Consulte o [resumo da release](docs/entregas/release-candidate.md). O ambiente publicado e o ambiente local de avaliação estão descritos em [docs/DEPLOY.md](docs/DEPLOY.md). A API usa o plano gratuito do Render e pode levar cerca de um minuto para responder após ficar inativa.
 
-- A galeria carrega até 100 projetos; busca por texto ainda está pendente.
-- Não há ambiente de staging, backup automatizado ou monitoramento configurado.
+- A galeria carrega os projetos em páginas de 100, busca por texto ainda está pendente.
+- Edição dos dados do projeto pela interface em andamento (#217).
+- Não há staging separado do ambiente publicado, backup automatizado ou monitoramento configurado.
 - O limite de upload de imagem é de 5 MB, acima disso a API responde 413.
 
 ## Documentação e acompanhamento
