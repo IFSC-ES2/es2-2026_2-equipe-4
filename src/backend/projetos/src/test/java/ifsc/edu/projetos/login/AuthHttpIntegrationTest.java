@@ -10,6 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -21,13 +25,17 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -51,6 +59,9 @@ class AuthHttpIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
     private final HttpClient http = HttpClient.newHttpClient();
     private String emailCriado;
     private String emailOutroUsuario;
@@ -58,10 +69,10 @@ class AuthHttpIntegrationTest {
     @AfterEach
     void removerUsuariosCriados() {
         if (emailCriado != null) {
-            userRepository.findByEmail(emailCriado).ifPresent(userRepository::delete);
+            mongoTemplate.remove(consultaPorEmail(emailCriado), User.class);
         }
         if (emailOutroUsuario != null) {
-            userRepository.findByEmail(emailOutroUsuario).ifPresent(userRepository::delete);
+            mongoTemplate.remove(consultaPorEmail(emailOutroUsuario), User.class);
         }
     }
 
@@ -110,6 +121,67 @@ class AuthHttpIntegrationTest {
                 jsonUsuario(emailCriado.toUpperCase(), "senha123"));
 
         assertEquals(409, duplicado.statusCode(), duplicado.body());
+
+        User outro = new User();
+        outro.setEmail(emailCriado);
+        outro.setNome("Outro usuário de teste");
+        outro.setPassword("hash-de-teste");
+        assertThrows(DuplicateKeyException.class, () -> userRepository.insert(outro));
+    }
+
+    @Test
+    void cadastrosConcorrentesCriamUmaUnicaConta() throws Exception {
+        emailCriado = emailAleatorio();
+        String rota = "/users/createAccount/0.0.1/novousers";
+        HttpRequest primeiraRequisicao = requisicaoPostJson(rota, jsonUsuario(emailCriado, "senha123"));
+        HttpRequest segundaRequisicao = requisicaoPostJson(rota,
+                jsonUsuario(emailCriado.toUpperCase(Locale.ROOT), "senha123"));
+
+        var primeiroEnvio = http.sendAsync(primeiraRequisicao, HttpResponse.BodyHandlers.ofString());
+        var segundoEnvio = http.sendAsync(segundaRequisicao, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> primeira = primeiroEnvio.get(15, TimeUnit.SECONDS);
+        HttpResponse<String> segunda = segundoEnvio.get(15, TimeUnit.SECONDS);
+
+        List<Integer> codigos = List.of(primeira.statusCode(), segunda.statusCode()).stream().sorted().toList();
+        assertEquals(List.of(201, 409), codigos, () -> primeira.body() + " / " + segunda.body());
+        assertEquals(1L, mongoTemplate.count(consultaPorEmail(emailCriado), User.class));
+    }
+
+    @Test
+    void usuarioPodeAtualizarEExcluirPropriaConta() throws Exception {
+        emailCriado = emailAleatorio();
+        String rotaConta = "/users/createAccount/0.0.1";
+        HttpResponse<String> cadastro = postJson(rotaConta + "/novousers", jsonUsuario(emailCriado, "senha123"));
+        assertEquals(201, cadastro.statusCode(), cadastro.body());
+        String id = JsonPath.read(cadastro.body(), "$.userId");
+        String token = loginEObterToken(emailCriado);
+
+        String alteracao = """
+                {"nome":"Nome atualizado","email":"%s","password":"novaSenha123"}
+                """.formatted(emailCriado);
+        HttpRequest atualizar = HttpRequest.newBuilder(URI.create(baseUrl() + rotaConta + "/atualizar"))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .PUT(HttpRequest.BodyPublishers.ofString(alteracao, StandardCharsets.UTF_8))
+                .build();
+        HttpResponse<String> atualizada = http.send(atualizar, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, atualizada.statusCode(), atualizada.body());
+        assertEquals(id, JsonPath.read(atualizada.body(), "$.userId"));
+        User usuario = userRepository.findById(id).orElseThrow();
+        assertEquals("Nome atualizado", usuario.getNome());
+        assertEquals(emailCriado, usuario.getEmail());
+        assertTrue(passwordEncoder.matches("novaSenha123", usuario.getPassword()));
+        assertFalse(passwordEncoder.matches("senha123", usuario.getPassword()));
+
+        HttpRequest excluir = HttpRequest.newBuilder(URI.create(baseUrl() + rotaConta + "/delete/" + id))
+                .header("Authorization", "Bearer " + token)
+                .DELETE()
+                .build();
+        HttpResponse<String> excluida = http.send(excluir, HttpResponse.BodyHandlers.ofString());
+        assertEquals(204, excluida.statusCode(), excluida.body());
+        assertTrue(excluida.body().isEmpty());
+        assertFalse(userRepository.existsById(id));
+        assertEquals(401, get("/auth/token", "Bearer " + token).statusCode());
     }
 
     @Test
@@ -208,11 +280,18 @@ class AuthHttpIntegrationTest {
 
 
     private HttpResponse<String> postJson(String rota, String json) throws IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder(URI.create(baseUrl() + rota))
+        return http.send(requisicaoPostJson(rota, json), HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+    }
+
+    private HttpRequest requisicaoPostJson(String rota, String json) {
+        return HttpRequest.newBuilder(URI.create(baseUrl() + rota))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json, StandardCharsets.UTF_8))
                 .build();
-        return http.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+    }
+
+    private Query consultaPorEmail(String email) {
+        return Query.query(Criteria.where("email").is(email));
     }
 
     private HttpResponse<String> get(String rota, String autorizacao) throws IOException, InterruptedException {
