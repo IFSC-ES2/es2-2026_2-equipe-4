@@ -228,11 +228,12 @@ class ProjetoServiceTest {
     }
 
     @Test
-    @DisplayName("Trocar imagem não recria um projeto excluído durante o upload")
-    void trocarImagemDeProjetoExcluidoDuranteUploadLancaExcecao() {
+    @DisplayName("Trocar imagem remove o upload novo se o projeto foi excluído")
+    void trocarImagemDeProjetoExcluidoDuranteUploadRemoveArquivoNovo() {
         Projeto projeto = new Projeto();
         projeto.setId("projeto-1");
         projeto.setAutorId("autor-1");
+        projeto.setImagens(List.of("imagem-antiga"));
         User autor = new User();
         autor.setId("autor-1");
         MockMultipartFile arquivo = new MockMultipartFile("arquivo", new byte[]{1});
@@ -246,6 +247,9 @@ class ProjetoServiceTest {
 
         assertThrows(NoSuchElementException.class,
                 () -> projetoService.trocarImagem("projeto-1", arquivo, "ana@exemplo.com"));
+        assertEquals(List.of("imagem-antiga"), projeto.getImagens());
+        verify(armazenamentoArquivoService).removerArquivo("imagem-nova");
+        verify(armazenamentoArquivoService, never()).removerArquivo("imagem-antiga");
         verify(repository, never()).save(any(Projeto.class));
     }
 

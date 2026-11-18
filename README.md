@@ -145,14 +145,14 @@ O MVP é uma vitrine de projetos universitários com cadastro/login, publicaçã
 - [Uso de IA](USO-IA.md) e [fluxo de trabalho](docs/fluxo-de-trabalho.md).
 - Histórico: [Inception](docs/inception.md), [baseline](docs/BASELINE.md), [estimativas](docs/ESTIMATIVAS.md), [Sprint 1](docs/sprints/sprint-1.md) e [Sprint 2](docs/sprints/sprint-2.md). Inception e baseline registram o escopo inicial de artigos; o produto atual é a vitrine de projetos.
 - [Board](https://github.com/orgs/IFSC-ES2/projects/34) e [backlog](https://github.com/IFSC-ES2/es2-2026_2-equipe-4/issues).
-- API: [login](src/backend/docs/rotas-login.md), [contas](src/backend/docs/rotas-de-criacao-de-contas.md) e [listagem pública](src/backend/docs/rotas-publicas-de-listagem-de-projetos.md). A rota autenticada `PUT /api/v1/projetos/{id}/imagem` troca a imagem de um projeto; envie o arquivo multipart no campo `arquivo`. A rota pública `GET /api/v1/projetos/imagens/{id}` devolve uma imagem enviada.
+- API: [login](src/backend/docs/rotas-login.md), [contas](src/backend/docs/rotas-de-criacao-de-contas.md) e [listagem pública](src/backend/docs/rotas-publicas-de-listagem-de-projetos.md). A rota autenticada `PUT /api/v1/projetos/{id}` edita os dados de um projeto (JSON com título, resumo, autores, tema, tecnologias e links), apenas pelo autor. A rota autenticada `PUT /api/v1/projetos/{id}/imagem` troca a imagem de um projeto; envie o arquivo multipart no campo `arquivo`. A rota pública `GET /api/v1/projetos/imagens/{id}` devolve uma imagem enviada.
 
 ## Equipe
 
-| Nome | Papel | Matrícula |
-|---|---|---|
-| Bernardo Vieira de Souza | Arquiteto de Software / Scrum Master | 202510703707 |
-| Marcos Júnior Lemes Ferreira | DevOps / Infra | 202510703657 |
-| Juliano Tavares da Silva | Engenheiro de Qualidade | 202510704909 |
-| Pedro Henrique Bernhardt Valete | DBA | 202510703675 |
-| Gabriel Ferreira de Souza da Silva | Front-end Dev | 202410004990 |
+| Nome | Papel                                  | Matrícula |
+|---|----------------------------------------|---|
+| Bernardo Vieira de Souza | Arquiteto de Software                  | 202510703707 |
+| Marcos Júnior Lemes Ferreira | DevOps / Infra                         | 202510703657 |
+| Juliano Tavares da Silva | Engenheiro de Qualidade / Scrum Master | 202510704909 |
+| Pedro Henrique Bernhardt Valete | DBA                                    | 202510703675 |
+| Gabriel Ferreira de Souza da Silva | Front-end Dev                          | 202410004990 |

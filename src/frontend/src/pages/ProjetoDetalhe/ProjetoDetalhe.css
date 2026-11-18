@@ -342,6 +342,21 @@
   background: #1e293b;
 }
 
+.detalhe-acoes {
+  margin-top: 16px;
+}
+
+.detalhe-acoes .detalhe-botao {
+  min-width: 0;
+  justify-content: center;
+}
+
+.detalhe-botao.apagar {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
 /* Telas pequenas */
 @media (max-width: 600px) {
   .detalhe-projeto {

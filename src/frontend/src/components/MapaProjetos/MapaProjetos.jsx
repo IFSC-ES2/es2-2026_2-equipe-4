@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
 import './MapaProjetos.css';
 
+const paletaCores = ['#93c5fd', '#fca5a5', '#86efac', '#c4b5fd', '#fcd34d', '#67e8f9', '#f9a8d4', '#d9f99d'];
+
 function MapaProjetos({ projetos, onTemaClick, temaSelecionado = 'Todos' }) {
   const [tooltip, setTooltip] = useState(null);
-
-  const paletaCores = ['#93c5fd', '#fca5a5', '#86efac', '#c4b5fd', '#fcd34d', '#67e8f9', '#f9a8d4', '#d9f99d'];
 
   const { temasConfig, projetosMapeados } = useMemo(() => {
     const temasUnicos = Array.from(new Set(projetos.map(p => p.tema).filter(Boolean)));
@@ -47,10 +47,6 @@ function MapaProjetos({ projetos, onTemaClick, temaSelecionado = 'Todos' }) {
 
   return (
     <div className="mapa-container">
-      <p className="mapa-texto-instrucao">
-        FineWeb Style: Explorando dados textuais. Clique num tema para isolar os projetos ou clique num ponto para detalhes.
-      </p>
-      
       <svg className="mapa-svg" viewBox="0 0 1000 450" preserveAspectRatio="xMidYMid meet">
         {projetosMapeados.map((p) => {
           if (!p.cx) return null;

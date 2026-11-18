@@ -71,6 +71,30 @@ public class ProjetoService {
         return projetoRepository.save(metadadoDTO);
     }
 
+    // Atualiza os dados do projeto: só o autor pode editar. O autorId e as imagens não mudam por aqui
+    public Projeto atualizarProjeto(String id, Projeto dados, String emailAutor) {
+        if (dados.getTitulo() == null || dados.getTitulo().isBlank()) {
+            throw new IllegalArgumentException("Título é obrigatório");
+        }
+
+        Projeto projeto = projetoRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Projeto não encontrado"));
+
+        String autorId = userRepository.findIdByEmail(emailAutor).map(User::getId).orElse(null);
+        if (autorId == null || !autorId.equals(projeto.getAutorId())) {
+            throw new AccessDeniedException("Apenas o autor pode editar o projeto");
+        }
+
+        projeto.setTitulo(dados.getTitulo());
+        projeto.setResumo(dados.getResumo());
+        projeto.setAutores(dados.getAutores());
+        projeto.setTecnologias(dados.getTecnologias());
+        projeto.setTema(dados.getTema());
+        projeto.setLinkRepositorio(dados.getLinkRepositorio());
+        projeto.setLinkDemonstracao(dados.getLinkDemonstracao());
+        return projetoRepository.save(projeto);
+    }
+
     // As imagens padrão ficam no front-end, em src/frontend/public/imagens-padrao
     public static String imagemPadraoAleatoria() {
         int numero = new Random().nextInt(3) + 1;
@@ -90,6 +114,7 @@ public class ProjetoService {
         ProjetoRespostaDTO imagem = armazenamentoArquivoService.salvarArquivo(arquivo);
         List<String> imagens = List.of(imagem.getId());
         if (projetoRepository.atualizarImagens(id, autorId, imagens) == 0) {
+            armazenamentoArquivoService.removerArquivo(imagem.getId());
             throw new NoSuchElementException("Projeto não encontrado");
         }
         projeto.setImagens(imagens);

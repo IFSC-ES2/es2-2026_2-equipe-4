@@ -1,11 +1,11 @@
 package ifsc.edu.projetos;
 
+import ifsc.edu.projetos.accountcreation.exceptions.GlobalExceptionHandler;
 import ifsc.edu.projetos.accountcreation.repository.UserRepository;
 import ifsc.edu.projetos.controllers.ProjetoController;
 import ifsc.edu.projetos.repositories.ProjetoRepository;
 import ifsc.edu.projetos.services.ArmazenamentoArquivoService;
 import ifsc.edu.projetos.services.ProjetoService;
-import jakarta.servlet.ServletException;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +28,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -51,7 +50,9 @@ class ProjetoUploadControllerTest {
     void configurar() {
         ProjetoService projetos = new ProjetoService(repository,
                 new ArmazenamentoArquivoService(gridFsTemplate), userRepository);
-        mvc = MockMvcBuilders.standaloneSetup(new ProjetoController(projetos)).build();
+        mvc = MockMvcBuilders.standaloneSetup(new ProjetoController(projetos))
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
     }
 
     @Test
@@ -84,7 +85,7 @@ class ProjetoUploadControllerTest {
     }
 
     @Test
-    void falhaDoBancoContinuaPropagadaPeloController() {
+    void falhaDoBancoRetornaErro500SemIdDeUpload() throws Exception {
         MockMultipartFile arquivo = new MockMultipartFile(
                 "arquivo", "imagem.png", "image/png", new byte[]{1});
         DataAccessResourceFailureException falha =
@@ -92,9 +93,11 @@ class ProjetoUploadControllerTest {
         when(gridFsTemplate.store(any(InputStream.class), anyString(),
                 anyString(), any(Document.class))).thenThrow(falha);
 
-        ServletException erro = assertThrows(ServletException.class,
-                () -> mvc.perform(multipart("/projetos/upload").file(arquivo)));
-        assertSame(falha, erro.getCause());
+        mvc.perform(multipart("/projetos/upload").file(arquivo))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.erro.mensagem").value("Erro interno no servidor"))
+                .andExpect(jsonPath("$.id").doesNotExist());
     }
 
     // Simula um arquivo salvo no GridFS com o tipo informado no upload

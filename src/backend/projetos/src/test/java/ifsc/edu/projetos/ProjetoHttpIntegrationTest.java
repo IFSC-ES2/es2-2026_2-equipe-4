@@ -205,6 +205,25 @@ class ProjetoHttpIntegrationTest {
     }
 
     @Test
+    void rejeitaCamposObrigatoriosAusentesOuVaziosSemGravarProjeto() throws Exception {
+        User usuario = novoUsuario();
+        tituloTeste = "Projeto incompleto " + UUID.randomUUID();
+        String autorizacao = "Bearer " + jwtUtil.generateToken(usuario.getEmail());
+        String corpo = """
+                {"titulo":"%s","resumo":" ","autores":[],"tecnologias":[" "]}
+                """.formatted(tituloTeste);
+
+        HttpResponse<String> resposta = publicar(autorizacao, corpo);
+
+        assertEquals(400, resposta.statusCode(), resposta.body());
+        for (String campo : List.of("resumo", "autores", "tecnologias[0]", "tema")) {
+            assertNotNull(JsonPath.read(resposta.body(), "$.erro['" + campo + "']"), campo);
+        }
+        assertFalse(projetoRepository.findAll().stream()
+                .anyMatch(projeto -> tituloTeste.equals(projeto.getTitulo())));
+    }
+
+    @Test
     void rejeitaPublicacaoSemTokenSemGravarProjeto() throws Exception {
         tituloTeste = "Projeto sem token " + UUID.randomUUID();
 
@@ -360,6 +379,43 @@ class ProjetoHttpIntegrationTest {
                 () -> assertNull(arquivo, "O arquivo acima do limite nao deve ser salvo"));
     }
 
+    @Test
+    @Timeout(30)
+    void publicaProjetoComImagemEnviadaEPermiteConsultaPublica() throws Exception {
+        User autor = novoUsuario();
+        tituloTeste = "Projeto com imagem " + UUID.randomUUID();
+        String autorizacao = "Bearer " + jwtUtil.generateToken(autor.getEmail());
+
+        HttpResponse<String> upload = enviarUpload(IMAGEM_PNG, autorizacao);
+        assertEquals(201, upload.statusCode(), upload.body());
+        String idImagem = JsonPath.read(upload.body(), "$.id");
+        assertTrue(ObjectId.isValid(idImagem), "O upload deve retornar o ID da imagem no GridFS");
+
+        String metadados = """
+                {"titulo":"%s","resumo":"Resumo de teste","tema":"Tecnologia",
+                 "autores":["Ana"],"tecnologias":["Java"],"imagens":["%s"]}
+                """.formatted(tituloTeste, idImagem);
+        HttpResponse<String> publicacao = publicar(autorizacao, metadados);
+        assertEquals(201, publicacao.statusCode(), publicacao.body());
+        String idProjeto = JsonPath.read(publicacao.body(), "$.id");
+        assertNotNull(idProjeto);
+
+        HttpResponse<String> projeto = consultarSemToken("/projetos/" + idProjeto);
+        assertEquals(200, projeto.statusCode(), projeto.body());
+        assertEquals(idProjeto, JsonPath.read(projeto.body(), "$.id"));
+        assertEquals(autor.getId(), JsonPath.read(projeto.body(), "$.autorId"));
+        assertEquals(List.of(idImagem), JsonPath.read(projeto.body(), "$.imagens"));
+
+        HttpRequest consultaImagem = HttpRequest.newBuilder(
+                URI.create("http://127.0.0.1:" + porta + "/api/v1/projetos/imagens/" + idImagem))
+                .GET()
+                .build();
+        HttpResponse<byte[]> imagem = http.send(consultaImagem, HttpResponse.BodyHandlers.ofByteArray());
+        assertEquals(200, imagem.statusCode());
+        assertEquals("image/png", imagem.headers().firstValue("Content-Type").orElseThrow());
+        assertArrayEquals(IMAGEM_PNG, imagem.body());
+    }
+
     private void conferirArquivoDoUpload(HttpResponse<String> resposta, byte[] conteudoEsperado)
             throws IOException {
         String idArquivo = JsonPath.read(resposta.body(), "$.id");
@@ -445,7 +501,13 @@ class ProjetoHttpIntegrationTest {
 
     private HttpResponse<String> publicar(String autorizacao) throws IOException, InterruptedException {
         String corpo = "{\"id\":\"id-enviado-pelo-cliente\",\"autorId\":\"outro-autor\","
-                + "\"titulo\":\"" + tituloTeste + "\",\"resumo\":\"Resumo de teste\"}";
+                + "\"titulo\":\"" + tituloTeste + "\",\"resumo\":\"Resumo de teste\","
+                + "\"tema\":\"Tecnologia\",\"autores\":[\"Ana\"],\"tecnologias\":[\"Java\"]}";
+        return publicar(autorizacao, corpo);
+    }
+
+    private HttpResponse<String> publicar(String autorizacao, String corpo)
+            throws IOException, InterruptedException {
         HttpRequest.Builder request = HttpRequest.newBuilder(
                         URI.create("http://127.0.0.1:" + porta + "/api/v1/projetos/metadados"))
                 .header("Content-Type", "application/json")
