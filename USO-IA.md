@@ -324,3 +324,12 @@ Validação: Leitura e pequenas correções feitas
   Uso: Validação de imagens, mensagens de erro e reaproveitamento de uploads na submissão (#196).
   Artefatos: Página de submissão, estilos e testes do frontend.
   Validação: Build, testes do frontend e ESLint da submissão passaram.
+
+
+
+
+- Data: 16/11/2026
+  Ferramenta: Codex (OpenAI)
+  Uso: O modelo leu os detalhes da entrega `ES2-projeto-9.pdf` e avaliou diversos aspectos do projeto para verificar se o trabalho realizado estava de acordo com os requisitos solicitados pelo professor. Além disso, produziu alguns arquivos como resultado dessa análise abrangente de todo o projeto.
+  Artefatos: README.md, docs/ARQUITETURA.md, docs/diagramas/, docs/RETROSPECTIVA.md, docs/PADROES-DE-PROJETO.md, 
+  Validação: Revisado por um membro da equipe e testado em Markdown.
