@@ -290,6 +290,11 @@ Validação: Leitura e pequenas correções feitas
   Artefatos: docs/riscos.md e docs/qualidade.md
   Validação: Afirmações conferidas com o código, os PRs, as issues e as métricas
 
+  - Data: 17/11/2026
+  Ferramenta: Claude
+  Uso: Apoio na documentação do ambiente de execução, com o enxugamento do passo a passo do Render
+  Artefatos: docs/DEPLOY.md, README.md e docs/riscos.md
+  Validação: URLs, variáveis e configurações conferidas com os serviços publicados e o código
 - Data: 17/11/2026
   Ferramenta: Codex
   Uso: Implementação da paginação da galeria e dos testes de carregamento e recuperação de falha (#195).

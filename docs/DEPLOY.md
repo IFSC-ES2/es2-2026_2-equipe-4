@@ -1,8 +1,69 @@
-# Configuração de ambiente e deploy local
+# Configuração de ambiente e deploy
 
-Este procedimento documenta o ambiente local do PublicaIFSC com Docker Compose.
-Ele serve para desenvolvimento e testes rápidos; não é uma configuração de
-produção. Não há provedor nem ambiente de staging configurado neste repositório.
+## Ambiente de execução
+
+| Parte | Ferramenta | Endereço |
+|---|---|---|
+| Site (front-end) | Render Static Site | <https://publicaifsc.onrender.com/> |
+| API | Render Web Service | <https://publicaifsc-api.onrender.com/api/v1> |
+| Banco | MongoDB Atlas | Sem acesso público direto |
+
+### Acesso para avaliação
+
+- Endereço: <https://publicaifsc.onrender.com/>
+- Email de teste: teste@email.com
+- Senha de teste: teste123
+- Dados: projetos de demonstração criados pelo seed (`APP_SEED_PROJETOS_ENABLED`)
+  e um projeto publicado pelo usuário de teste.
+
+A API usa o plano gratuito do Render e dorme após 15 minutos sem uso. A primeira
+requisição depois disso pode levar cerca de 1 minuto
+
+### Configuração dos serviços
+
+| Serviço | Configuração |
+|---|---|
+| API | Root Directory `src/backend/projetos`, Language Docker, Branch `main`, Health Check Path `/api/v1/auth/status` |
+| Site | Root Directory `src/frontend`, Branch `main`, Build Command `npm ci && npm run build`, Publish Directory `dist` |
+
+| Serviço | Variáveis de ambiente (nomes) |
+|---|---|
+| API | `SPRING_MONGODB_URI`, `JWT_SECRET`, `APP_SEED_PROJETOS_ENABLED`, `PORT` |
+| Site | `VITE_API_BASE_URL` (`https://publicaifsc-api.onrender.com`, sem `/api/v1` e sem barra final), `NODE_VERSION` (`24`) |
+
+No Atlas há um usuário de banco exclusivo da API e acesso de rede liberado
+(`0.0.0.0/0`), porque o Render não tem IP fixo no plano gratuito. A senha e a
+URI de conexão ficam só em `SPRING_MONGODB_URI`, no Render.
+
+Para o React Router funcionar ao abrir ou recarregar links como `/projetos/<id>`,
+o site tem uma regra em **Redirects/Rewrites**: Source `/*`, Destination
+`/index.html`, Action **Rewrite**.
+
+### Como o deploy acontece
+
+O Render observa a branch `main` de cada serviço. Cada merge na `main` dispara um
+novo deploy da API e do site. O [CI](../.github/workflows/ci.yml) roda nos pull
+requests e também nos pushes para a `main`. O valor de `VITE_API_BASE_URL` é
+gravado no build, se a URL da API mudar, é preciso refazer o deploy do site.
+
+### Validar o ambiente
+
+1. Abra o site e a galeria `/projetos`, a lista deve carregar e o detalhe de um
+   projeto deve abrir.
+2. Consulte a [listagem pública](https://publicaifsc-api.onrender.com/api/v1/projetos?size=1);
+   a resposta deve ser HTTP 200 em JSON.
+3. Entre com o usuário de teste e confira o login, a submissão de um projeto com
+   imagem e a imagem no detalhe.
+
+### Limitações do ambiente publicado
+
+- Plano gratuito: a API demora a responder após um período sem uso.
+- Sem backup automatizado do banco nem monitoramento configurados.
+- Rede do Atlas aberta a qualquer IP, o acesso depende do usuário e da senha do banco.
+
+## Ambiente local com Docker Compose
+
+As instruções a seguir se aplicam ao desenvolvimento e aos testes locais.
 
 ## Pré-requisitos
 
@@ -143,8 +204,6 @@ npm run dev
 - Esta configuração destina-se a desenvolvimento local e testes rápidos.
 - O `.env` local contém credenciais de conveniência para este workspace e está
   ignorado pelo Git, sendo as informações contida em `.env.example` 
-- Ainda não há staging, deploy remoto, backup/restauração automatizados, TLS,
- ou monitoramento configurados.
 - URLs da API são compiladas no bundle do frontend; alterar `VITE_API_BASE_URL`
   exige rebuild do frontend.
 - A carga inicial de dados de demonstração é opcional e cria dados fictícios;

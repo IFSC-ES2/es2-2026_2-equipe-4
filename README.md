@@ -19,7 +19,15 @@ Não versione valores sensíveis; consulte [configuração de ambiente e deploy]
 
 ## Ambiente de validação
 
-O ambiente de validação é o Docker Compose local, reprodutível, com pré-requisitos, variáveis, comandos e validação rápida em [docs/DEPLOY.md](docs/DEPLOY.md), a interface e a API sobem nos endereços da seção Executar.
+O ambiente publicado fica no Render, com banco no MongoDB Atlas:
+
+- Site: <https://publicaifsc.onrender.com/>
+- API: <https://publicaifsc-api.onrender.com/api/v1>
+
+A API usa o plano gratuito e dorme após um período sem uso, a primeira requisição
+pode levar cerca de 1 minuto. As credenciais de teste, a configuração e a
+validação estão em [docs/DEPLOY.md](docs/DEPLOY.md). O ambiente local com Docker
+Compose também é reprodutível e está descrito no mesmo documento.
 
 ## Tecnologias
 
@@ -124,12 +132,12 @@ Em outro terminal, a partir da raiz, execute `cd src/frontend` e:
 | Windows (PowerShell) | `npm.cmd ci` | `npm.cmd test -- --run` |
 
 O [CI](.github/workflows/ci.yml) executa testes, builds e verificações de
-documentação em PRs para `main` e `entrega-*`.
+documentação em PRs para `main` e `entrega-*` e em pushes para a `main`.
 
 ## Limitações e pendências
 
 - A galeria carrega até 100 projetos; busca por texto ainda está pendente.
-- Staging e deploy automatizado não foram entregues, a validação é feita localmente com Docker Compose.
+- O ambiente publicado usa planos gratuitos: a API demora a responder depois de um período sem uso, e não há backup automatizado nem monitoramento.
 - O limite de upload de imagem é de 5 MB, acima disso a API responde 413.
 - A exclusão pela galeria ainda não tem suporte na API.
 
