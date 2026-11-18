@@ -11,8 +11,8 @@
 ### Acesso para avaliação
 
 - Endereço: <https://publicaifsc.onrender.com/>
-- Usuário de teste: A PREENCHER (e-mail do professor)
-- Senha de teste: A PREENCHER (senha criada só para esta avaliação)
+- Email de teste: teste@email.com
+- Senha de teste: teste123
 - Dados: projetos de demonstração criados pelo seed (`APP_SEED_PROJETOS_ENABLED`)
   e um projeto publicado pelo usuário de teste.
 
