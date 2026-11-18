@@ -376,3 +376,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Remoção do texto do mapa de projetos e dos links sem destino no rodapé (#216).
   Artefatos: `MapaProjetos.jsx`, `MapaProjetos.css` e `Footer.jsx`.
   Validação: Build e ESLint do frontend passaram.
+
+- Data: 18/11/2026
+  Ferramenta: Codex
+  Uso: Apoio na documentação dos 18 casos de aceitação do MVP (#214), na revisão dos vínculos com as issues e no registro da aprovação dos quatro casos de edição.
+  Artefato: [docs/ACEITACAO.md](docs/ACEITACAO.md).
+  Validação: Status e totais conferidos com os resultados da execução manual informados pelo responsável. Vínculos verificados nos critérios das issues e nos PRs correspondentes.
