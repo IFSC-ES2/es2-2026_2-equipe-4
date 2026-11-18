@@ -370,3 +370,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Implementação do formulário de edição e das ações do autor no detalhe do projeto (#217).
   Artefatos: Galeria, detalhe, formulário de submissão e adaptações nos testes existentes do frontend.
   Validação: Build, ESLint e os 65 testes existentes do frontend passaram. A suíte do backend passou com MongoDB 8.
+
+- Data: 18/11/2026
+  Ferramenta: Codex
+  Uso: Remoção do texto do mapa de projetos e dos links sem destino no rodapé (#216).
+  Artefatos: `MapaProjetos.jsx`, `MapaProjetos.css` e `Footer.jsx`.
+  Validação: Build e ESLint do frontend passaram.
