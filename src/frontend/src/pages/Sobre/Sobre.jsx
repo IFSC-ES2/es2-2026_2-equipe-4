@@ -15,7 +15,7 @@ function Sobre() {
           const dados = await resposta.json();
           setProjetosAmostra(dados.content || []);
         }
-      } catch (e) {
+      } catch {
         console.log("Sistema fora do ar!");
       }
     }
