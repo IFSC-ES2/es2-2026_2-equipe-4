@@ -53,6 +53,10 @@ public class ArmazenamentoArquivoService {
         }
     }
 
+    public void removerArquivo(String id) {
+        gridFsTemplate.delete(Query.query(Criteria.where("_id").is(new ObjectId(id))));
+    }
+
     // Busca um arquivo salvo pelo id devolvido no upload; vazio se o id for inválido ou não existir
     public Optional<GridFsResource> buscarArquivo(String id) {
         if (id == null || !ObjectId.isValid(id)) {
