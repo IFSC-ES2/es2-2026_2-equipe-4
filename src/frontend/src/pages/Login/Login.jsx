@@ -47,8 +47,8 @@ function Login() {
         throw new Error(erroJson.erro?.mensagem || 'Erro ao realizar login.');
       }
 
-      const dados = await resposta.json();
-      if (!iniciarSessao(dados.token)) throw new Error('Não foi possível iniciar sua sessão. Tente entrar novamente.');
+      const dados = await resposta.json().catch(() => null);
+      if (!iniciarSessao(dados?.token)) throw new Error('Não foi possível iniciar sua sessão. Tente entrar novamente.');
       setStatus({ tipo: 'sucesso', mensagem: 'Acesso liberado!' });
       
       setTimeout(() => navigate('/'), 800); 
