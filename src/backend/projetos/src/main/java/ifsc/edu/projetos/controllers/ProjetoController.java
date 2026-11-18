@@ -46,6 +46,15 @@ public class ProjetoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 
+    // Edita os dados do projeto (application/json), só o autor pode editar
+    @PutMapping(value = "/{id}", consumes = "application/json")
+    public ResponseEntity<Projeto> atualizarProjeto(@PathVariable String id,
+            @RequestBody Projeto dados, Authentication authentication) {
+
+        Projeto atualizado = projetoService.atualizarProjeto(id, dados, authentication.getName());
+        return ResponseEntity.ok(atualizado);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirProjeto(@PathVariable String id, Authentication authentication) {
         projetoService.excluirProjeto(id, authentication.getName());
