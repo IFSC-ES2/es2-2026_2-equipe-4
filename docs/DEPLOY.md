@@ -1,69 +1,65 @@
 # Configuração de ambiente e deploy
 
-## Ambiente de execução no Render
+## Ambiente de execução
 
-- Frontend (Render Static Site) em <https://publicaifsc.onrender.com/>.
-- API (Render Web Service) em <https://publicaifsc-api.onrender.com/api/v1>.
-- Banco de dados no MongoDB Atlas, acessado pela API.
+| Parte | Ferramenta | Endereço |
+|---|---|---|
+| Site (front-end) | Render Static Site | <https://publicaifsc.onrender.com/> |
+| API | Render Web Service | <https://publicaifsc-api.onrender.com/api/v1> |
+| Banco | MongoDB Atlas | Sem acesso público direto |
 
-### Configurar o Static Site
+### Acesso para avaliação
 
-1. No [painel do Render](https://dashboard.render.com/), selecione **New → Static Site**
-   e conecte o repositório `IFSC-ES2/es2-2026_2-equipe-4`. Para atualizar a
-   configuração existente, abra o serviço **publicaifsc**.
-2. Preencha os campos de **Build & Deploy**.
+- Endereço: <https://publicaifsc.onrender.com/>
+- Usuário de teste: A PREENCHER (e-mail do professor)
+- Senha de teste: A PREENCHER (senha criada só para esta avaliação)
+- Dados: projetos de demonstração criados pelo seed (`APP_SEED_PROJETOS_ENABLED`)
+  e um projeto publicado pelo usuário de teste.
 
-   | Campo | Valor |
-   |---|---|
-   | Branch | `main` |
-   | Root Directory | `src/frontend` |
-   | Build Command | `npm ci && npm run build` |
-   | Publish Directory | `dist` |
+A API usa o plano gratuito do Render e dorme após 15 minutos sem uso. A primeira
+requisição depois disso pode levar cerca de 1 minuto
 
-3. Em **Environment Variables**, configure as variáveis do build.
+### Configuração dos serviços
 
-   | Variável | Valor |
-   |---|---|
-   | `NODE_VERSION` | `24` |
-   | `VITE_API_BASE_URL` | `https://publicaifsc-api.onrender.com` |
-
-   O frontend acrescenta `/api/v1` ao montar as requisições. Informe apenas
-   a origem HTTPS da API em `VITE_API_BASE_URL`. O Vite incorpora esse valor
-   ao JavaScript publicado, por isso ele deve conter somente informação pública.
-4. Crie o site ou salve as alterações e acompanhe o build na aba **Deploys**.
-   Com **Auto-Deploy** habilitado, mudanças em `src/frontend` na `main`
-   disparam um novo deploy. Ao alterar `VITE_API_BASE_URL`, faça um novo build
-   pelo painel para aplicar o valor ao site publicado.
-
-
-### Configurar o acesso direto às rotas
-
-No serviço **publicaifsc**, vá a **Redirects/Rewrites → Add Rule**, configure
-os campos abaixo e salve em **Save Changes**.
-
-| Campo | Valor |
+| Serviço | Configuração |
 |---|---|
-| Source | `/*` |
-| Destination | `/index.html` |
-| Action | **Rewrite** |
+| API | Root Directory `src/backend/projetos`, Language Docker, Branch `main`, Health Check Path `/api/v1/auth/status` |
+| Site | Root Directory `src/frontend`, Branch `main`, Build Command `npm ci && npm run build`, Publish Directory `dist` |
 
-Com essa regra, o Render entrega `index.html` mantendo a URL solicitada.
-O React Router resolve caminhos como `/projetos`, `/projetos/<id>` e `/login`
-ao abrir um link direto ou recarregar a página.
+| Serviço | Variáveis de ambiente (nomes) |
+|---|---|
+| API | `SPRING_MONGODB_URI`, `JWT_SECRET`, `APP_SEED_PROJETOS_ENABLED`, `PORT` |
+| Site | `VITE_API_BASE_URL` (`https://publicaifsc-api.onrender.com`, sem `/api/v1` e sem barra final), `NODE_VERSION` (`24`) |
 
-### Validar o deploy
+No Atlas há um usuário de banco exclusivo da API e acesso de rede liberado
+(`0.0.0.0/0`), porque o Render não tem IP fixo no plano gratuito. A senha e a
+URI de conexão ficam só em `SPRING_MONGODB_URI`, no Render.
 
-1. Abra a [página inicial](https://publicaifsc.onrender.com/) e a
-   [galeria](https://publicaifsc.onrender.com/projetos). Confirme que a lista
-   carrega e abra o detalhe de um projeto existente.
-2. Copie a URL do detalhe, abra em outra aba e recarregue a página.
-   Repita o acesso direto em `/login` e `/cadastro` para verificar a regra.
-3. Nas ferramentas do navegador, confira se a requisição para
-   `/api/v1/projetos` vai para a API publicada e retorna HTTP 200, sem erro de
-   CORS. O [endpoint público da listagem](https://publicaifsc-api.onrender.com/api/v1/projetos?size=1)
-   também pode ser consultado diretamente.
-4. Para validar o fluxo autenticado, use uma conta de teste e confira o
-   cadastro, o login, a submissão com imagem e a exibição da imagem no detalhe.
+Para o React Router funcionar ao abrir ou recarregar links como `/projetos/<id>`,
+o site tem uma regra em **Redirects/Rewrites**: Source `/*`, Destination
+`/index.html`, Action **Rewrite**.
+
+### Como o deploy acontece
+
+O Render observa a branch `main` de cada serviço. Cada merge na `main` dispara um
+novo deploy da API e do site. O [CI](../.github/workflows/ci.yml) roda nos pull
+requests e também nos pushes para a `main`. O valor de `VITE_API_BASE_URL` é
+gravado no build, se a URL da API mudar, é preciso refazer o deploy do site.
+
+### Validar o ambiente
+
+1. Abra o site e a galeria `/projetos`, a lista deve carregar e o detalhe de um
+   projeto deve abrir.
+2. Consulte a [listagem pública](https://publicaifsc-api.onrender.com/api/v1/projetos?size=1);
+   a resposta deve ser HTTP 200 em JSON.
+3. Entre com o usuário de teste e confira o login, a submissão de um projeto com
+   imagem e a imagem no detalhe.
+
+### Limitações do ambiente publicado
+
+- Plano gratuito: a API demora a responder após um período sem uso.
+- Sem backup automatizado do banco nem monitoramento configurados.
+- Rede do Atlas aberta a qualquer IP, o acesso depende do usuário e da senha do banco.
 
 ## Ambiente local com Docker Compose
 
