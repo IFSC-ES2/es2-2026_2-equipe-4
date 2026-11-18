@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import MapaProjetos from '../../components/MapaProjetos/MapaProjetos';
 import { API_BASE_URL } from '../../config/api';
+import { useSessao } from '../../sessao/contextoSessao';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -10,6 +11,8 @@ function Login() {
   const [status, setStatus] = useState({ tipo: '', mensagem: '' });
   const [projetosMapa, setProjetosMapa] = useState([]);
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const { iniciarSessao } = useSessao();
 
   useEffect(() => {
     async function carregarProjetosParaMapa() {
@@ -19,7 +22,8 @@ function Login() {
           const dados = await resposta.json();
           setProjetosMapa(dados.content || []);
         }
-      } catch (e) {
+      } catch {
+        // A indisponibilidade do mapa não impede o login.
       }
     }
     carregarProjetosParaMapa();
@@ -44,7 +48,7 @@ function Login() {
       }
 
       const dados = await resposta.json();
-      localStorage.setItem('token', dados.token);
+      if (!iniciarSessao(dados.token)) throw new Error('Não foi possível iniciar sua sessão. Tente entrar novamente.');
       setStatus({ tipo: 'sucesso', mensagem: 'Acesso liberado!' });
       
       setTimeout(() => navigate('/'), 800); 
@@ -65,6 +69,12 @@ function Login() {
           <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>Acesse sua conta para publicar projetos.</p>
         </div>
         
+        {!status.mensagem && state?.sessaoExpirada && (
+          <div className="status-mensagem erro" role="alert">
+            Sua sessão terminou. Entre novamente para publicar seu projeto.
+          </div>
+        )}
+
         {status.mensagem && (
           <div className={`status-mensagem ${status.tipo}`} style={{ textAlign: 'center' }}>
             {status.mensagem}

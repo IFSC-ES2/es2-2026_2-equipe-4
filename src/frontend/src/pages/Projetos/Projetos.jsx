@@ -3,31 +3,62 @@ import { Link, useNavigate } from 'react-router-dom';
 import MapaProjetos from '../../components/MapaProjetos/MapaProjetos';
 import { API_BASE_URL, urlImagem } from '../../config/api';
 
+const tamanhoPagina = 100;
+
 function Projetos() {
   const navigate = useNavigate();
-  const [projetos, setProjetos] = useState([]);
   const [temaSelecionado, setTemaSelecionado] = useState('Todos');
-  const [carregando, setCarregando] = useState(true);
-  const [erro, setErro] = useState('');
+  const [consulta, setConsulta] = useState({ pagina: 0 });
+  const [resultado, setResultado] = useState({
+    consulta: null,
+    projetos: [],
+    proximaPagina: 0,
+    erro: false,
+  });
 
-  const [idConfirmandoDelecao, setIdConfirmandoDelecao] = useState(null);
+  const { projetos, proximaPagina } = resultado;
+  const carregando = resultado.consulta !== consulta;
+  const erro = !carregando && resultado.erro;
+  const carregouPrimeiraPagina = proximaPagina !== 0;
 
   useEffect(() => {
+    const controlador = new AbortController();
+    const { signal } = controlador;
+    const { pagina } = consulta;
+
     async function buscarProjetos() {
       try {
-        const resposta = await fetch(`${API_BASE_URL}/api/v1/projetos?size=100`);
-        if (!resposta.ok) throw new Error('Erro de conexão: Sistema fora do ar!');
-        
+        const resposta = await fetch(
+          `${API_BASE_URL}/api/v1/projetos?page=${pagina}&size=${tamanhoPagina}`,
+          { signal },
+        );
+        if (!resposta.ok) throw new Error(`Falha ao buscar projetos (${resposta.status})`);
+
         const dados = await resposta.json();
-        setProjetos(dados.content || []); 
-      } catch (err) {
-        setErro('Erro de conexão: Sistema fora do ar!');
-      } finally {
-        setCarregando(false);
+        if (signal.aborted) return;
+        if (!Array.isArray(dados?.content) || dados.number !== pagina || typeof dados.last !== 'boolean') {
+          throw new Error('A API retornou uma página de projetos inválida');
+        }
+
+        setResultado((anterior) => {
+          const porId = new Map(anterior.projetos.map((projeto) => [projeto.id, projeto]));
+          for (const projeto of dados.content) porId.set(projeto.id, projeto);
+
+          return {
+            consulta,
+            projetos: Array.from(porId.values()),
+            proximaPagina: dados.last ? null : dados.number + 1,
+            erro: false,
+          };
+        });
+      } catch {
+        if (!signal.aborted) setResultado((anterior) => ({ ...anterior, consulta, erro: true }));
       }
     }
+
     buscarProjetos();
-  }, []);
+    return () => controlador.abort();
+  }, [consulta]);
 
   const temasDinamicos = useMemo(() => {
     const temas = Array.from(new Set(projetos.map(p => p.tema).filter(Boolean)));
@@ -37,35 +68,6 @@ function Projetos() {
   const projetosFiltrados = temaSelecionado === 'Todos' 
     ? projetos 
     : projetos.filter(p => p.tema === temaSelecionado);
-
-  const handleDeletarProjeto = async (id) => {
-    if (idConfirmandoDelecao !== id) {
-      setIdConfirmandoDelecao(id);
-      return;
-    }
-
-    const token = localStorage.getItem('token');
-
-    try {
-      const resposta = await fetch(`${API_BASE_URL}/api/v1/projetos/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': token ? `Bearer ${token}` : ''
-        }
-      });
-
-      if (resposta.ok || resposta.status === 204) {
-        setProjetos((prev) => prev.filter((p) => p.id !== id));
-        alert('Projeto apagado com sucesso.');
-      } else {
-        alert('Acesso negado: Você só pode apagar os projetos que você mesmo criou.');
-      }
-    } catch (err) {
-      alert('Erro de conexão ao tentar apagar o projeto.');
-    } finally {
-      setIdConfirmandoDelecao(null);
-    }
-  };
 
   return (
     <main className="pagina-animada" style={{ width: '100%', margin: '0 auto', minHeight: '80vh' }}>
@@ -83,7 +85,7 @@ function Projetos() {
 
       <div style={{ maxWidth: '1140px', margin: '0 auto', padding: '40px 24px 80px' }}>
         
-        {!carregando && !erro && (
+        {carregouPrimeiraPagina && (
           <div style={{ marginBottom: '48px' }}>
             {projetos.length > 0 ? (
               <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
@@ -97,6 +99,11 @@ function Projetos() {
           </div>
         )}
         
+        {carregouPrimeiraPagina && proximaPagina !== null && (
+          <p style={{ textAlign: 'center', color: '#475569' }}>
+            Os filtros e as contagens consideram os projetos carregados. Carregue mais para encontrar outros temas.
+          </p>
+        )}
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '48px' }}>
           {temasDinamicos.map((tema) => {
             const isAtivo = temaSelecionado === tema;
@@ -125,10 +132,11 @@ function Projetos() {
           })}
         </div>
 
-        {carregando && <p style={{ textAlign: 'center', color: '#475569' }}>Procurando projetos...</p>}
-        {erro && <p style={{ textAlign: 'center', color: '#ef4444' }}>{erro}</p>}
+        {!carregouPrimeiraPagina && carregando && (
+          <p role="status" style={{ textAlign: 'center', color: '#475569' }}>Procurando projetos...</p>
+        )}
 
-        {!carregando && !erro && (
+        {carregouPrimeiraPagina && (
           <div className="galeria-behance" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '32px' }}>
             {projetosFiltrados.length === 0 ? (
               <div style={{ width: '100%', textAlign: 'center', color: '#94a3b8', padding: '60px', gridColumn: '1 / -1', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
@@ -137,8 +145,6 @@ function Projetos() {
               </div>
             ) : (
               projetosFiltrados.map((projeto) => {
-                const estaConfirmando = idConfirmandoDelecao === projeto.id;
-
                 return (
                   <div 
                     key={projeto.id} 
@@ -165,7 +171,7 @@ function Projetos() {
                           Por <span style={{ color: '#0f172a', fontWeight: '600' }}>{projeto.autores?.join(', ')}</span>
                         </small>
                         
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
                           <div style={{ display: 'flex', gap: '8px' }}>
                             <Link
                               to={`/projetos/${projeto.id}`}
@@ -199,28 +205,6 @@ function Projetos() {
                               </a>
                             )}
                           </div>
-
-                          <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeletarProjeto(projeto.id);
-                              }}
-                              style={{
-                                background: estaConfirmando ? '#fef2f2' : 'transparent',
-                                color: estaConfirmando ? '#dc2626' : '#94a3b8',
-                                border: 'none',
-                                padding: '6px',
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                borderRadius: '4px',
-                                transition: 'all 0.2s'
-                              }}
-                            >
-                              {estaConfirmando ? 'Confirmar Exclusão' : 'Apagar'}
-                            </button>
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -230,6 +214,28 @@ function Projetos() {
             )}
           </div>
         )}
+
+        <div style={{ marginTop: '32px', textAlign: 'center' }}>
+          {erro && (
+            <p role="alert" style={{ color: '#b91c1c' }}>
+              {carregouPrimeiraPagina
+                ? 'Não foi possível carregar mais projetos. Tente novamente.'
+                : 'Erro de conexão: Sistema fora do ar!'}
+            </p>
+          )}
+          {proximaPagina !== null && (carregouPrimeiraPagina || erro) && (
+            <button
+              type="button"
+              disabled={carregando}
+              onClick={() => setConsulta({ pagina: proximaPagina })}
+            >
+              {carregando ? 'Carregando mais projetos...' : erro ? 'Tentar novamente' : 'Carregar mais projetos'}
+            </button>
+          )}
+          {proximaPagina === null && projetos.length > 0 && (
+            <p role="status" style={{ color: '#475569' }}>Todos os projetos foram carregados.</p>
+          )}
+        </div>
       </div>
     </main>
   );

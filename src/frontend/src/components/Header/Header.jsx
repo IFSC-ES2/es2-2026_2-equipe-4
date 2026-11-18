@@ -1,14 +1,14 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useSessao } from '../../sessao/contextoSessao';
 import './Header.css';
 
 function Header() {
   const navigate = useNavigate();
   const location = useLocation();
-  const token = localStorage.getItem('token');
-  const estaLogado = !!token;
+  const { token, encerrarSessao } = useSessao();
 
   const terminarSessao = () => {
-    localStorage.removeItem('token');
+    encerrarSessao();
     navigate('/login');
   };
 
@@ -25,7 +25,7 @@ function Header() {
           <Link to="/projetos" className={`header-link ${isActive('/projetos')}`}>Showcase</Link>
           <Link to="/submissao" className={`header-link ${isActive('/submissao')}`}>Submissão</Link>
           
-          {!estaLogado ? (
+          {!token ? (
             <div style={{display: 'flex', gap: '12px', marginLeft: '8px'}}>
               <Link to="/login" className="header-botao-secundario">Entrar</Link>
               <Link to="/cadastro" className="header-botao">Criar Conta</Link>

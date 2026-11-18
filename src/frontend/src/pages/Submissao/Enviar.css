@@ -154,6 +154,34 @@ main {
   background: #f1f5f9;
 }
 
+.erros-imagens {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  color: #b91c1c;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.lista-imagens-selecionadas {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.lista-imagens-selecionadas li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  overflow-wrap: anywhere;
+}
+
+.lista-imagens-selecionadas button {
+  min-height: 32px;
+  padding: 4px 8px;
+  font-size: 13px;
+}
+
 .campo small {
   color: #ef4444 !important;
   font-size: 13px;
