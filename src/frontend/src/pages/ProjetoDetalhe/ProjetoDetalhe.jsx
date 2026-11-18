@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { API_BASE_URL, urlImagem } from '../../config/api';
+import { useSessao } from '../../sessao/contextoSessao';
+import { useUsuarioId } from '../../sessao/useUsuarioId';
 import './ProjetoDetalhe.css';
 
 // Gera as iniciais exibidas na capa e nos autores (ex.: "Horta Inteligente" → "HI").
@@ -75,9 +77,18 @@ function GaleriaFotos({ idsImagens, titulo }) {
 // Página com os detalhes de um projeto: imagem, descrição, tecnologias e links.
 export default function ProjetoDetalhe() {
   const { id } = useParams();
+  return <Detalhe key={id} id={id} />;
+}
+
+function Detalhe({ id }) {
+  const navigate = useNavigate();
+  const { token, invalidarSessao } = useSessao();
+  const usuarioId = useUsuarioId();
   const [projeto, setProjeto] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState('');
+  const [apagando, setApagando] = useState(false);
+  const [erroExclusao, setErroExclusao] = useState('');
 
   useEffect(() => {
     async function buscarProjeto() {
@@ -109,6 +120,36 @@ export default function ProjetoDetalhe() {
   const autores = projeto?.autores ?? [];
   const tecnologias = projeto?.tecnologias ?? [];
   const temLinks = Boolean(projeto?.linkRepositorio || projeto?.linkDemonstracao);
+  const podeGerenciar = Boolean(usuarioId && projeto?.autorId === usuarioId);
+
+  async function apagarProjeto() {
+    if (!podeGerenciar || apagando) return;
+    if (!window.confirm(`Apagar o projeto "${projeto.titulo}"?`)) return;
+
+    setApagando(true);
+    setErroExclusao('');
+    try {
+      const resposta = await fetch(`${API_BASE_URL}/api/v1/projetos/${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (resposta.status === 401) {
+        invalidarSessao(token);
+        throw new Error('Sua sessão terminou. Entre novamente para apagar o projeto.');
+      }
+      if (resposta.status === 403) throw new Error('Apenas o autor pode apagar este projeto.');
+      if (resposta.status !== 204) throw new Error('Não foi possível apagar o projeto. Tente novamente.');
+
+      navigate('/projetos', { replace: true });
+    } catch (falha) {
+      setErroExclusao(falha instanceof TypeError
+        ? 'Não foi possível apagar o projeto. Verifique sua conexão e tente novamente.'
+        : falha.message);
+    } finally {
+      setApagando(false);
+    }
+  }
 
   return (
     <main className="pagina-animada detalhe-projeto">
@@ -138,6 +179,19 @@ export default function ProjetoDetalhe() {
                 <p className="detalhe-vazio">Autores não informados.</p>
               )}
             </div>
+            {podeGerenciar && (
+              <div className="detalhe-botoes detalhe-acoes">
+                <button
+                  type="button"
+                  className="detalhe-botao apagar"
+                  disabled={apagando}
+                  onClick={apagarProjeto}
+                >
+                  {apagando ? 'Apagando...' : 'Apagar'}
+                </button>
+              </div>
+            )}
+            {erroExclusao && <p className="detalhe-erro" role="alert">{erroExclusao}</p>}
           </header>
 
           {/* Quadro na ordem do desenho: imagem → descrição → tecnologias → links */}

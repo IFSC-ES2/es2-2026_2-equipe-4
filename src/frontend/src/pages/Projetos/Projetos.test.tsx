@@ -3,16 +3,20 @@ import { render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import userEvent from '@testing-library/user-event'
 import Projetos from './Projetos'
-import { MemoryRouter } from 'react-router-dom'
+import ProjetoDetalhe from '../ProjetoDetalhe/ProjetoDetalhe'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import ProvedorSessao from '../../sessao/ProvedorSessao'
 import { criarTokenTeste } from '../../sessao/tokenTeste'
 
 // A página usa <Link>, então precisa de um router nos testes.
 function renderizarProjetos() {
     render(
-        <MemoryRouter>
+        <MemoryRouter initialEntries={['/projetos']}>
             <ProvedorSessao>
-                <Projetos />
+                <Routes>
+                    <Route path="/projetos" element={<Projetos />} />
+                    <Route path="/projetos/:id" element={<ProjetoDetalhe />} />
+                </Routes>
             </ProvedorSessao>
         </MemoryRouter>,
     )
@@ -54,15 +58,22 @@ function simularSessao(projetos = [projetoTecnologia, projetoSaude], usuarioId =
     localStorage.setItem('token', token)
     const excluir = vi.fn().mockResolvedValue({ status: 204 })
     const listar = vi.fn().mockResolvedValue(respostaPagina(projetos))
-    const fetchApi = vi.fn((url: string, opcoes: RequestInit) => {
+    const fetchApi = vi.fn((url: string, opcoes?: RequestInit) => {
         if (url.endsWith('/auth/token')) {
             return Promise.resolve({ ok: true, json: async () => ({ userId: usuarioId }) })
         }
-        if (opcoes.method === 'DELETE') return excluir(url, opcoes)
+        if (opcoes?.method === 'DELETE') return excluir(url, opcoes)
+        const projeto = projetos.find(({ id }) => url.endsWith(`/projetos/${id}`))
+        if (projeto) return Promise.resolve({ ok: true, status: 200, json: async () => projeto })
         return listar(url, opcoes)
     })
     vi.stubGlobal('fetch', fetchApi)
     return { fetchApi, excluir, listar, token }
+}
+
+async function abrirDetalheDoAutor(usuario: ReturnType<typeof userEvent.setup>) {
+    await usuario.click(await screen.findByRole('link', { name: 'Gerenciar Horta inteligente' }))
+    return screen.findByRole('button', { name: 'Apagar', exact: true })
 }
 
 afterEach(() => {
@@ -217,7 +228,7 @@ describe('Projetos', () => {
         expect(fetchApi.mock.calls.map(([url]) => new URL(url).searchParams.get('page'))).toEqual(['0', '1', '1'])
     })
 
-    it('não oferece exclusão a visitantes', async () => {
+    it('não oferece gerenciamento a visitantes', async () => {
         const fetchApi = simularBusca()
 
         renderizarProjetos()
@@ -225,23 +236,27 @@ describe('Projetos', () => {
             'href', '/projetos/projeto-1',
         )
         expect(screen.queryByRole('button', { name: /apagar|excluir|exclusão|🗑️/i })).not.toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: /gerenciar/i })).not.toBeInTheDocument()
         expect(fetchApi).toHaveBeenCalledExactlyOnceWith(
             'http://localhost:8080/api/v1/projetos?page=0&size=100',
             expect.objectContaining({ signal: expect.any(AbortSignal) }),
         )
     })
 
-    it('oferece Apagar apenas nos projetos da conta atual', async () => {
+    it('oferece o lápis apenas nos projetos da conta atual e abre Apagar no detalhe', async () => {
         const { fetchApi, token } = simularSessao()
+        const usuario = userEvent.setup()
         renderizarProjetos()
 
-        expect(await screen.findByRole('button', { name: 'Apagar Horta inteligente' })).toBeInTheDocument()
+        expect(await screen.findByRole('link', { name: 'Gerenciar Horta inteligente' })).toBeInTheDocument()
         expect(screen.getByRole('heading', { name: 'Aplicativo de saúde' })).toBeInTheDocument()
-        expect(screen.queryByRole('button', { name: 'Apagar Aplicativo de saúde' })).not.toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: 'Gerenciar Aplicativo de saúde' })).not.toBeInTheDocument()
+        expect(screen.queryByRole('button', { name: /Apagar/ })).not.toBeInTheDocument()
         expect(fetchApi).toHaveBeenCalledWith(
             'http://localhost:8080/api/v1/auth/token',
             expect.objectContaining({ headers: { Authorization: `Bearer ${token}` } }),
         )
+        expect(await abrirDetalheDoAutor(usuario)).toBeInTheDocument()
     })
 
     it('mantém o projeto quando o autor cancela a confirmação', async () => {
@@ -250,7 +265,7 @@ describe('Projetos', () => {
         const usuario = userEvent.setup()
         renderizarProjetos()
 
-        await usuario.click(await screen.findByRole('button', { name: 'Apagar Horta inteligente' }))
+        await usuario.click(await abrirDetalheDoAutor(usuario))
 
         expect(confirmar).toHaveBeenCalledWith('Apagar o projeto "Horta inteligente"?')
         expect(excluir).not.toHaveBeenCalled()
@@ -258,13 +273,16 @@ describe('Projetos', () => {
     })
 
     it('envia o token e remove o projeto e seu filtro após a API confirmar a exclusão', async () => {
-        const { excluir, token } = simularSessao()
+        const { excluir, listar, token } = simularSessao()
+        listar
+            .mockResolvedValueOnce(respostaPagina([projetoTecnologia, projetoSaude]))
+            .mockResolvedValueOnce(respostaPagina([projetoSaude]))
         vi.spyOn(window, 'confirm').mockReturnValue(true)
         const usuario = userEvent.setup()
         renderizarProjetos()
         await usuario.click(await screen.findByRole('button', { name: 'Tecnologia 1' }))
 
-        await usuario.click(await screen.findByRole('button', { name: 'Apagar Horta inteligente' }))
+        await usuario.click(await abrirDetalheDoAutor(usuario))
 
         expect(excluir).toHaveBeenCalledExactlyOnceWith('http://localhost:8080/api/v1/projetos/projeto-1', {
             method: 'DELETE',
@@ -287,11 +305,11 @@ describe('Projetos', () => {
         const usuario = userEvent.setup()
         renderizarProjetos()
 
-        await usuario.click(await screen.findByRole('button', { name: 'Apagar Horta inteligente' }))
+        await usuario.click(await abrirDetalheDoAutor(usuario))
 
         expect(await screen.findByRole('alert')).toHaveTextContent(mensagem)
         expect(screen.getByRole('heading', { name: 'Horta inteligente' })).toBeInTheDocument()
-        expect(screen.getByRole('button', { name: 'Apagar Horta inteligente' })).toBeEnabled()
+        expect(screen.getByRole('button', { name: 'Apagar' })).toBeEnabled()
     })
 
     it('encerra a sessão e mantém o projeto quando a exclusão retorna 401', async () => {
@@ -301,7 +319,7 @@ describe('Projetos', () => {
         const usuario = userEvent.setup()
         renderizarProjetos()
 
-        await usuario.click(await screen.findByRole('button', { name: 'Apagar Horta inteligente' }))
+        await usuario.click(await abrirDetalheDoAutor(usuario))
 
         expect(await screen.findByRole('alert')).toHaveTextContent('Sua sessão terminou.')
         expect(screen.getByRole('heading', { name: 'Horta inteligente' })).toBeInTheDocument()
@@ -309,7 +327,7 @@ describe('Projetos', () => {
         expect(localStorage.getItem('token')).toBeNull()
     })
 
-    it('preenche a lacuna na paginação antes de carregar mais após uma exclusão', async () => {
+    it('retorna à primeira página atualizada e permite carregar mais após a exclusão', async () => {
         const { listar } = simularSessao()
         listar
             .mockResolvedValueOnce(respostaPagina([projetoTecnologia], 0, false))
@@ -319,7 +337,7 @@ describe('Projetos', () => {
         const usuario = userEvent.setup()
         renderizarProjetos()
 
-        await usuario.click(await screen.findByRole('button', { name: 'Apagar Horta inteligente' }))
+        await usuario.click(await abrirDetalheDoAutor(usuario))
         expect(await screen.findByRole('heading', { name: 'Aplicativo de saúde' })).toBeInTheDocument()
         await usuario.click(screen.getByRole('button', { name: 'Carregar mais projetos' }))
 
