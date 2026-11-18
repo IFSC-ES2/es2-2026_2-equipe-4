@@ -306,6 +306,36 @@ describe('Submissão de projeto', () => {
     expect(await screen.findByText(/Imagem inválida/)).toBeInTheDocument()
   })
 
+  it.each([{}, null])('interrompe a publicação quando o upload não retorna ID (%j)', async (corpo) => {
+    const fetchApi = vi.fn().mockResolvedValue({ ok: true, status: 201, json: async () => corpo })
+    vi.stubGlobal('fetch', fetchApi)
+    renderizarEnviar()
+    const usuario = userEvent.setup()
+
+    await preencherFormulario(usuario)
+    await usuario.upload(document.getElementById('imagens'), new File(['imagem'], 'capa.png', { type: 'image/png' }))
+    await usuario.click(screen.getByRole('button', { name: /publicar projeto na vitrine/i }))
+
+    expect(await screen.findByText(/não foi possível confirmar o envio de capa.png/i)).toBeInTheDocument()
+    expect(fetchApi).toHaveBeenCalledTimes(1)
+    expect(screen.getByLabelText(/nome do projeto/i)).toHaveValue('Projeto Teste')
+    expect(screen.getByRole('button', { name: 'Remover capa.png' })).toBeInTheDocument()
+  })
+
+  it('preserva o formulário quando a API não confirma a publicação com um ID', async () => {
+    const fetchApi = vi.fn().mockResolvedValue({ ok: true, status: 201, json: async () => ({}) })
+    vi.stubGlobal('fetch', fetchApi)
+    renderizarEnviar()
+    const usuario = userEvent.setup()
+
+    await preencherFormulario(usuario)
+    await usuario.click(screen.getByRole('button', { name: /publicar projeto na vitrine/i }))
+
+    expect(await screen.findByText(/não foi possível confirmar a publicação/i)).toBeInTheDocument()
+    expect(screen.queryByText('Projeto publicado com sucesso na vitrine!')).not.toBeInTheDocument()
+    expect(screen.getByLabelText(/nome do projeto/i)).toHaveValue('Projeto Teste')
+  })
+
   it('mostra o erro da API quando os metadados não são salvos', async () => {
     const fetchApi = vi.fn().mockResolvedValue({
       ok: false,
@@ -388,7 +418,7 @@ describe('Submissão de projeto', () => {
       .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'id-manter' }) })
       .mockResolvedValueOnce({ ok: true, json: async () => ({ id: 'id-remover' }) })
       .mockResolvedValueOnce({ ok: false, status: 500, json: async () => ({ erro: 'Falha ao publicar' }) })
-      .mockResolvedValueOnce({ ok: true })
+      .mockResolvedValueOnce({ ok: true, status: 201, json: async () => ({ id: 'id-projeto-123' }) })
     vi.stubGlobal('fetch', fetchApi)
     renderizarEnviar()
     const usuario = userEvent.setup()

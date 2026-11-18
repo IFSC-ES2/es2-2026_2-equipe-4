@@ -188,7 +188,8 @@ function Enviar() {
         }
         if (!respUpload.ok) throw new Error(await mensagemDeErro(respUpload, 'Falha ao processar imagens.'))
 
-        const { id } = await respUpload.json()
+        const dadosUpload = await respUpload.json().catch(() => null)
+        const id = dadosUpload?.id
         if (typeof id !== 'string' || !id.trim()) {
           throw new Error(`Não foi possível confirmar o envio de ${imagem.arquivo.name}. Tente novamente.`)
         }
@@ -224,6 +225,11 @@ function Enviar() {
         return
       }
       if (!respostaMetadados.ok) throw new Error(await mensagemDeErro(respostaMetadados, 'Erro ao salvar os metadados do projeto.'))
+
+      const projetoPublicado = await respostaMetadados.json().catch(() => null)
+      if (typeof projetoPublicado?.id !== 'string' || !projetoPublicado.id.trim()) {
+        throw new Error('Não foi possível confirmar a publicação. Confira a vitrine antes de tentar novamente.')
+      }
 
       setMensagem('Projeto publicado com sucesso na vitrine!')
       setFormulario(formularioInicial)
