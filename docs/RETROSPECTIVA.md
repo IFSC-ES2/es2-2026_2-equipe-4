@@ -19,9 +19,10 @@ por React ([ADR-0003](adr/ADR-0003.md)).
 | Revisão por pares | Removida do escopo | Não integra o fluxo atual do MVP. |
 | MySQL | Removida do escopo | Foi alternativa no plano; MongoDB é o banco implementado. |
 | Busca por texto | Pendente | Não disponível na galeria. |
-| Exclusão de projeto pela galeria/API | Pendente | Não foi localizada rota de exclusão de projeto; a exclusão citada na Sprint 4 refere-se à conta do próprio usuário. |
-| Staging e deploy automatizado | Removida da Sprint 4 | Issues #161 a #164 foram fechadas como não planejadas em 11/11. Depois da Sprint 4,  publicou o site e a API no Render e configurou o MongoDB Atlas; não há staging separado. Consulte [DEPLOY](DEPLOY.md). |
-| Backup e validação do tipo da imagem | Pendente | Limitações registradas no risco R06. |
+| Exclusão de projeto pelo autor | Concluída | Rota `DELETE /projetos/{id}` restrita ao autor e botão Apagar na galeria (#211, PR #212; #210, PR #213). |
+| Edição de projeto pelo autor | Pendente | Em andamento na #217; a interface ainda não oferece edição. |
+| Ambiente publicado e deploy automatizado | Concluída na Entrega 9 | Removidos da Sprint 4 (#161 a #164, não planejadas em 11/11). Na Entrega 9 a equipe publicou o site e a API no Render, com banco no MongoDB Atlas e deploy a partir da `main` (#189, #190, #191). Não há staging separado. Consulte [DEPLOY](DEPLOY.md). |
+| Backup e validação do tipo da imagem | Parcial | A interface valida as imagens antes do envio (#196, PR #205); o backend não valida o tipo no upload e não há backup (R06). |
 
 ## Indicadores observados
 
@@ -44,9 +45,12 @@ escopo na Sprint 3 coincidiu com queda da taxa, mas o crescimento de escopo na
 Sprint 4 trouxe novamente ajustes corretivos. As contribuições da Sprint 4
 estão associadas a PRs e revisões em [sprint-4.md](sprints/sprint-4.md).
 
-O Compose local torna o ambiente reproduzível, mas não atende ao requisito de
-ambiente remoto acessível. Permanecem riscos de backup, validação do conteúdo
-de imagens, `admin123` no histórico e checks não obrigatórios; estão
+Na Entrega 9 o foco foi consolidar: correções de front-end, exclusão pelo
+autor e o ambiente publicado no Render, além do Compose local reproduzível.
+As contribuições individuais desta entrega estão na
+[release candidate](entregas/release-candidate.md). Permanecem riscos de backup,
+validação do tipo das imagens no backend, `admin123` no histórico e checks não
+obrigatórios; estão
 detalhados em [riscos](riscos.md). O planejamento e a documentação devem ser
 iniciados antes do fechamento da sprint, com responsáveis e datas
 intermediárias para reduzir concentração de trabalho no prazo final.
