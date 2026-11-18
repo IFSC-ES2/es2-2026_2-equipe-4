@@ -325,6 +325,11 @@ Validação: Leitura e pequenas correções feitas
   Artefatos: Página de submissão, estilos e testes do frontend.
   Validação: Build, testes do frontend e ESLint da submissão passaram.
 
+- Data: 18/11/2026
+  Ferramenta: Codex
+  Uso: Implementação da rota de exclusão de projetos pelo autor e proteção contra recriação durante a troca de imagem (#211).
+  Artefatos: Controller, serviço, repositório, tratamento de erros e testes do backend de projetos.
+  Validação: Os 55 testes do backend passaram com Java 25 e MongoDB 8.
 
 
 
