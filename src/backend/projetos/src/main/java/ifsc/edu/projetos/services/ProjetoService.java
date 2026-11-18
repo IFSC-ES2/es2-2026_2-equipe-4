@@ -90,6 +90,7 @@ public class ProjetoService {
         ProjetoRespostaDTO imagem = armazenamentoArquivoService.salvarArquivo(arquivo);
         List<String> imagens = List.of(imagem.getId());
         if (projetoRepository.atualizarImagens(id, autorId, imagens) == 0) {
+            armazenamentoArquivoService.removerArquivo(imagem.getId());
             throw new NoSuchElementException("Projeto não encontrado");
         }
         projeto.setImagens(imagens);

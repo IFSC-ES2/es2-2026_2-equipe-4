@@ -97,6 +97,8 @@ jobs:
           cache-dependency-path: ./src/frontend/package-lock.json
       - name: Instalar dependências
         run: npm ci
+      - name: Rodar ESLint
+        run: npm run lint -- --max-warnings=0
       - name: Rodar testes de interface
         run: npm run test -- --run
 
@@ -157,3 +159,22 @@ jobs:
         run: docker compose up -d --build --wait
       - name: Conferir que a API responde
         run: curl --fail --retry 20 --retry-delay 3 --retry-all-errors http://localhost:8080/api/v1/auth/status
+      - name: Conferir o JSON da listagem de projetos
+        run: |
+          curl --fail --silent --show-error \
+            'http://localhost:8080/api/v1/projetos?page=0&size=1' \
+            --output /tmp/publicaifsc-projetos.json
+          python3 - <<'PY'
+          import json
+
+          with open('/tmp/publicaifsc-projetos.json', encoding='utf-8') as resposta:
+              pagina = json.load(resposta)
+          if pagina.get('number') != 0 or not isinstance(pagina.get('content'), list):
+              raise SystemExit('A API não retornou a primeira página de projetos.')
+          PY
+      - name: Conferir a página inicial do frontend
+        run: |
+          curl --fail --silent --show-error --retry 20 --retry-delay 3 --retry-all-errors \
+            http://localhost:5173/ --output /tmp/publicaifsc-frontend.html
+          grep -Fq '<title>PublicaIFSC</title>' /tmp/publicaifsc-frontend.html
+          grep -Fq 'id="root"' /tmp/publicaifsc-frontend.html

@@ -93,6 +93,24 @@ describe('Login', () => {
     expect(screen.getByRole('button', { name: /entrar/i })).toBeEnabled()
   })
 
+  it.each([{}, null])('recusa iniciar sessão quando o login não retorna token (%j)', async (corpo) => {
+    simularApiLogin(vi.fn().mockResolvedValue({ ok: true, json: async () => corpo }))
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>,
+      { wrapper: ProvedorSessao },
+    )
+    const usuario = userEvent.setup()
+
+    await preencherLogin(usuario)
+    await usuario.click(screen.getByRole('button', { name: /entrar/i }))
+
+    expect(await screen.findByText(/não foi possível iniciar sua sessão/i)).toBeInTheDocument()
+    expect(screen.queryByText('Acesso liberado!')).not.toBeInTheDocument()
+    expect(localStorage.getItem('token')).toBeNull()
+  })
+
   it('informa falha de conexão e permite uma nova tentativa', async () => {
     const responderLogin = vi.fn().mockRejectedValue(new TypeError('Failed to fetch'))
     simularApiLogin(responderLogin)

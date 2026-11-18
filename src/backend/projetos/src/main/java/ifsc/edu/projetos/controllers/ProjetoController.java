@@ -3,6 +3,7 @@ package ifsc.edu.projetos.controllers;
 import ifsc.edu.projetos.dtos.Projeto;
 import ifsc.edu.projetos.dtos.ProjetoRespostaDTO;
 import ifsc.edu.projetos.services.ProjetoService;
+import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.security.core.Authentication;
@@ -40,7 +41,7 @@ public class ProjetoController {
     // Rota 2: apenas os metadados (application/json)
     @PostMapping(value = "/metadados", consumes = "application/json")
     public ResponseEntity<Projeto> enviarMetadados(
-            @RequestBody Projeto metadadoDTO, Authentication authentication) {
+            @Valid @RequestBody Projeto metadadoDTO, Authentication authentication) {
 
         Projeto salvo = projetoService.salvarMetadados(metadadoDTO, authentication.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
