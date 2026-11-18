@@ -376,3 +376,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Remoção do texto do mapa de projetos e dos links sem destino no rodapé (#216).
   Artefatos: `MapaProjetos.jsx`, `MapaProjetos.css` e `Footer.jsx`.
   Validação: Build e ESLint do frontend passaram.
+
+- Data: 18/11/2026
+  Ferramenta: Claude
+  Uso: Apoio na atualização da release candidate, da retrospectiva e do README e no levantamento da contribuição individual da Entrega 9 (#215).
+  Artefatos: docs/entregas/release-candidate.md, docs/RETROSPECTIVA.md e README.md
+  Validação: PRs, autores, revisores e issues conferidos no GitHub, comportamento da galeria conferido no código
