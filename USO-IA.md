@@ -354,10 +354,22 @@ Validação: Leitura e pequenas correções feitas
   Validação: Build e 60 testes do frontend passaram. Os 50 testes do backend passaram, assim como os testes HTTP de autenticação e exclusão em uma cópia local com o PR #212.
 
 - Data: 18/11/2026
+  Ferramenta: Claude
+  Uso: Apoio na implementação da rota de edição dos dados do projeto pelo autor no backend
+  Artefatos: `ProjetoController.java`, `ProjetoService.java`
+  Validação: Compilação do backend e teste manual na API local
+
+- Data: 18/11/2026
   Ferramenta: Codex
   Uso: Implementação das melhorias de QA do MVP (#201), com validações de publicação e login, testes de imagens e gestão da conta, índice único de e-mail e verificações no CI.
   Artefatos: Código e testes em `src/backend/projetos` e `src/frontend`, além de `.github/workflows/ci.yml`.
   Validação: 59 testes do backend passaram com MongoDB 8 isolado e 65 testes do frontend passaram. ESLint, builds e verificações HTTP do Docker Compose passaram localmente.
+
+- Data: 18/11/2026
+  Ferramenta: Codex
+  Uso: Implementação do formulário de edição e das ações do autor no detalhe do projeto (#217).
+  Artefatos: Galeria, detalhe, formulário de submissão e adaptações nos testes existentes do frontend.
+  Validação: Build, ESLint e os 65 testes existentes do frontend passaram. A suíte do backend passou com MongoDB 8.
 
 - Data: 18/11/2026
   Ferramenta: Codex

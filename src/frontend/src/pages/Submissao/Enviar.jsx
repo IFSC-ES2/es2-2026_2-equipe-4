@@ -48,8 +48,21 @@ async function mensagemDeErro(resposta, padrao) {
   return (typeof erro === 'object' ? erro?.mensagem : erro) || padrao
 }
 
-function Enviar() {
-  const [formulario, setFormulario] = useState(formularioInicial)
+function Enviar({ projeto, onAtualizarProjeto, onFecharEdicao }) {
+  const editando = Boolean(projeto)
+  const [formulario, setFormulario] = useState(() => {
+    if (!projeto) return formularioInicial
+
+    return {
+      titulo: projeto.titulo ?? '',
+      resumo: projeto.resumo ?? '',
+      tema: projeto.tema ?? '',
+      autores: projeto.autores?.join(', ') ?? '',
+      tecnologias: projeto.tecnologias?.join(', ') ?? '',
+      linkRepositorio: projeto.linkRepositorio ?? '',
+      linkDemonstracao: projeto.linkDemonstracao ?? '',
+    }
+  })
   const [imagensSelecionadas, setImagensSelecionadas] = useState([])
   const [errosImagens, setErrosImagens] = useState([])
   const [arrastando, setArrastando] = useState(false)
@@ -81,6 +94,11 @@ function Enviar() {
   }
 
   function adicionarImagens(arquivos) {
+    if (editando && arquivos?.length > 1) {
+      setErrosImagens(['Selecione apenas uma imagem.'])
+      return
+    }
+
     const novasImagens = []
     const novosErros = []
 
@@ -94,7 +112,9 @@ function Enviar() {
       }
     }
 
-    setImagensSelecionadas(atuais => [...atuais, ...novasImagens])
+    setImagensSelecionadas(atuais => (
+      editando && novasImagens.length ? novasImagens : [...atuais, ...novasImagens]
+    ))
     setErrosImagens(novosErros)
     setMensagem('')
   }
@@ -144,7 +164,9 @@ function Enviar() {
 
     function interromperSessao() {
       if (!invalidarSessao(token)) {
-        setMensagem('Sua sessão mudou. Tente publicar o projeto novamente.')
+        setMensagem(editando
+          ? 'Sua sessão mudou. Tente salvar o projeto novamente.'
+          : 'Sua sessão mudou. Tente publicar o projeto novamente.')
       }
     }
 
@@ -160,9 +182,64 @@ function Enviar() {
 
     envioEmAndamento.current = true
     setCarregando(true)
-    setMensagem('Processando a submissão, aguarde...')
+    setMensagem(editando ? 'Salvando alterações, aguarde...' : 'Processando a submissão, aguarde...')
+
+    const payloadMetadados = {
+      titulo: formulario.titulo,
+      resumo: formulario.resumo,
+      tema: formulario.tema,
+      autores: separarLista(formulario.autores),
+      tecnologias: separarLista(formulario.tecnologias),
+      linkRepositorio: formulario.linkRepositorio,
+      linkDemonstracao: formulario.linkDemonstracao,
+    }
+    let dadosEdicaoSalvos = false
 
     try {
+      if (editando) {
+        const urlProjeto = `${API_BASE_URL}/api/v1/projetos/${encodeURIComponent(projeto.id)}`
+        const autorizacao = { Authorization: `Bearer ${token}` }
+        const resposta = await fetch(urlProjeto, {
+          method: 'PUT',
+          headers: { ...autorizacao, 'Content-Type': 'application/json' },
+          body: JSON.stringify(payloadMetadados),
+        })
+        if (resposta.status === 401) {
+          interromperSessao()
+          return
+        }
+        if (!resposta.ok) throw new Error(await mensagemDeErro(resposta, 'Não foi possível salvar o projeto.'))
+
+        let atualizado = await resposta.json()
+        if (atualizado?.id !== projeto.id) throw new Error('Não foi possível confirmar a edição do projeto.')
+
+        const imagem = imagensSelecionadas[0]
+        if (imagem) {
+          onAtualizarProjeto(atualizado)
+          dadosEdicaoSalvos = true
+          const arquivo = new FormData()
+          arquivo.append('arquivo', imagem.arquivo)
+          const respostaImagem = await fetch(`${urlProjeto}/imagem`, {
+            method: 'PUT',
+            headers: autorizacao,
+            body: arquivo,
+          })
+          if (respostaImagem.status === 401) {
+            interromperSessao()
+            return
+          }
+          if (!respostaImagem.ok) {
+            throw new Error(await mensagemDeErro(respostaImagem, 'Não foi possível trocar a imagem.'))
+          }
+          const { imagens } = await respostaImagem.json()
+          atualizado = { ...atualizado, imagens }
+        }
+
+        onAtualizarProjeto(atualizado)
+        onFecharEdicao()
+        return
+      }
+
       const idsImagens = []
       for (const imagem of imagensSelecionadas) {
         if (imagem.idUpload) {
@@ -200,24 +277,13 @@ function Enviar() {
         idsImagens.push(id)
       }
 
-      const payloadMetadados = {
-        titulo: formulario.titulo,
-        resumo: formulario.resumo,
-        tema: formulario.tema,
-        autores: separarLista(formulario.autores),
-        tecnologias: separarLista(formulario.tecnologias),
-        imagens: idsImagens,
-        linkRepositorio: formulario.linkRepositorio,
-        linkDemonstracao: formulario.linkDemonstracao,
-      }
-
       const respostaMetadados = await fetch(`${API_BASE_URL}/api/v1/projetos/metadados`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(payloadMetadados),
+        body: JSON.stringify({ ...payloadMetadados, imagens: idsImagens }),
       })
 
       if (respostaMetadados.status === 401) {
@@ -239,7 +305,8 @@ function Enviar() {
       event.target.reset()
 
     } catch (erro) {
-      setMensagem(erro.message.includes('Failed to fetch') ? 'Erro de conexão: Sistema fora do ar!' : erro.message)
+      const mensagemErro = erro.message.includes('Failed to fetch') ? 'Erro de conexão: Sistema fora do ar!' : erro.message
+      setMensagem(dadosEdicaoSalvos ? `Os dados foram salvos. ${mensagemErro}` : mensagemErro)
     } finally {
       envioEmAndamento.current = false
       setCarregando(false)
@@ -254,7 +321,7 @@ function Enviar() {
     <main className="pagina-submissao" style={{ background: '#f8fafc', paddingBottom: '60px' }}>
       <header className="cabecalho-submissao" style={{ background: 'transparent', padding: '60px 24px 20px', borderBottom: 'none' }}>
         <p style={{ color: '#146c5a' }}>Área do Criador</p>
-        <h1>Publicar Novo Projeto</h1>
+        <h1>{editando ? 'Editar Projeto' : 'Publicar Novo Projeto'}</h1>
       </header>
 
       <form className="formulario-submissao" onSubmit={enviarFormulario} style={{ background: '#ffffff', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)', padding: '40px' }} noValidate>
@@ -310,7 +377,7 @@ function Enviar() {
         </label>
 
         <div className="campo campo-largo campo-arquivo">
-          <span>Screenshots do Projeto</span>
+          <span>{editando ? 'Trocar imagem do projeto' : 'Screenshots do Projeto'}</span>
           <label
             className={`enviar ${arrastando ? 'arrastando' : ''} ${carregando ? 'desabilitado' : ''}`}
             htmlFor="imagens"
@@ -320,12 +387,15 @@ function Enviar() {
             style={{ padding: '32px', background: '#f8fafc', border: '2px dashed #cbd5e1' }}
           >
             <div style={{ fontSize: '32px', marginBottom: '12px', opacity: 0.5 }}>📸</div>
-            <strong style={{ color: '#0f172a' }}>Clique para selecionar imagens</strong>
+            <strong style={{ color: '#0f172a' }}>
+              {editando ? 'Clique para selecionar uma imagem' : 'Clique para selecionar imagens'}
+            </strong>
             <span id="formatos-imagens" style={{ color: '#64748b' }}>
-              Ou arraste e solte arquivos aqui. {nomesFormatosImagem}, até {limiteImagemMB} MB por imagem.
+              {editando ? 'Ou arraste e solte uma imagem aqui.' : 'Ou arraste e solte arquivos aqui.'}{' '}
+              {nomesFormatosImagem}, até {limiteImagemMB} MB por imagem.
             </span>
           </label>
-          <input id="imagens" className="arquivo-input" name="imagens" type="file" multiple accept={formatosImagem.join(',')} aria-describedby="formatos-imagens" onChange={selecionarImagens} disabled={carregando} />
+          <input id="imagens" className="arquivo-input" name="imagens" type="file" multiple={!editando} accept={formatosImagem.join(',')} aria-describedby="formatos-imagens" onChange={selecionarImagens} disabled={carregando} />
 
           {errosImagens.length > 0 && (
             <ul role="alert" className="erros-imagens">
@@ -357,8 +427,15 @@ function Enviar() {
 
         <div className="acoes-formulario campo-largo" style={{ marginTop: '16px' }}>
           <button type="submit" disabled={carregando} style={{ width: '100%', height: '52px', fontSize: '16px' }}>
-            {carregando ? 'Processando e publicando...' : 'Publicar Projeto na Vitrine'}
+            {editando
+              ? (carregando ? 'Salvando...' : 'Salvar alterações')
+              : (carregando ? 'Processando e publicando...' : 'Publicar Projeto na Vitrine')}
           </button>
+          {editando && (
+            <button type="button" disabled={carregando} onClick={onFecharEdicao} style={{ marginTop: '12px' }}>
+              Cancelar
+            </button>
+          )}
           
           {mensagem && (
             <div role="status" style={{ marginTop: '16px', padding: '16px', borderRadius: '8px', background: mensagem.includes('sucesso') ? '#f0fdf4' : '#fef2f2', color: mensagem.includes('sucesso') ? '#15803d' : '#b91c1c', border: `1px solid ${mensagem.includes('sucesso') ? '#bbf7d0' : '#fecaca'}`, textAlign: 'center', fontWeight: '500', fontSize: '14px' }}>
