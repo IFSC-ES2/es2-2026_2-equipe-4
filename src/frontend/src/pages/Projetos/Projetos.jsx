@@ -2,16 +2,13 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import MapaProjetos from '../../components/MapaProjetos/MapaProjetos';
 import { API_BASE_URL, urlImagem } from '../../config/api';
-import { useSessao } from '../../sessao/contextoSessao';
+import { useUsuarioId } from '../../sessao/useUsuarioId';
 
 const tamanhoPagina = 100;
 
 function Projetos() {
   const navigate = useNavigate();
-  const { token, invalidarSessao } = useSessao();
-  const [identidade, setIdentidade] = useState(null);
-  const [projetoEmExclusao, setProjetoEmExclusao] = useState(null);
-  const [erroExclusao, setErroExclusao] = useState(null);
+  const usuarioId = useUsuarioId();
   const [temaSelecionado, setTemaSelecionado] = useState('Todos');
   const [consulta, setConsulta] = useState({ pagina: 0 });
   const [resultado, setResultado] = useState({
@@ -25,36 +22,6 @@ function Projetos() {
   const carregando = resultado.consulta !== consulta;
   const erro = !carregando && resultado.erro;
   const carregouPrimeiraPagina = proximaPagina !== 0;
-  const usuarioId = token && identidade?.token === token ? identidade.usuarioId : null;
-
-  useEffect(() => {
-    if (!token) return;
-
-    const controlador = new AbortController();
-    const { signal } = controlador;
-
-    async function buscarIdentidade() {
-      try {
-        const resposta = await fetch(`${API_BASE_URL}/api/v1/auth/token`, {
-          headers: { Authorization: `Bearer ${token}` },
-          signal,
-        });
-        if (signal.aborted) return;
-        if (resposta.status === 401) invalidarSessao(token);
-        if (!resposta.ok) return;
-
-        const { userId } = await resposta.json();
-        if (!signal.aborted && typeof userId === 'string' && userId) {
-          setIdentidade({ token, usuarioId: userId });
-        }
-      } catch {
-        // A galeria pública continua disponível se a identidade não puder ser confirmada.
-      }
-    }
-
-    buscarIdentidade();
-    return () => controlador.abort();
-  }, [token, invalidarSessao]);
 
   useEffect(() => {
     const controlador = new AbortController();
@@ -94,42 +61,6 @@ function Projetos() {
     buscarProjetos();
     return () => controlador.abort();
   }, [consulta]);
-
-  async function apagarProjeto(evento, projeto) {
-    evento.stopPropagation();
-    if (!usuarioId || projeto.autorId !== usuarioId || projetoEmExclusao || carregando) return;
-    if (!window.confirm(`Apagar o projeto "${projeto.titulo}"?`)) return;
-
-    setProjetoEmExclusao(projeto.id);
-    setErroExclusao(null);
-    try {
-      const resposta = await fetch(`${API_BASE_URL}/api/v1/projetos/${encodeURIComponent(projeto.id)}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (resposta.status === 401) {
-        invalidarSessao(token);
-        throw new Error('Sua sessão terminou. Entre novamente para apagar o projeto.');
-      }
-      if (resposta.status === 403) throw new Error('Apenas o autor pode apagar este projeto.');
-      if (resposta.status !== 204) throw new Error('Não foi possível apagar o projeto. Tente novamente.');
-
-      const restantes = projetos.filter(({ id }) => id !== projeto.id);
-      setResultado((anterior) => ({ ...anterior, projetos: restantes }));
-      setTemaSelecionado((tema) => restantes.some((item) => item.tema === tema) ? tema : 'Todos');
-
-      // Uma exclusão desloca as páginas seguintes. Recarregue a última página para preencher a lacuna.
-      if (proximaPagina !== null) setConsulta({ pagina: proximaPagina - 1 });
-    } catch (erro) {
-      const mensagem = erro instanceof TypeError
-        ? 'Não foi possível apagar o projeto. Verifique sua conexão e tente novamente.'
-        : erro.message;
-      setErroExclusao({ id: projeto.id, mensagem });
-    } finally {
-      setProjetoEmExclusao(null);
-    }
-  }
 
   const temasDinamicos = useMemo(() => {
     const temas = Array.from(new Set(projetos.map(p => p.tema).filter(Boolean)));
@@ -276,23 +207,18 @@ function Projetos() {
                               </a>
                             )}
                             {usuarioId && projeto.autorId === usuarioId && (
-                              <button
-                                type="button"
-                                disabled={projetoEmExclusao !== null || carregando}
-                                onClick={(evento) => apagarProjeto(evento, projeto)}
-                                aria-label={`Apagar ${projeto.titulo}`}
-                                style={{ background: '#fef2f2', color: '#991b1b', border: '1px solid #fecaca', padding: '6px 12px', borderRadius: '6px', fontSize: '13px', fontWeight: '600' }}
+                              <Link
+                                to={`/projetos/${encodeURIComponent(projeto.id)}`}
+                                onClick={(evento) => evento.stopPropagation()}
+                                aria-label={`Gerenciar ${projeto.titulo}`}
+                                title="Gerenciar projeto"
+                                style={{ display: 'inline-grid', placeItems: 'center', minWidth: '32px', borderRadius: '6px', background: '#f1f5f9', color: '#0f172a', fontSize: '18px', textDecoration: 'none' }}
                               >
-                                {projetoEmExclusao === projeto.id ? 'Apagando...' : 'Apagar'}
-                              </button>
+                                <span aria-hidden="true">✎</span>
+                              </Link>
                             )}
                           </div>
                         </div>
-                        {erroExclusao?.id === projeto.id && (
-                          <p role="alert" style={{ color: '#b91c1c', fontSize: '13px' }}>
-                            {erroExclusao.mensagem}
-                          </p>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -313,7 +239,7 @@ function Projetos() {
           {proximaPagina !== null && (carregouPrimeiraPagina || erro) && (
             <button
               type="button"
-              disabled={carregando || projetoEmExclusao !== null}
+              disabled={carregando}
               onClick={() => setConsulta({ pagina: erro ? consulta.pagina : proximaPagina })}
             >
               {carregando ? 'Carregando mais projetos...' : erro ? 'Tentar novamente' : 'Carregar mais projetos'}

@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import ProvedorSessao from '../../sessao/ProvedorSessao'
 import ProjetoDetalhe from './ProjetoDetalhe'
 
 const projeto = {
@@ -25,11 +26,13 @@ function simularResposta(resposta) {
 
 function renderizar(id = 'projeto-1') {
   render(
-    <MemoryRouter initialEntries={[`/projetos/${id}`]}>
-      <Routes>
-        <Route path="/projetos/:id" element={<ProjetoDetalhe />} />
-      </Routes>
-    </MemoryRouter>,
+    <ProvedorSessao>
+      <MemoryRouter initialEntries={[`/projetos/${id}`]}>
+        <Routes>
+          <Route path="/projetos/:id" element={<ProjetoDetalhe />} />
+        </Routes>
+      </MemoryRouter>
+    </ProvedorSessao>,
   )
 }
 
