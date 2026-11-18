@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.BsonObjectId;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 
@@ -43,13 +44,15 @@ class ProjetoUploadControllerTest {
     private ProjetoRepository repository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private MongoTemplate mongoTemplate;
 
     private MockMvc mvc;
 
     @BeforeEach
     void configurar() {
         ProjetoService projetos = new ProjetoService(repository,
-                new ArmazenamentoArquivoService(gridFsTemplate), userRepository);
+                new ArmazenamentoArquivoService(gridFsTemplate), userRepository, mongoTemplate);
         mvc = MockMvcBuilders.standaloneSetup(new ProjetoController(projetos))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();

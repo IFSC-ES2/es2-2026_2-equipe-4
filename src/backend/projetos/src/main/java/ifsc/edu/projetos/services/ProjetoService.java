@@ -2,9 +2,15 @@ package ifsc.edu.projetos.services;
 
 import ifsc.edu.projetos.accountcreation.entity.User;
 import ifsc.edu.projetos.accountcreation.repository.UserRepository;
+import ifsc.edu.projetos.dtos.AtualizacaoProjeto;
 import ifsc.edu.projetos.dtos.Projeto;
 import ifsc.edu.projetos.dtos.ProjetoRespostaDTO;
 import ifsc.edu.projetos.repositories.ProjetoRepository;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -21,12 +27,14 @@ public class ProjetoService {
     private final ProjetoRepository projetoRepository;
     private final ArmazenamentoArquivoService armazenamentoArquivoService;
     private final UserRepository userRepository; // Usado para descobrir o id do usuário logado a partir do e-mail
+    private final MongoTemplate mongoTemplate;
 
     public ProjetoService(ProjetoRepository projetoRepository, ArmazenamentoArquivoService armazenamentoArquivoService,
-                          UserRepository userRepository) {
+                          UserRepository userRepository, MongoTemplate mongoTemplate) {
         this.projetoRepository = projetoRepository;
         this.armazenamentoArquivoService = armazenamentoArquivoService;
         this.userRepository = userRepository;
+        this.mongoTemplate = mongoTemplate;
     }
 
     public ProjetoRespostaDTO salvarArquivo(MultipartFile arquivo) {
@@ -45,6 +53,29 @@ public class ProjetoService {
 
         if (projetoRepository.existsById(id)) {
             throw new AccessDeniedException("Apenas o autor pode excluir o projeto");
+        }
+        throw new NoSuchElementException("Projeto não encontrado");
+    }
+
+    public Projeto atualizarProjeto(String id, AtualizacaoProjeto dados, String emailAutor) {
+        String autorId = userRepository.findIdByEmail(emailAutor).map(User::getId).orElse(null);
+        if (autorId != null) {
+            Query filtro = Query.query(Criteria.where("_id").is(id).and("autorId").is(autorId));
+            Update alteracoes = new Update()
+                    .set("titulo", dados.titulo())
+                    .set("resumo", dados.resumo())
+                    .set("autores", dados.autores())
+                    .set("tema", dados.tema())
+                    .set("tecnologias", dados.tecnologias())
+                    .set("linkRepositorio", dados.linkRepositorio())
+                    .set("linkDemonstracao", dados.linkDemonstracao());
+            Projeto atualizado = mongoTemplate.findAndModify(
+                    filtro, alteracoes, FindAndModifyOptions.options().returnNew(true), Projeto.class);
+            if (atualizado != null) return atualizado;
+        }
+
+        if (projetoRepository.existsById(id)) {
+            throw new AccessDeniedException("Apenas o autor pode editar o projeto");
         }
         throw new NoSuchElementException("Projeto não encontrado");
     }

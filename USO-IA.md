@@ -358,3 +358,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Implementação das melhorias de QA do MVP (#201), com validações de publicação e login, testes de imagens e gestão da conta, índice único de e-mail e verificações no CI.
   Artefatos: Código e testes em `src/backend/projetos` e `src/frontend`, além de `.github/workflows/ci.yml`.
   Validação: 59 testes do backend passaram com MongoDB 8 isolado e 65 testes do frontend passaram. ESLint, builds e verificações HTTP do Docker Compose passaram localmente.
+
+- Data: 18/11/2026
+  Ferramenta: Codex
+  Uso: Implementação da edição de dados e da troca de imagem pelo autor do projeto (#217).
+  Artefatos: Rota e formulário de edição, ícone de lápis na galeria, ações no detalhe e README.
+  Validação: Build e ESLint do frontend passaram. Os 59 testes existentes do backend passaram com MongoDB sem autenticação, como no CI. A rota respondeu 200 para o autor e 403 para outro usuário.

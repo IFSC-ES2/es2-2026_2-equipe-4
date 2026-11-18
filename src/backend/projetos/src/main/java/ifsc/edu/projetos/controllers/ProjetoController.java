@@ -1,5 +1,6 @@
 package ifsc.edu.projetos.controllers;
 
+import ifsc.edu.projetos.dtos.AtualizacaoProjeto;
 import ifsc.edu.projetos.dtos.Projeto;
 import ifsc.edu.projetos.dtos.ProjetoRespostaDTO;
 import ifsc.edu.projetos.services.ProjetoService;
@@ -51,6 +52,12 @@ public class ProjetoController {
     public ResponseEntity<Void> excluirProjeto(@PathVariable String id, Authentication authentication) {
         projetoService.excluirProjeto(id, authentication.getName());
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(value = "/{id}", consumes = "application/json")
+    public ResponseEntity<Projeto> atualizarProjeto(@PathVariable String id,
+            @Valid @RequestBody AtualizacaoProjeto dados, Authentication authentication) {
+        return ResponseEntity.ok(projetoService.atualizarProjeto(id, dados, authentication.getName()));
     }
 
     // Rota 3: troca a imagem do projeto (multipart/form-data, campo "arquivo")
