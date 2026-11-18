@@ -9,6 +9,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.AccessDeniedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,6 +46,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResponseErro> handleAuthException(AuthException ex, HttpServletRequest request) {
         ResponseErro response = new ResponseErro(401, Map.of("mensagem", ex.getMessage()), request.getRequestURI());
         return ResponseEntity.status(401).body(response);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ResponseErro> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
+        ResponseErro response = new ResponseErro(403, Map.of("mensagem", ex.getMessage()), request.getRequestURI());
+        return ResponseEntity.status(403).body(response);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

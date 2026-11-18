@@ -46,6 +46,12 @@ public class ProjetoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluirProjeto(@PathVariable String id, Authentication authentication) {
+        projetoService.excluirProjeto(id, authentication.getName());
+        return ResponseEntity.noContent().build();
+    }
+
     // Rota 3: troca a imagem do projeto (multipart/form-data, campo "arquivo")
     @PutMapping(value = "/{id}/imagem", consumes = "multipart/form-data")
     public ResponseEntity<Projeto> trocarImagem(@PathVariable String id,

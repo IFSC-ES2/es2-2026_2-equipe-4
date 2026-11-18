@@ -6,6 +6,7 @@ import ifsc.edu.projetos.dtos.Projeto;
 import ifsc.edu.projetos.dtos.ProjetoRespostaDTO;
 import ifsc.edu.projetos.repositories.ProjetoRepository;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,6 +35,18 @@ public class ProjetoService {
 
     public Optional<GridFsResource> buscarArquivo(String id) {
         return armazenamentoArquivoService.buscarArquivo(id);
+    }
+
+    public void excluirProjeto(String id, String emailAutor) {
+        String autorId = userRepository.findIdByEmail(emailAutor).map(User::getId).orElse(null);
+        if (autorId != null && projetoRepository.deleteByIdAndAutorId(id, autorId) > 0) {
+            return;
+        }
+
+        if (projetoRepository.existsById(id)) {
+            throw new AccessDeniedException("Apenas o autor pode excluir o projeto");
+        }
+        throw new NoSuchElementException("Projeto não encontrado");
     }
 
     // emailAutor vem do token JWT (authentication.getName() no controller), nunca do corpo da requisição
@@ -75,8 +88,12 @@ public class ProjetoService {
         }
 
         ProjetoRespostaDTO imagem = armazenamentoArquivoService.salvarArquivo(arquivo);
-        projeto.setImagens(List.of(imagem.getId()));
-        return projetoRepository.save(projeto);
+        List<String> imagens = List.of(imagem.getId());
+        if (projetoRepository.atualizarImagens(id, autorId, imagens) == 0) {
+            throw new NoSuchElementException("Projeto não encontrado");
+        }
+        projeto.setImagens(imagens);
+        return projeto;
     }
 
     public List<Projeto> listarTodos(){
