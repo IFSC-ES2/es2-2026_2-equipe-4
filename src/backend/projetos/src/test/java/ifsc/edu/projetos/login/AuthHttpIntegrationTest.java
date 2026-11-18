@@ -1,5 +1,6 @@
 package ifsc.edu.projetos.login;
 
+import com.jayway.jsonpath.JsonPath;
 import ifsc.edu.projetos.accountcreation.entity.User;
 import ifsc.edu.projetos.accountcreation.repository.UserRepository;
 import ifsc.edu.projetos.login.security.JwtUtil;
@@ -84,7 +85,10 @@ class AuthHttpIntegrationTest {
         assertTrue(tokenJson.find(), login.body());
         String token = tokenJson.group(1);
 
-        assertEquals(200, get("/auth/token", "Bearer " + token).statusCode());
+        HttpResponse<String> sessao = get("/auth/token", "Bearer " + token);
+        assertEquals(200, sessao.statusCode(), sessao.body());
+        assertEquals("Token válido", JsonPath.read(sessao.body(), "$.mensagem"));
+        assertEquals(salvo.getId(), JsonPath.read(sessao.body(), "$.userId"));
         assertEquals(401, get("/auth/token", null).statusCode());
         assertEquals(401, get("/auth/token", "Bearer token-invalido").statusCode());
 
