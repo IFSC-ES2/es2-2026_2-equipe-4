@@ -19,7 +19,7 @@ Não versione valores sensíveis; consulte [configuração de ambiente e deploy]
 
 ## Ambiente de validação
 
-O ambiente de validação é o Docker Compose local, reprodutível, com pré-requisitos, variáveis, comandos e validação rápida em [docs/DEPLOY.md](docs/DEPLOY.md), a interface e a API sobem nos endereços da seção Executar.
+O ambiente publicado usa Render para o site e a API e MongoDB Atlas para os dados. Acesse o [site do PublicaIFSC](https://publicaifsc.onrender.com/) e a [API](https://publicaifsc-api.onrender.com/api/v1). O ambiente local com Docker Compose também é reprodutível. Configuração, credenciais de avaliação e validação estão em [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Tecnologias
 
@@ -124,32 +124,34 @@ Em outro terminal, a partir da raiz, execute `cd src/frontend` e:
 | Windows (PowerShell) | `npm.cmd ci` | `npm.cmd test -- --run` |
 
 O [CI](.github/workflows/ci.yml) executa testes, builds e verificações de
-documentação em PRs para `main` e `entrega-*`.
+documentação em PRs para `main` e `entrega-*` e em pushes para a `main`.
 
-## Limitações e pendências
+## MVP entregue e limitações
 
-- A galeria carrega até 100 projetos; busca por texto ainda está pendente.
-- Staging e deploy automatizado não foram entregues, a validação é feita localmente com Docker Compose.
+O MVP é uma vitrine de projetos universitários com cadastro/login, publicação autenticada, galeria pública e páginas de detalhe. Consulte o [resumo da release](docs/entregas/release-candidate.md). O ambiente publicado e o ambiente local de avaliação estão descritos em [docs/DEPLOY.md](docs/DEPLOY.md). A API usa o plano gratuito do Render e pode levar cerca de um minuto para responder após ficar inativa.
+
+- A galeria carrega os projetos em páginas de 100, busca por texto ainda está pendente.
+- Não há staging separado do ambiente publicado, backup automatizado ou monitoramento configurado.
 - O limite de upload de imagem é de 5 MB, acima disso a API responde 413.
-- A exclusão pela galeria ainda não tem suporte na API.
 
 ## Documentação e acompanhamento
 
-- [Arquitetura](docs/ARQUITETURA.md), [ADRs](docs/adr/) e [reengenharia e medições](docs/REENGENHARIA.md).
+- [Arquitetura](docs/ARQUITETURA.md), [diagramas](docs/diagramas/), [padrões de projeto](docs/PADROES-DE-PROJETO.md), [ADRs](docs/adr/) e [reengenharia e medições](docs/REENGENHARIA.md).
+- [Retrospectiva](docs/RETROSPECTIVA.md) e [release candidate](docs/entregas/release-candidate.md).
 - [Registro da Sprint 3](docs/sprints/sprint-3.md) e [Sprint 4](docs/sprints/sprint-4.md).
 - [Métricas](docs/METRICAS.md) e [fichas](docs/metricas/).
 - [Riscos](docs/riscos.md), [qualidade](docs/qualidade.md) e [DoD](docs/dod.md).
 - [Uso de IA](USO-IA.md) e [fluxo de trabalho](docs/fluxo-de-trabalho.md).
 - Histórico: [Inception](docs/inception.md), [baseline](docs/BASELINE.md), [estimativas](docs/ESTIMATIVAS.md), [Sprint 1](docs/sprints/sprint-1.md) e [Sprint 2](docs/sprints/sprint-2.md). Inception e baseline registram o escopo inicial de artigos; o produto atual é a vitrine de projetos.
 - [Board](https://github.com/orgs/IFSC-ES2/projects/34) e [backlog](https://github.com/IFSC-ES2/es2-2026_2-equipe-4/issues).
-- API: [login](src/backend/docs/rotas-login.md), [contas](src/backend/docs/rotas-de-criacao-de-contas.md) e [listagem pública](src/backend/docs/rotas-publicas-de-listagem-de-projetos.md). A rota autenticada `PUT /api/v1/projetos/{id}/imagem` troca a imagem de um projeto; envie o arquivo multipart no campo `arquivo`. A rota pública `GET /api/v1/projetos/imagens/{id}` devolve uma imagem enviada.
+- API: [login](src/backend/docs/rotas-login.md), [contas](src/backend/docs/rotas-de-criacao-de-contas.md) e [listagem pública](src/backend/docs/rotas-publicas-de-listagem-de-projetos.md). A rota autenticada `PUT /api/v1/projetos/{id}` edita os dados de um projeto (JSON com título, resumo, autores, tema, tecnologias e links), apenas pelo autor. A rota autenticada `PUT /api/v1/projetos/{id}/imagem` troca a imagem de um projeto; envie o arquivo multipart no campo `arquivo`. A rota pública `GET /api/v1/projetos/imagens/{id}` devolve uma imagem enviada.
 
 ## Equipe
 
-| Nome | Papel | Matrícula |
-|---|---|---|
-| Bernardo Vieira de Souza | Arquiteto de Software / Scrum Master | 202510703707 |
-| Marcos Júnior Lemes Ferreira | DevOps / Infra | 202510703657 |
-| Juliano Tavares da Silva | Engenheiro de Qualidade | 202510704909 |
-| Pedro Henrique Bernhardt Valete | DBA | 202510703675 |
-| Gabriel Ferreira de Souza da Silva | Front-end Dev | 202410004990 |
+| Nome | Papel                                  | Matrícula |
+|---|----------------------------------------|---|
+| Bernardo Vieira de Souza | Arquiteto de Software                  | 202510703707 |
+| Marcos Júnior Lemes Ferreira | DevOps / Infra                         | 202510703657 |
+| Juliano Tavares da Silva | Engenheiro de Qualidade / Scrum Master | 202510704909 |
+| Pedro Henrique Bernhardt Valete | DBA                                    | 202510703675 |
+| Gabriel Ferreira de Souza da Silva | Front-end Dev                          | 202410004990 |

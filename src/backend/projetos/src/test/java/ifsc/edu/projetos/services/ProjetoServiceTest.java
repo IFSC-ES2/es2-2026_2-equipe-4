@@ -210,7 +210,7 @@ class ProjetoServiceTest {
         when(repository.findById("projeto-1")).thenReturn(Optional.of(projeto));
         when(userRepository.findIdByEmail("ana@exemplo.com")).thenReturn(Optional.of(autor));
         when(armazenamentoArquivoService.salvarArquivo(arquivo)).thenReturn(imagemSalva);
-        when(repository.save(any(Projeto.class))).thenReturn(projeto);
+        when(repository.atualizarImagens("projeto-1", "autor-1", List.of("imagem-nova"))).thenReturn(1L);
 
         // Executar
         Projeto resultado = projetoService.trocarImagem("projeto-1", arquivo, "ana@exemplo.com");
@@ -223,13 +223,34 @@ class ProjetoServiceTest {
         assertEquals("Sistema para monitorar uma horta.", resultado.getResumo());
         verify(armazenamentoArquivoService).salvarArquivo(arquivo);
 
-        ArgumentCaptor<Projeto> projetoEnviadoAoBanco = ArgumentCaptor.forClass(Projeto.class);
-        verify(repository).save(projetoEnviadoAoBanco.capture());
-        assertEquals(List.of("imagem-nova"), projetoEnviadoAoBanco.getValue().getImagens());
-        assertEquals("projeto-1", projetoEnviadoAoBanco.getValue().getId());
-        assertEquals("autor-1", projetoEnviadoAoBanco.getValue().getAutorId());
-        assertEquals("Horta inteligente", projetoEnviadoAoBanco.getValue().getTitulo());
-        assertEquals("Sistema para monitorar uma horta.", projetoEnviadoAoBanco.getValue().getResumo());
+        verify(repository).atualizarImagens("projeto-1", "autor-1", List.of("imagem-nova"));
+        verify(repository, never()).save(any(Projeto.class));
+    }
+
+    @Test
+    @DisplayName("Trocar imagem remove o upload novo se o projeto foi excluído")
+    void trocarImagemDeProjetoExcluidoDuranteUploadRemoveArquivoNovo() {
+        Projeto projeto = new Projeto();
+        projeto.setId("projeto-1");
+        projeto.setAutorId("autor-1");
+        projeto.setImagens(List.of("imagem-antiga"));
+        User autor = new User();
+        autor.setId("autor-1");
+        MockMultipartFile arquivo = new MockMultipartFile("arquivo", new byte[]{1});
+        ProjetoRespostaDTO imagem = new ProjetoRespostaDTO(
+                "imagem-nova", "nova-imagem.png", "imagem-nova", 1, "Arquivo salvo com sucesso");
+
+        when(repository.findById("projeto-1")).thenReturn(Optional.of(projeto));
+        when(userRepository.findIdByEmail("ana@exemplo.com")).thenReturn(Optional.of(autor));
+        when(armazenamentoArquivoService.salvarArquivo(arquivo)).thenReturn(imagem);
+        when(repository.atualizarImagens("projeto-1", "autor-1", List.of("imagem-nova"))).thenReturn(0L);
+
+        assertThrows(NoSuchElementException.class,
+                () -> projetoService.trocarImagem("projeto-1", arquivo, "ana@exemplo.com"));
+        assertEquals(List.of("imagem-antiga"), projeto.getImagens());
+        verify(armazenamentoArquivoService).removerArquivo("imagem-nova");
+        verify(armazenamentoArquivoService, never()).removerArquivo("imagem-antiga");
+        verify(repository, never()).save(any(Projeto.class));
     }
 
     @Test

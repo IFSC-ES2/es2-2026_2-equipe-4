@@ -3,6 +3,7 @@ package ifsc.edu.projetos.controllers;
 import ifsc.edu.projetos.dtos.Projeto;
 import ifsc.edu.projetos.dtos.ProjetoRespostaDTO;
 import ifsc.edu.projetos.services.ProjetoService;
+import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.security.core.Authentication;
@@ -40,10 +41,25 @@ public class ProjetoController {
     // Rota 2: apenas os metadados (application/json)
     @PostMapping(value = "/metadados", consumes = "application/json")
     public ResponseEntity<Projeto> enviarMetadados(
-            @RequestBody Projeto metadadoDTO, Authentication authentication) {
+            @Valid @RequestBody Projeto metadadoDTO, Authentication authentication) {
 
         Projeto salvo = projetoService.salvarMetadados(metadadoDTO, authentication.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
+    }
+
+    // Edita os dados do projeto (application/json), só o autor pode editar
+    @PutMapping(value = "/{id}", consumes = "application/json")
+    public ResponseEntity<Projeto> atualizarProjeto(@PathVariable String id,
+            @RequestBody Projeto dados, Authentication authentication) {
+
+        Projeto atualizado = projetoService.atualizarProjeto(id, dados, authentication.getName());
+        return ResponseEntity.ok(atualizado);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluirProjeto(@PathVariable String id, Authentication authentication) {
+        projetoService.excluirProjeto(id, authentication.getName());
+        return ResponseEntity.noContent().build();
     }
 
     // Rota 3: troca a imagem do projeto (multipart/form-data, campo "arquivo")

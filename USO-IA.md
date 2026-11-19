@@ -289,3 +289,110 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio na revisão dos riscos e da qualidade da Sprint 4
   Artefatos: docs/riscos.md e docs/qualidade.md
   Validação: Afirmações conferidas com o código, os PRs, as issues e as métricas
+
+  - Data: 17/11/2026
+  Ferramenta: Claude
+  Uso: Apoio na documentação do ambiente de execução, com o enxugamento do passo a passo do Render
+  Artefatos: docs/DEPLOY.md, README.md e docs/riscos.md
+  Validação: URLs, variáveis e configurações conferidas com os serviços publicados e o código
+- Data: 17/11/2026
+  Ferramenta: Codex
+  Uso: Implementação da paginação da galeria e dos testes de carregamento e recuperação de falha (#195).
+  Artefatos: `Projetos.jsx` e `Projetos.test.tsx`.
+  Validação: Build e 45 testes do frontend passaram.
+
+- Data: 17/11/2026
+  Ferramenta: Codex
+  Uso: Remoção da exclusão sem suporte da galeria e ajuste do teste da #193.
+  Artefatos: `Projetos.jsx` e `Projetos.test.tsx`.
+  Validação: Build e 43 testes do frontend passaram.
+
+- Data: 17/11/2026
+  Ferramenta: Codex
+  Uso: Atualização do título da aba e criação do favicon do PublicaIFSC (#198).
+  Artefatos: `src/frontend/index.html` e `src/frontend/public/favicon-publicaifsc.svg`.
+  Validação: Build do frontend e verificação do título e do SVG na página inicial e em uma rota interna no preview de produção.
+
+- Data: 17/11/2026
+  Ferramenta: Codex
+  Uso: Implementação do encerramento da sessão expirada e do redirecionamento após `401` na submissão (#194).
+  Artefatos: Sessão, cabeçalho, login e submissão do frontend, com os respectivos testes.
+  Validação: Build e 46 testes do frontend passaram. O lint dos arquivos alterados passou.
+
+- Data: 17/11/2026
+  Ferramenta: Codex
+  Uso: Validação de imagens, mensagens de erro e reaproveitamento de uploads na submissão (#196).
+  Artefatos: Página de submissão, estilos e testes do frontend.
+  Validação: Build, testes do frontend e ESLint da submissão passaram.
+
+- Data: 18/11/2026
+  Ferramenta: Codex
+  Uso: Implementação da rota de exclusão de projetos pelo autor e proteção contra recriação durante a troca de imagem (#211).
+  Artefatos: Controller, serviço, repositório, tratamento de erros e testes do backend de projetos.
+  Validação: Os 55 testes do backend passaram com Java 25 e MongoDB 8.
+
+
+
+- Data: 16/11/2026
+  Ferramenta: Codex (OpenAI)
+  Uso: O modelo leu os detalhes da entrega `ES2-projeto-9.pdf` e avaliou diversos aspectos do projeto para verificar se o trabalho realizado estava de acordo com os requisitos solicitados pelo professor. Além disso, produziu alguns arquivos como resultado dessa análise abrangente de todo o projeto.
+  Artefatos: README.md, docs/ARQUITETURA.md, docs/diagramas/, docs/RETROSPECTIVA.md, docs/PADROES-DE-PROJETO.md, 
+  Validação: Revisado por um membro da equipe e testado em Markdown.
+
+
+
+  - Data: 18/11/2026
+  Ferramenta: Codex (OpenAI)
+  Uso: Reconciliação da documentação da Entrega 9 com a implantação publicada em 17/11; atualização dos ambientes Render/Atlas e do histórico de riscos e decisões.
+  Artefatos: README.md, docs/DEPLOY.md, docs/ARQUITETURA.md, docs/diagramas/conteineres.md, docs/entregas/release-candidate.md
+  Validação: Conferência com a documentação de deploy em `origin/entrega-9`, busca por afirmações desatualizadas e `git diff --check`;
+
+- Data: 18/11/2026
+  Ferramenta: Codex
+  Uso: Implementação do botão Apagar na galeria para o autor do projeto, com identificação pela sessão e confirmação da exclusão (#210).
+  Artefatos: Página e testes da galeria, rota de autenticação, documentação e testes do backend.
+  Validação: Build e 60 testes do frontend passaram. Os 50 testes do backend passaram, assim como os testes HTTP de autenticação e exclusão em uma cópia local com o PR #212.
+
+- Data: 18/11/2026
+  Ferramenta: Claude
+  Uso: Apoio na implementação da rota de edição dos dados do projeto pelo autor no backend
+  Artefatos: `ProjetoController.java`, `ProjetoService.java`
+  Validação: Compilação do backend e teste manual na API local
+
+- Data: 18/11/2026
+  Ferramenta: Codex
+  Uso: Implementação das melhorias de QA do MVP (#201), com validações de publicação e login, testes de imagens e gestão da conta, índice único de e-mail e verificações no CI.
+  Artefatos: Código e testes em `src/backend/projetos` e `src/frontend`, além de `.github/workflows/ci.yml`.
+  Validação: 59 testes do backend passaram com MongoDB 8 isolado e 65 testes do frontend passaram. ESLint, builds e verificações HTTP do Docker Compose passaram localmente.
+
+- Data: 18/11/2026
+  Ferramenta: Codex
+  Uso: Implementação do formulário de edição e das ações do autor no detalhe do projeto (#217).
+  Artefatos: Galeria, detalhe, formulário de submissão e adaptações nos testes existentes do frontend.
+  Validação: Build, ESLint e os 65 testes existentes do frontend passaram. A suíte do backend passou com MongoDB 8.
+
+- Data: 18/11/2026
+  Ferramenta: Codex
+  Uso: Remoção do texto do mapa de projetos e dos links sem destino no rodapé (#216).
+  Artefatos: `MapaProjetos.jsx`, `MapaProjetos.css` e `Footer.jsx`.
+  Validação: Build e ESLint do frontend passaram.
+
+- Data: 18/11/2026
+  Ferramenta: Claude
+  Uso: Apoio no preenchimento das fichas M-05 e M-08 da Sprint 5
+  Artefatos: docs/metricas/M-05.md e docs/metricas/M-08.md
+  Validação: Contagens conferidas com os PRs mergeados na entrega-9 e as datas de criação das issues no GitHub
+
+- Data: 18/11/2026
+  Ferramenta: Claude
+  Uso: Apoio no preenchimento das fichas M-01 e M-04 da Sprint 5
+  Artefatos: docs/metricas/M-01.md e docs/metricas/M-04.md
+  Validação: Método de contagem reproduziu os valores da Sprint 4 (3.776 NCLOC e CBO 40) antes de ser aplicado ao código da entrega-9
+  Ferramenta: Codex
+  Uso: Apoio na documentação dos 18 casos de aceitação do MVP (#214), na revisão dos vínculos com as issues e no registro da aprovação dos quatro casos de edição.
+  Artefato: [docs/ACEITACAO.md](docs/ACEITACAO.md).
+  Validação: Status e totais conferidos com os resultados da execução manual informados pelo responsável. Vínculos verificados nos critérios das issues e nos PRs correspondentes.
+  Ferramenta: Claude
+  Uso: Apoio na atualização da release candidate, da retrospectiva e do README e no levantamento da contribuição individual da Entrega 9 (#215).
+  Artefatos: docs/entregas/release-candidate.md, docs/RETROSPECTIVA.md e README.md
+  Validação: PRs, autores, revisores e issues conferidos no GitHub, comportamento da galeria conferido no código

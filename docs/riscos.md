@@ -170,5 +170,25 @@ Mesmos critérios das seções 2.1 e 2.2. Os responsáveis foram mantidos; os ma
 
 | ID | Risco | Probabilidade / Impacto | Prioridade | Mitigação | Responsável |
 |----|-------|:---:|:---:|-----------|-------------|
-| R13 | **Staging não entregue:** as issues #161 a #164 (staging, deploy automatizado, validação e `DEPLOY.md`) foram fechadas como não planejadas em 11/11; o `docs/DEPLOY.md` diz que não há staging, e não há URL, workflow de deploy nem deployment registrado no GitHub. O enunciado avalia staging acessível e documentado. | Alta / Alto | Alta | Registrar no `DEPLOY.md` a decisão e as limitações, apresentar o Docker Compose local como alternativa reprodutível e planejar o staging para a próxima etapa. | A definir |
-| R14 | **Pipeline sem todos os checks obrigatórios:** o ruleset da `entrega-*` exige 5 checks; `Docker (Compose)` e os dois builds não são obrigatórios, e a proteção da `main` não pôde ser conferida. | Média / Médio | Média | Marcar os checks como obrigatórios nas regras do repositório (exige administrador) e conferir a proteção da `main`. | A definir |
+| R13 | **Staging não configurado:** as issues #161 a #164 (staging, deploy automatizado, validação e `DEPLOY.md`) foram fechadas como não planejadas em 11/11. Depois, publicou o site e a API no Render e configurou o MongoDB Atlas; não há ambiente separado de staging. | Mitigado em parte / Médio | Média | Manter o ambiente publicado e o local documentados; planejar staging apenas se necessário. Detalhes em [DEPLOY.md](DEPLOY.md) e o histórico da decisão em [ADR-0007](adr/ADR-0007.md). | A definir |
+| R14 | **Pipeline sem todos os checks obrigatórios:** o ruleset da `entrega-*` exige 5 checks; `Docker (Compose)` e os dois builds não são obrigatórios, e a proteção da `main` não pôde ser conferida. | Ativo / Médio | Média | Tornar os checks relevantes obrigatórios nas regras do repositório e conferir a proteção da `main`; depende de permissão administrativa. | A definir |
+
+## 7. Revisão documental para a Entrega 9 (16/11/2026; atualização em 18/11/2026)
+
+Esta revisão registra o estado documental observado em 16/11. A atualização de
+18/11 incorpora a publicação feita pela equipe em 17/11, documentada em
+[DEPLOY.md](DEPLOY.md); não representa nova execução de pipeline nem validação
+independente do ambiente remoto.
+
+| ID | Estado revisto | Evidência e encaminhamento |
+|---|---|---|
+| R06 | Ativo | O limite de 5 MB e a leitura de imagens foram implementados. Validação do tipo real do arquivo e backup do volume seguem pendentes. |
+| R08 | Mitigado em parte | Segredos exigidos por ambiente desde #156; `admin123` continua no histórico Git e em dois testes de integração. Remover dos testes e avaliar rotação histórica permanecem pendentes. |
+| R12 | Ativo — inconsistência | `docker-compose.yml` usa falso como padrão, mas `.env.example` contém `APP_SEED_PROJETOS_ENABLED=True`; `DEPLOY.md` descreve seed desligado. A configuração e a documentação divergem. |
+| R13 | Mitigado em parte | Há ambiente publicado no Render com MongoDB Atlas e instruções locais via Compose; staging, monitoramento e backup seguem ausentes. URLs e acesso de avaliação estão em [DEPLOY.md](DEPLOY.md). |
+| R14 | Ativo | Não há evidência local de que os builds e o job Docker sejam checks obrigatórios; a proteção da `main` permanece sem confirmação. |
+
+Os responsáveis ainda marcados como “A definir” dependem de decisão da equipe;
+nenhuma atribuição individual foi inferida nesta revisão documental. R06, R08,
+R12, R13 e R14 devem permanecer no acompanhamento até que haja evidência de
+mitigação ou aceite formal.

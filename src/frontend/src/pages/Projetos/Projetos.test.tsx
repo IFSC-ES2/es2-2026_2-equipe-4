@@ -3,19 +3,28 @@ import { render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import userEvent from '@testing-library/user-event'
 import Projetos from './Projetos'
-import { MemoryRouter } from 'react-router-dom'
+import ProjetoDetalhe from '../ProjetoDetalhe/ProjetoDetalhe'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import ProvedorSessao from '../../sessao/ProvedorSessao'
+import { criarTokenTeste } from '../../sessao/tokenTeste'
 
 // A página usa <Link>, então precisa de um router nos testes.
 function renderizarProjetos() {
     render(
-        <MemoryRouter>
-            <Projetos />
+        <MemoryRouter initialEntries={['/projetos']}>
+            <ProvedorSessao>
+                <Routes>
+                    <Route path="/projetos" element={<Projetos />} />
+                    <Route path="/projetos/:id" element={<ProjetoDetalhe />} />
+                </Routes>
+            </ProvedorSessao>
         </MemoryRouter>,
     )
 }
 
 const projetoTecnologia = {
     id: 'projeto-1',
+    autorId: 'autor-1',
     titulo: 'Horta inteligente',
     resumo: 'Sistema para monitorar uma horta.',
     tema: 'Tecnologia',
@@ -26,21 +35,45 @@ const projetoTecnologia = {
 const projetoSaude = {
     ...projetoTecnologia,
     id: 'projeto-2',
+    autorId: 'autor-2',
     titulo: 'Aplicativo de saúde',
     resumo: 'Sistema para monitorar a saúde de pacientes.',
     tema: 'Saúde',
     autores: ['Bernardo Vieira'],
 }
 
-// Prepara uma resposta da API com os projetos necessários para cada teste.
+function respostaPagina(projetos = [projetoTecnologia], number = 0, last = true) {
+    return { ok: true, json: async () => ({ content: projetos, number, last }) }
+}
+
 function simularBusca(projetos = [projetoTecnologia]) {
-    const fetchApi = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ content: projetos }),
-    })
+    const fetchApi = vi.fn().mockResolvedValue(respostaPagina(projetos))
 
     vi.stubGlobal('fetch', fetchApi)
     return fetchApi
+}
+
+function simularSessao(projetos = [projetoTecnologia, projetoSaude], usuarioId = 'autor-1') {
+    const token = criarTokenTeste()
+    localStorage.setItem('token', token)
+    const excluir = vi.fn().mockResolvedValue({ status: 204 })
+    const listar = vi.fn().mockResolvedValue(respostaPagina(projetos))
+    const fetchApi = vi.fn((url: string, opcoes?: RequestInit) => {
+        if (url.endsWith('/auth/token')) {
+            return Promise.resolve({ ok: true, json: async () => ({ userId: usuarioId }) })
+        }
+        if (opcoes?.method === 'DELETE') return excluir(url, opcoes)
+        const projeto = projetos.find(({ id }) => url.endsWith(`/projetos/${id}`))
+        if (projeto) return Promise.resolve({ ok: true, status: 200, json: async () => projeto })
+        return listar(url, opcoes)
+    })
+    vi.stubGlobal('fetch', fetchApi)
+    return { fetchApi, excluir, listar, token }
+}
+
+async function abrirDetalheDoAutor(usuario: ReturnType<typeof userEvent.setup>) {
+    await usuario.click(await screen.findByRole('link', { name: 'Gerenciar Horta inteligente' }))
+    return screen.findByRole('button', { name: 'Apagar', exact: true })
 }
 
 afterEach(() => {
@@ -65,7 +98,8 @@ describe('Projetos', () => {
         expect(screen.getByText('Ana Lima')).toBeInTheDocument()
         expect(screen.queryByText('Procurando projetos...')).not.toBeInTheDocument()
         expect(fetchApi).toHaveBeenCalledExactlyOnceWith(
-            'http://localhost:8080/api/v1/projetos?size=100',
+            'http://localhost:8080/api/v1/projetos?page=0&size=100',
+            expect.objectContaining({ signal: expect.any(AbortSignal) }),
         )
     })
 
@@ -136,39 +170,180 @@ describe('Projetos', () => {
         expect(screen.queryByText('Procurando projetos...')).not.toBeInTheDocument()
     })
 
-    it('exige confirmação e exclui apenas o projeto escolhido usando o token', async () => {
-        localStorage.setItem('token', 'token-teste')
-        const alerta = vi.spyOn(window, 'alert').mockImplementation(() => {})
-        const fetchApi = simularBusca([projetoTecnologia, projetoSaude])
+    it('carrega o 101º projeto sem duplicar cartões e permite filtrar pelo novo tema', async () => {
+        const primeiraPagina = Array.from({ length: 100 }, (_, indice) => ({
+            ...projetoTecnologia,
+            id: `tecnologia-${indice + 1}`,
+            titulo: `Projeto Tecnologia ${indice + 1}`,
+        }))
+        const fetchApi = vi.fn()
+            .mockResolvedValueOnce(respostaPagina(primeiraPagina, 0, false))
+            .mockResolvedValueOnce(respostaPagina([primeiraPagina[99], projetoSaude], 1))
+        vi.stubGlobal('fetch', fetchApi)
         const usuario = userEvent.setup()
 
         renderizarProjetos()
-        await screen.findByRole('heading', { name: 'Aplicativo de saúde' })
 
-        fetchApi.mockResolvedValueOnce({ ok: true, status: 204 })
-        await usuario.click(screen.getAllByRole('button', { name: 'Apagar' })[0])
+        const carregarMais = await screen.findByRole('button', { name: 'Carregar mais projetos' })
+        expect(screen.getByText(/as contagens consideram os projetos carregados/i)).toBeInTheDocument()
+        expect(screen.queryByRole('button', { name: /Saúde/ })).not.toBeInTheDocument()
+        await usuario.click(screen.getByRole('button', { name: 'Tecnologia 100' }))
+        await usuario.click(carregarMais)
 
-        expect(screen.getByRole('button', { name: 'Confirmar Exclusão' })).toBeInTheDocument()
-        // O primeiro clique apenas pede confirmação, sem enviar o DELETE.
-        expect(fetchApi).toHaveBeenCalledTimes(1)
-
-        await usuario.click(screen.getByRole('button', { name: 'Confirmar Exclusão' }))
-
-        await waitFor(() => {
-            expect(
-                screen.queryByRole('heading', { name: 'Horta inteligente' }),
-            ).not.toBeInTheDocument()
-        })
-
+        const filtroSaude = await screen.findByRole('button', { name: 'Saúde 1' })
+        expect(screen.getAllByRole('link', { name: 'Detalhes' })).toHaveLength(100)
+        expect(screen.getByRole('heading', { name: 'Projeto Tecnologia 100' })).toBeInTheDocument()
         expect(fetchApi).toHaveBeenLastCalledWith(
-            'http://localhost:8080/api/v1/projetos/projeto-1',
-            {
-                method: 'DELETE',
-                headers: { Authorization: 'Bearer token-teste' },
-            },
+            'http://localhost:8080/api/v1/projetos?page=1&size=100',
+            expect.objectContaining({ signal: expect.any(AbortSignal) }),
         )
-        expect(alerta).toHaveBeenCalledExactlyOnceWith('Projeto apagado com sucesso.')
+
+        await usuario.click(filtroSaude)
         expect(screen.getByRole('heading', { name: 'Aplicativo de saúde' })).toBeInTheDocument()
-        expect(screen.getByRole('button', { name: 'Todos 1' })).toBeInTheDocument()
+        expect(screen.getAllByRole('link', { name: 'Detalhes' })).toHaveLength(1)
+        await usuario.click(screen.getByRole('button', { name: 'Todos 101' }))
+        expect(screen.getAllByRole('link', { name: 'Detalhes' })).toHaveLength(101)
+        expect(screen.getByRole('status')).toHaveTextContent('Todos os projetos foram carregados.')
+        expect(screen.queryByRole('button', { name: 'Carregar mais projetos' })).not.toBeInTheDocument()
+    })
+
+    it('preserva os projetos carregados e tenta a mesma página após falha', async () => {
+        const fetchApi = vi.fn()
+            .mockResolvedValueOnce(respostaPagina([projetoTecnologia], 0, false))
+            .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+            .mockResolvedValueOnce(respostaPagina([projetoSaude], 1))
+        vi.stubGlobal('fetch', fetchApi)
+        const usuario = userEvent.setup()
+
+        renderizarProjetos()
+        await usuario.click(await screen.findByRole('button', { name: 'Carregar mais projetos' }))
+
+        expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível carregar mais projetos.')
+        expect(screen.getByRole('heading', { name: 'Horta inteligente' })).toBeInTheDocument()
+        await usuario.click(screen.getByRole('button', { name: 'Tentar novamente' }))
+
+        expect(await screen.findByRole('heading', { name: 'Aplicativo de saúde' })).toBeInTheDocument()
+        expect(screen.getByRole('heading', { name: 'Horta inteligente' })).toBeInTheDocument()
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+        expect(fetchApi.mock.calls.map(([url]) => new URL(url).searchParams.get('page'))).toEqual(['0', '1', '1'])
+    })
+
+    it('não oferece gerenciamento a visitantes', async () => {
+        const fetchApi = simularBusca()
+
+        renderizarProjetos()
+        expect(await screen.findByRole('link', { name: 'Detalhes' })).toHaveAttribute(
+            'href', '/projetos/projeto-1',
+        )
+        expect(screen.queryByRole('button', { name: /apagar|excluir|exclusão|🗑️/i })).not.toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: /gerenciar/i })).not.toBeInTheDocument()
+        expect(fetchApi).toHaveBeenCalledExactlyOnceWith(
+            'http://localhost:8080/api/v1/projetos?page=0&size=100',
+            expect.objectContaining({ signal: expect.any(AbortSignal) }),
+        )
+    })
+
+    it('oferece o lápis apenas nos projetos da conta atual e abre as ações no detalhe', async () => {
+        const { fetchApi, token } = simularSessao()
+        const usuario = userEvent.setup()
+        renderizarProjetos()
+
+        expect(await screen.findByRole('link', { name: 'Gerenciar Horta inteligente' })).toBeInTheDocument()
+        expect(screen.getByRole('heading', { name: 'Aplicativo de saúde' })).toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: 'Gerenciar Aplicativo de saúde' })).not.toBeInTheDocument()
+        expect(screen.queryByRole('button', { name: /Apagar/ })).not.toBeInTheDocument()
+        expect(fetchApi).toHaveBeenCalledWith(
+            'http://localhost:8080/api/v1/auth/token',
+            expect.objectContaining({ headers: { Authorization: `Bearer ${token}` } }),
+        )
+        expect(await abrirDetalheDoAutor(usuario)).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: 'Editar' })).toBeInTheDocument()
+    })
+
+    it('mantém o projeto quando o autor cancela a confirmação', async () => {
+        const { excluir } = simularSessao()
+        const confirmar = vi.spyOn(window, 'confirm').mockReturnValue(false)
+        const usuario = userEvent.setup()
+        renderizarProjetos()
+
+        await usuario.click(await abrirDetalheDoAutor(usuario))
+
+        expect(confirmar).toHaveBeenCalledWith('Apagar o projeto "Horta inteligente"?')
+        expect(excluir).not.toHaveBeenCalled()
+        expect(screen.getByRole('heading', { name: 'Horta inteligente' })).toBeInTheDocument()
+    })
+
+    it('envia o token e remove o projeto e seu filtro após a API confirmar a exclusão', async () => {
+        const { excluir, listar, token } = simularSessao()
+        listar
+            .mockResolvedValueOnce(respostaPagina([projetoTecnologia, projetoSaude]))
+            .mockResolvedValueOnce(respostaPagina([projetoSaude]))
+        vi.spyOn(window, 'confirm').mockReturnValue(true)
+        const usuario = userEvent.setup()
+        renderizarProjetos()
+        await usuario.click(await screen.findByRole('button', { name: 'Tecnologia 1' }))
+
+        await usuario.click(await abrirDetalheDoAutor(usuario))
+
+        expect(excluir).toHaveBeenCalledExactlyOnceWith('http://localhost:8080/api/v1/projetos/projeto-1', {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` },
+        })
+        expect(await screen.findByRole('heading', { name: 'Aplicativo de saúde' })).toBeInTheDocument()
+        expect(screen.queryByRole('heading', { name: 'Horta inteligente' })).not.toBeInTheDocument()
+        expect(screen.getByRole('button', { name: 'Todos 1' })).toHaveClass('ativo')
+    })
+
+    it.each([
+        { status: 403, mensagem: 'Apenas o autor pode apagar este projeto.' },
+        { status: 405, mensagem: 'Não foi possível apagar o projeto. Tente novamente.' },
+        { status: null, mensagem: 'Não foi possível apagar o projeto. Verifique sua conexão e tente novamente.' },
+    ])('mantém o projeto se a exclusão falhar ($status)', async ({ status, mensagem }) => {
+        const { excluir } = simularSessao()
+        if (status === null) excluir.mockRejectedValueOnce(new TypeError('Failed to fetch'))
+        else excluir.mockResolvedValueOnce({ status })
+        vi.spyOn(window, 'confirm').mockReturnValue(true)
+        const usuario = userEvent.setup()
+        renderizarProjetos()
+
+        await usuario.click(await abrirDetalheDoAutor(usuario))
+
+        expect(await screen.findByRole('alert')).toHaveTextContent(mensagem)
+        expect(screen.getByRole('heading', { name: 'Horta inteligente' })).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: 'Apagar' })).toBeEnabled()
+    })
+
+    it('encerra a sessão e mantém o projeto quando a exclusão retorna 401', async () => {
+        const { excluir } = simularSessao()
+        excluir.mockResolvedValueOnce({ status: 401 })
+        vi.spyOn(window, 'confirm').mockReturnValue(true)
+        const usuario = userEvent.setup()
+        renderizarProjetos()
+
+        await usuario.click(await abrirDetalheDoAutor(usuario))
+
+        expect(await screen.findByRole('alert')).toHaveTextContent('Sua sessão terminou.')
+        expect(screen.getByRole('heading', { name: 'Horta inteligente' })).toBeInTheDocument()
+        expect(screen.queryByRole('button', { name: /Apagar/ })).not.toBeInTheDocument()
+        expect(localStorage.getItem('token')).toBeNull()
+    })
+
+    it('retorna à primeira página atualizada e permite carregar mais após a exclusão', async () => {
+        const { listar } = simularSessao()
+        listar
+            .mockResolvedValueOnce(respostaPagina([projetoTecnologia], 0, false))
+            .mockResolvedValueOnce(respostaPagina([projetoSaude], 0, false))
+            .mockResolvedValueOnce(respostaPagina([{ ...projetoSaude, id: 'projeto-3', titulo: 'Terceiro projeto' }], 1))
+        vi.spyOn(window, 'confirm').mockReturnValue(true)
+        const usuario = userEvent.setup()
+        renderizarProjetos()
+
+        await usuario.click(await abrirDetalheDoAutor(usuario))
+        expect(await screen.findByRole('heading', { name: 'Aplicativo de saúde' })).toBeInTheDocument()
+        await usuario.click(screen.getByRole('button', { name: 'Carregar mais projetos' }))
+
+        expect(await screen.findByRole('heading', { name: 'Terceiro projeto' })).toBeInTheDocument()
+        await waitFor(() => expect(listar.mock.calls.map(([url]) => new URL(url).searchParams.get('page')))
+            .toEqual(['0', '0', '1']))
     })
 })

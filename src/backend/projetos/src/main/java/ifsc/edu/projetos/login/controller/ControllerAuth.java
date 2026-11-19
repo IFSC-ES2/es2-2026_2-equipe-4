@@ -1,7 +1,10 @@
 package ifsc.edu.projetos.login.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,7 +40,8 @@ public class ControllerAuth {
     }
 
     @GetMapping("/token")
-    public ResponseEntity<java.util.Map<String, String>> routeForTestIfTokenIsvalid() {
-        return ResponseEntity.ok(java.util.Map.of("mensagem", "Token válido"));
+    public ResponseEntity<Map<String, String>> routeForTestIfTokenIsvalid(Authentication authentication) {
+        String userId = authService.buscarIdUsuario(authentication.getName());
+        return ResponseEntity.ok(Map.of("mensagem", "Token válido", "userId", userId));
     }
 }

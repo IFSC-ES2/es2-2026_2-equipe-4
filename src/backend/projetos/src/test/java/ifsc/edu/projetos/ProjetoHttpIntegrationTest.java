@@ -147,20 +147,80 @@ class ProjetoHttpIntegrationTest {
         assertEquals(usuario.getId(), autorConsultado);
         assertEquals(salvo.getImagens(), imagensConsultadas);
 
-        // Conferir a listagem pública, sem depender da posição do projeto na lista
-        int pagina = 0;
-        boolean projetoEncontrado = false;
-        boolean ultimaPagina = false;
-        while (!projetoEncontrado && !ultimaPagina) {
-            HttpResponse<String> listagem = consultarSemToken("/projetos?page=" + pagina + "&size=100");
-            assertEquals(200, listagem.statusCode(), listagem.body());
+        assertTrue(projetoApareceNaListagem(idPublicado),
+                "O projeto publicado deve aparecer na listagem sem login");
+    }
 
-            List<String> idsNaPagina = JsonPath.read(listagem.body(), "$.content[*].id");
-            projetoEncontrado = idsNaPagina.contains(idPublicado);
-            ultimaPagina = JsonPath.read(listagem.body(), "$.last");
-            pagina++;
+    @Test
+    @Timeout(30)
+    void autorPodeExcluirProjetoDaConsultaEDaListagem() throws Exception {
+        User autor = novoUsuario();
+        Projeto projeto = novoProjetoComImagemPadrao(autor);
+        String autorizacao = "Bearer " + jwtUtil.generateToken(autor.getEmail());
+        String id = projeto.getId();
+        assertTrue(projetoApareceNaListagem(id));
+
+        HttpResponse<String> resposta = excluirProjeto(id, autorizacao);
+
+        assertEquals(204, resposta.statusCode(), resposta.body());
+        assertTrue(resposta.body().isEmpty());
+        assertFalse(projetoRepository.existsById(id));
+        assertFalse(projetoApareceNaListagem(id));
+        assertEquals(404, consultarSemToken("/projetos/" + id).statusCode());
+    }
+
+    @Test
+    @Timeout(30)
+    void rejeitaExclusaoDeProjetoSemToken() throws Exception {
+        Projeto projeto = novoProjetoComImagemPadrao(novoUsuario());
+
+        HttpResponse<String> resposta = excluirProjeto(projeto.getId(), null);
+
+        assertEquals(401, resposta.statusCode(), resposta.body());
+        assertEquals(projeto, projetoRepository.findById(projeto.getId()).orElseThrow());
+    }
+
+    @Test
+    @Timeout(30)
+    void rejeitaExclusaoDeProjetoDeOutroUsuario() throws Exception {
+        Projeto projeto = novoProjetoComImagemPadrao(novoUsuario());
+        User outroUsuario = novoUsuario();
+        String autorizacao = "Bearer " + jwtUtil.generateToken(outroUsuario.getEmail());
+
+        HttpResponse<String> resposta = excluirProjeto(projeto.getId(), autorizacao);
+
+        assertEquals(403, resposta.statusCode(), resposta.body());
+        assertEquals(projeto, projetoRepository.findById(projeto.getId()).orElseThrow());
+    }
+
+    @Test
+    @Timeout(30)
+    void retornaProjetoNaoEncontradoAoExcluirIdInexistente() throws Exception {
+        User usuario = novoUsuario();
+        String autorizacao = "Bearer " + jwtUtil.generateToken(usuario.getEmail());
+
+        HttpResponse<String> resposta = excluirProjeto(new ObjectId().toHexString(), autorizacao);
+
+        assertEquals(404, resposta.statusCode(), resposta.body());
+    }
+
+    @Test
+    void rejeitaCamposObrigatoriosAusentesOuVaziosSemGravarProjeto() throws Exception {
+        User usuario = novoUsuario();
+        tituloTeste = "Projeto incompleto " + UUID.randomUUID();
+        String autorizacao = "Bearer " + jwtUtil.generateToken(usuario.getEmail());
+        String corpo = """
+                {"titulo":"%s","resumo":" ","autores":[],"tecnologias":[" "]}
+                """.formatted(tituloTeste);
+
+        HttpResponse<String> resposta = publicar(autorizacao, corpo);
+
+        assertEquals(400, resposta.statusCode(), resposta.body());
+        for (String campo : List.of("resumo", "autores", "tecnologias[0]", "tema")) {
+            assertNotNull(JsonPath.read(resposta.body(), "$.erro['" + campo + "']"), campo);
         }
-        assertTrue(projetoEncontrado, "O projeto publicado deve aparecer na listagem sem login");
+        assertFalse(projetoRepository.findAll().stream()
+                .anyMatch(projeto -> tituloTeste.equals(projeto.getTitulo())));
     }
 
     @Test
@@ -319,6 +379,43 @@ class ProjetoHttpIntegrationTest {
                 () -> assertNull(arquivo, "O arquivo acima do limite nao deve ser salvo"));
     }
 
+    @Test
+    @Timeout(30)
+    void publicaProjetoComImagemEnviadaEPermiteConsultaPublica() throws Exception {
+        User autor = novoUsuario();
+        tituloTeste = "Projeto com imagem " + UUID.randomUUID();
+        String autorizacao = "Bearer " + jwtUtil.generateToken(autor.getEmail());
+
+        HttpResponse<String> upload = enviarUpload(IMAGEM_PNG, autorizacao);
+        assertEquals(201, upload.statusCode(), upload.body());
+        String idImagem = JsonPath.read(upload.body(), "$.id");
+        assertTrue(ObjectId.isValid(idImagem), "O upload deve retornar o ID da imagem no GridFS");
+
+        String metadados = """
+                {"titulo":"%s","resumo":"Resumo de teste","tema":"Tecnologia",
+                 "autores":["Ana"],"tecnologias":["Java"],"imagens":["%s"]}
+                """.formatted(tituloTeste, idImagem);
+        HttpResponse<String> publicacao = publicar(autorizacao, metadados);
+        assertEquals(201, publicacao.statusCode(), publicacao.body());
+        String idProjeto = JsonPath.read(publicacao.body(), "$.id");
+        assertNotNull(idProjeto);
+
+        HttpResponse<String> projeto = consultarSemToken("/projetos/" + idProjeto);
+        assertEquals(200, projeto.statusCode(), projeto.body());
+        assertEquals(idProjeto, JsonPath.read(projeto.body(), "$.id"));
+        assertEquals(autor.getId(), JsonPath.read(projeto.body(), "$.autorId"));
+        assertEquals(List.of(idImagem), JsonPath.read(projeto.body(), "$.imagens"));
+
+        HttpRequest consultaImagem = HttpRequest.newBuilder(
+                URI.create("http://127.0.0.1:" + porta + "/api/v1/projetos/imagens/" + idImagem))
+                .GET()
+                .build();
+        HttpResponse<byte[]> imagem = http.send(consultaImagem, HttpResponse.BodyHandlers.ofByteArray());
+        assertEquals(200, imagem.statusCode());
+        assertEquals("image/png", imagem.headers().firstValue("Content-Type").orElseThrow());
+        assertArrayEquals(IMAGEM_PNG, imagem.body());
+    }
+
     private void conferirArquivoDoUpload(HttpResponse<String> resposta, byte[] conteudoEsperado)
             throws IOException {
         String idArquivo = JsonPath.read(resposta.body(), "$.id");
@@ -360,7 +457,7 @@ class ProjetoHttpIntegrationTest {
     }
 
     private Projeto novoProjetoComImagemPadrao(User autor) {
-        tituloTeste = "Projeto para troca de imagem " + UUID.randomUUID();
+        tituloTeste = "Projeto de teste " + UUID.randomUUID();
         Projeto projeto = new Projeto();
         projeto.setTitulo(tituloTeste);
         projeto.setResumo("Resumo original do projeto");
@@ -404,7 +501,13 @@ class ProjetoHttpIntegrationTest {
 
     private HttpResponse<String> publicar(String autorizacao) throws IOException, InterruptedException {
         String corpo = "{\"id\":\"id-enviado-pelo-cliente\",\"autorId\":\"outro-autor\","
-                + "\"titulo\":\"" + tituloTeste + "\",\"resumo\":\"Resumo de teste\"}";
+                + "\"titulo\":\"" + tituloTeste + "\",\"resumo\":\"Resumo de teste\","
+                + "\"tema\":\"Tecnologia\",\"autores\":[\"Ana\"],\"tecnologias\":[\"Java\"]}";
+        return publicar(autorizacao, corpo);
+    }
+
+    private HttpResponse<String> publicar(String autorizacao, String corpo)
+            throws IOException, InterruptedException {
         HttpRequest.Builder request = HttpRequest.newBuilder(
                         URI.create("http://127.0.0.1:" + porta + "/api/v1/projetos/metadados"))
                 .header("Content-Type", "application/json")
@@ -424,6 +527,33 @@ class ProjetoHttpIntegrationTest {
         return http.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
     }
 
+    private boolean projetoApareceNaListagem(String id) throws IOException, InterruptedException {
+        int pagina = 0;
+        boolean ultimaPagina;
+        do {
+            HttpResponse<String> listagem = consultarSemToken("/projetos?page=" + pagina + "&size=100");
+            assertEquals(200, listagem.statusCode(), listagem.body());
+
+            List<String> idsNaPagina = JsonPath.read(listagem.body(), "$.content[*].id");
+            if (idsNaPagina.contains(id)) {
+                return true;
+            }
+            ultimaPagina = JsonPath.read(listagem.body(), "$.last");
+            pagina++;
+        } while (!ultimaPagina);
+        return false;
+    }
+
+    private HttpResponse<String> excluirProjeto(String id, String autorizacao)
+            throws IOException, InterruptedException {
+        HttpRequest.Builder request = HttpRequest.newBuilder(
+                        URI.create("http://127.0.0.1:" + porta + "/api/v1/projetos/" + id))
+                .DELETE();
+        if (autorizacao != null) {
+            request.header("Authorization", autorizacao);
+        }
+        return http.send(request.build(), HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+    }
 
     private static String uriBancoDeTeste() {
         String uriExplicita = System.getenv("TEST_MONGODB_URI");

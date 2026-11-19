@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import arquivoImg from '../../assets/arquivo.png'
+import { useState, useRef } from 'react'
+import { Navigate } from 'react-router-dom'
 import './Enviar.css'
 import { API_BASE_URL } from '../../config/api';
+import { useSessao } from '../../sessao/contextoSessao'
 
 const formularioInicial = {
   titulo: '',
@@ -22,6 +22,20 @@ const mensagensCamposObrigatorios = {
   tecnologias: 'Informe ao menos uma tecnologia.',
 }
 
+const limiteImagemMB = 5
+const limiteImagemBytes = limiteImagemMB * 1024 * 1024
+const formatosImagem = ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/avif']
+const nomesFormatosImagem = 'PNG, JPG, WebP, GIF ou AVIF'
+
+function validarImagem(arquivo) {
+  const tipo = arquivo.type.toLowerCase()
+  if (tipo === 'image/svg+xml' || /\.svgz?$/i.test(arquivo.name)) return 'arquivos SVG não são aceitos.'
+  if (!formatosImagem.includes(tipo)) return `formato incompatível. Use ${nomesFormatosImagem}.`
+  if (arquivo.size === 0) return 'o arquivo está vazio.'
+  if (arquivo.size > limiteImagemBytes) return `a imagem ultrapassa o limite de ${limiteImagemMB} MB.`
+  return ''
+}
+
 function separarLista(valor) {
   return valor.split(',').map(item => item.trim()).filter(Boolean)
 }
@@ -34,23 +48,31 @@ async function mensagemDeErro(resposta, padrao) {
   return (typeof erro === 'object' ? erro?.mensagem : erro) || padrao
 }
 
-function Enviar() {
-  const [formulario, setFormulario] = useState(formularioInicial)
+function Enviar({ projeto, onAtualizarProjeto, onFecharEdicao }) {
+  const editando = Boolean(projeto)
+  const [formulario, setFormulario] = useState(() => {
+    if (!projeto) return formularioInicial
+
+    return {
+      titulo: projeto.titulo ?? '',
+      resumo: projeto.resumo ?? '',
+      tema: projeto.tema ?? '',
+      autores: projeto.autores?.join(', ') ?? '',
+      tecnologias: projeto.tecnologias?.join(', ') ?? '',
+      linkRepositorio: projeto.linkRepositorio ?? '',
+      linkDemonstracao: projeto.linkDemonstracao ?? '',
+    }
+  })
   const [imagensSelecionadas, setImagensSelecionadas] = useState([])
+  const [errosImagens, setErrosImagens] = useState([])
   const [arrastando, setArrastando] = useState(false)
   const [erros, setErros] = useState({})
   const [mensagem, setMensagem] = useState('')
   const [carregando, setCarregando] = useState(false)
+  const proximaChaveImagem = useRef(0)
+  const envioEmAndamento = useRef(false)
 
-  const navigate = useNavigate()
-  //const API_BASE_URL = 'http://localhost:8080'
-
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (!token) {
-      navigate('/login')
-    }
-  }, [navigate])
+  const { token, expiraEm, expirada, invalidarSessao } = useSessao()
 
   function limparErro(campo) {
     setErros((errosAtuais) => {
@@ -71,15 +93,45 @@ function Enviar() {
     setMensagem('')
   }
 
+  function adicionarImagens(arquivos) {
+    if (editando && arquivos?.length > 1) {
+      setErrosImagens(['Selecione apenas uma imagem.'])
+      return
+    }
+
+    const novasImagens = []
+    const novosErros = []
+
+    for (const arquivo of arquivos || []) {
+      const erro = validarImagem(arquivo)
+      if (erro) {
+        novosErros.push(`${arquivo.name}: ${erro}`)
+      } else {
+        const chave = proximaChaveImagem.current++
+        novasImagens.push({ arquivo, chave, idUpload: null })
+      }
+    }
+
+    setImagensSelecionadas(atuais => (
+      editando && novasImagens.length ? novasImagens : [...atuais, ...novasImagens]
+    ))
+    setErrosImagens(novosErros)
+    setMensagem('')
+  }
+
   function selecionarImagens(event) {
-    const arquivos = Array.from(event.target.files || [])
-    setImagensSelecionadas(arquivos)
+    adicionarImagens(event.target.files)
+    event.target.value = ''
+  }
+
+  function removerImagem(chave) {
+    setImagensSelecionadas(atuais => atuais.filter(imagem => imagem.chave !== chave))
     setMensagem('')
   }
 
   function arrastarSobre(event) {
     event.preventDefault()
-    setArrastando(true)
+    if (!carregando) setArrastando(true)
   }
 
   function sairDaArea(event) {
@@ -90,8 +142,7 @@ function Enviar() {
   function soltarImagens(event) {
     event.preventDefault()
     setArrastando(false)
-    const arquivos = Array.from(event.dataTransfer.files || [])
-    setImagensSelecionadas(arquivos)
+    if (!carregando) adicionarImagens(event.dataTransfer.files)
   }
 
   function validarFormulario() {
@@ -109,26 +160,95 @@ function Enviar() {
 
   async function enviarFormulario(event) {
     event.preventDefault()
+    if (envioEmAndamento.current) return
+
+    function interromperSessao() {
+      if (!invalidarSessao(token)) {
+        setMensagem(editando
+          ? 'Sua sessão mudou. Tente salvar o projeto novamente.'
+          : 'Sua sessão mudou. Tente publicar o projeto novamente.')
+      }
+    }
+
+    if (Date.now() >= expiraEm) {
+      interromperSessao()
+      return
+    }
 
     if (!validarFormulario()) {
       setMensagem('')
       return
     }
 
-    const token = localStorage.getItem('token')
-    if (!token) {
-      navigate('/login')
-      return
-    }
-
+    envioEmAndamento.current = true
     setCarregando(true)
-    setMensagem('Processando a submissão, aguarde...')
+    setMensagem(editando ? 'Salvando alterações, aguarde...' : 'Processando a submissão, aguarde...')
+
+    const payloadMetadados = {
+      titulo: formulario.titulo,
+      resumo: formulario.resumo,
+      tema: formulario.tema,
+      autores: separarLista(formulario.autores),
+      tecnologias: separarLista(formulario.tecnologias),
+      linkRepositorio: formulario.linkRepositorio,
+      linkDemonstracao: formulario.linkDemonstracao,
+    }
+    let dadosEdicaoSalvos = false
 
     try {
+      if (editando) {
+        const urlProjeto = `${API_BASE_URL}/api/v1/projetos/${encodeURIComponent(projeto.id)}`
+        const autorizacao = { Authorization: `Bearer ${token}` }
+        const resposta = await fetch(urlProjeto, {
+          method: 'PUT',
+          headers: { ...autorizacao, 'Content-Type': 'application/json' },
+          body: JSON.stringify(payloadMetadados),
+        })
+        if (resposta.status === 401) {
+          interromperSessao()
+          return
+        }
+        if (!resposta.ok) throw new Error(await mensagemDeErro(resposta, 'Não foi possível salvar o projeto.'))
+
+        let atualizado = await resposta.json()
+        if (atualizado?.id !== projeto.id) throw new Error('Não foi possível confirmar a edição do projeto.')
+
+        const imagem = imagensSelecionadas[0]
+        if (imagem) {
+          onAtualizarProjeto(atualizado)
+          dadosEdicaoSalvos = true
+          const arquivo = new FormData()
+          arquivo.append('arquivo', imagem.arquivo)
+          const respostaImagem = await fetch(`${urlProjeto}/imagem`, {
+            method: 'PUT',
+            headers: autorizacao,
+            body: arquivo,
+          })
+          if (respostaImagem.status === 401) {
+            interromperSessao()
+            return
+          }
+          if (!respostaImagem.ok) {
+            throw new Error(await mensagemDeErro(respostaImagem, 'Não foi possível trocar a imagem.'))
+          }
+          const { imagens } = await respostaImagem.json()
+          atualizado = { ...atualizado, imagens }
+        }
+
+        onAtualizarProjeto(atualizado)
+        onFecharEdicao()
+        return
+      }
+
       const idsImagens = []
       for (const imagem of imagensSelecionadas) {
+        if (imagem.idUpload) {
+          idsImagens.push(imagem.idUpload)
+          continue
+        }
+
         const formDataImagem = new FormData()
-        formDataImagem.append('arquivo', imagem)
+        formDataImagem.append('arquivo', imagem.arquivo)
 
         const respUpload = await fetch(`${API_BASE_URL}/api/v1/projetos/upload`, {
           method: 'POST',
@@ -136,21 +256,25 @@ function Enviar() {
           body: formDataImagem,
         })
 
+        if (respUpload.status === 401) {
+          interromperSessao()
+          return
+        }
+        if (respUpload.status === 413) {
+          throw new Error(`${imagem.arquivo.name}: o envio ultrapassou o limite permitido. Reduza o tamanho da imagem e tente novamente.`)
+        }
         if (!respUpload.ok) throw new Error(await mensagemDeErro(respUpload, 'Falha ao processar imagens.'))
-        
-        const dadosUpload = await respUpload.json()
-        if (dadosUpload.id) idsImagens.push(dadosUpload.id)
-      }
 
-      const payloadMetadados = {
-        titulo: formulario.titulo,
-        resumo: formulario.resumo,
-        tema: formulario.tema,
-        autores: separarLista(formulario.autores),
-        tecnologias: separarLista(formulario.tecnologias),
-        imagens: idsImagens,
-        linkRepositorio: formulario.linkRepositorio,
-        linkDemonstracao: formulario.linkDemonstracao,
+        const dadosUpload = await respUpload.json().catch(() => null)
+        const id = dadosUpload?.id
+        if (typeof id !== 'string' || !id.trim()) {
+          throw new Error(`Não foi possível confirmar o envio de ${imagem.arquivo.name}. Tente novamente.`)
+        }
+
+        setImagensSelecionadas(atuais => atuais.map(item => (
+          item.chave === imagem.chave ? { ...item, idUpload: id } : item
+        )))
+        idsImagens.push(id)
       }
 
       const respostaMetadados = await fetch(`${API_BASE_URL}/api/v1/projetos/metadados`, {
@@ -159,29 +283,45 @@ function Enviar() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(payloadMetadados),
+        body: JSON.stringify({ ...payloadMetadados, imagens: idsImagens }),
       })
 
+      if (respostaMetadados.status === 401) {
+        interromperSessao()
+        return
+      }
       if (!respostaMetadados.ok) throw new Error(await mensagemDeErro(respostaMetadados, 'Erro ao salvar os metadados do projeto.'))
+
+      const projetoPublicado = await respostaMetadados.json().catch(() => null)
+      if (typeof projetoPublicado?.id !== 'string' || !projetoPublicado.id.trim()) {
+        throw new Error('Não foi possível confirmar a publicação. Confira a vitrine antes de tentar novamente.')
+      }
 
       setMensagem('Projeto publicado com sucesso na vitrine!')
       setFormulario(formularioInicial)
       setImagensSelecionadas([])
+      setErrosImagens([])
       setErros({})
       event.target.reset()
 
     } catch (erro) {
-      setMensagem(erro.message.includes('Failed to fetch') ? 'Erro de conexão: Sistema fora do ar!' : erro.message)
+      const mensagemErro = erro.message.includes('Failed to fetch') ? 'Erro de conexão: Sistema fora do ar!' : erro.message
+      setMensagem(dadosEdicaoSalvos ? `Os dados foram salvos. ${mensagemErro}` : mensagemErro)
     } finally {
+      envioEmAndamento.current = false
       setCarregando(false)
     }
+  }
+
+  if (!token) {
+    return <Navigate to="/login" replace state={expirada ? { sessaoExpirada: true } : undefined} />
   }
 
   return (
     <main className="pagina-submissao" style={{ background: '#f8fafc', paddingBottom: '60px' }}>
       <header className="cabecalho-submissao" style={{ background: 'transparent', padding: '60px 24px 20px', borderBottom: 'none' }}>
         <p style={{ color: '#146c5a' }}>Área do Criador</p>
-        <h1>Publicar Novo Projeto</h1>
+        <h1>{editando ? 'Editar Projeto' : 'Publicar Novo Projeto'}</h1>
       </header>
 
       <form className="formulario-submissao" onSubmit={enviarFormulario} style={{ background: '#ffffff', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)', padding: '40px' }} noValidate>
@@ -237,35 +377,68 @@ function Enviar() {
         </label>
 
         <div className="campo campo-largo campo-arquivo">
-          <span>Screenshots do Projeto</span>
+          <span>{editando ? 'Trocar imagem do projeto' : 'Screenshots do Projeto'}</span>
           <label
             className={`enviar ${arrastando ? 'arrastando' : ''} ${carregando ? 'desabilitado' : ''}`}
             htmlFor="imagens"
-            onDragOver={carregando ? undefined : arrastarSobre}
-            onDragLeave={carregando ? undefined : sairDaArea}
-            onDrop={carregando ? undefined : soltarImagens}
+            onDragOver={arrastarSobre}
+            onDragLeave={sairDaArea}
+            onDrop={soltarImagens}
             style={{ padding: '32px', background: '#f8fafc', border: '2px dashed #cbd5e1' }}
           >
             <div style={{ fontSize: '32px', marginBottom: '12px', opacity: 0.5 }}>📸</div>
-            <strong style={{ color: '#0f172a' }}>Clique para selecionar imagens</strong>
-            <span style={{ color: '#64748b' }}>ou arraste e solte arquivos aqui (PNG, JPG)</span>
+            <strong style={{ color: '#0f172a' }}>
+              {editando ? 'Clique para selecionar uma imagem' : 'Clique para selecionar imagens'}
+            </strong>
+            <span id="formatos-imagens" style={{ color: '#64748b' }}>
+              {editando ? 'Ou arraste e solte uma imagem aqui.' : 'Ou arraste e solte arquivos aqui.'}{' '}
+              {nomesFormatosImagem}, até {limiteImagemMB} MB por imagem.
+            </span>
           </label>
-          <input id="imagens" className="arquivo-input" name="imagens" type="file" multiple accept="image/*" onChange={selecionarImagens} disabled={carregando} />
+          <input id="imagens" className="arquivo-input" name="imagens" type="file" multiple={!editando} accept={formatosImagem.join(',')} aria-describedby="formatos-imagens" onChange={selecionarImagens} disabled={carregando} />
+
+          {errosImagens.length > 0 && (
+            <ul role="alert" className="erros-imagens">
+              {errosImagens.map((erro, indice) => <li key={indice}>{erro}</li>)}
+            </ul>
+          )}
           
           {imagensSelecionadas.length > 0 && (
             <div style={{ marginTop: '12px', background: '#eef6f3', color: '#146c5a', padding: '12px', borderRadius: '6px', fontSize: '13px', fontWeight: '600' }}>
-              ✓ {imagensSelecionadas.length} arquivo(s) anexado(s) e prontos para envio.
+              {imagensSelecionadas.length} arquivo(s) anexado(s).
+              <ul className="lista-imagens-selecionadas">
+                {imagensSelecionadas.map(({ arquivo, chave }) => (
+                  <li key={chave}>
+                    <span>{arquivo.name}</span>
+                    <button
+                      type="button"
+                      aria-label={`Remover ${arquivo.name}`}
+                      onClick={() => removerImagem(chave)}
+                      disabled={carregando}
+                    >
+                      Remover
+                    </button>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </div>
 
         <div className="acoes-formulario campo-largo" style={{ marginTop: '16px' }}>
           <button type="submit" disabled={carregando} style={{ width: '100%', height: '52px', fontSize: '16px' }}>
-            {carregando ? 'Processando e publicando...' : 'Publicar Projeto na Vitrine'}
+            {editando
+              ? (carregando ? 'Salvando...' : 'Salvar alterações')
+              : (carregando ? 'Processando e publicando...' : 'Publicar Projeto na Vitrine')}
           </button>
+          {editando && (
+            <button type="button" disabled={carregando} onClick={onFecharEdicao} style={{ marginTop: '12px' }}>
+              Cancelar
+            </button>
+          )}
           
           {mensagem && (
-            <div style={{ marginTop: '16px', padding: '16px', borderRadius: '8px', background: mensagem.includes('sucesso') ? '#f0fdf4' : '#fef2f2', color: mensagem.includes('sucesso') ? '#15803d' : '#b91c1c', border: `1px solid ${mensagem.includes('sucesso') ? '#bbf7d0' : '#fecaca'}`, textAlign: 'center', fontWeight: '500', fontSize: '14px' }}>
+            <div role="status" style={{ marginTop: '16px', padding: '16px', borderRadius: '8px', background: mensagem.includes('sucesso') ? '#f0fdf4' : '#fef2f2', color: mensagem.includes('sucesso') ? '#15803d' : '#b91c1c', border: `1px solid ${mensagem.includes('sucesso') ? '#bbf7d0' : '#fecaca'}`, textAlign: 'center', fontWeight: '500', fontSize: '14px' }}>
               {mensagem}
             </div>
           )}
