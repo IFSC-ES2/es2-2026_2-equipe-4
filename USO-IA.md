@@ -382,3 +382,9 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio no preenchimento das fichas M-05 e M-08 da Sprint 5
   Artefatos: docs/metricas/M-05.md e docs/metricas/M-08.md
   Validação: Contagens conferidas com os PRs mergeados na entrega-9 e as datas de criação das issues no GitHub
+
+- Data: 18/11/2026
+  Ferramenta: Claude
+  Uso: Apoio no preenchimento das fichas M-01 e M-04 da Sprint 5
+  Artefatos: docs/metricas/M-01.md e docs/metricas/M-04.md
+  Validação: Método de contagem reproduziu os valores da Sprint 4 (3.776 NCLOC e CBO 40) antes de ser aplicado ao código da entrega-9
