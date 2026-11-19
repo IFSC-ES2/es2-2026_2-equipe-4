@@ -388,3 +388,11 @@ Validação: Leitura e pequenas correções feitas
   Uso: Apoio no preenchimento das fichas M-01 e M-04 da Sprint 5
   Artefatos: docs/metricas/M-01.md e docs/metricas/M-04.md
   Validação: Método de contagem reproduziu os valores da Sprint 4 (3.776 NCLOC e CBO 40) antes de ser aplicado ao código da entrega-9
+  Ferramenta: Codex
+  Uso: Apoio na documentação dos 18 casos de aceitação do MVP (#214), na revisão dos vínculos com as issues e no registro da aprovação dos quatro casos de edição.
+  Artefato: [docs/ACEITACAO.md](docs/ACEITACAO.md).
+  Validação: Status e totais conferidos com os resultados da execução manual informados pelo responsável. Vínculos verificados nos critérios das issues e nos PRs correspondentes.
+  Ferramenta: Claude
+  Uso: Apoio na atualização da release candidate, da retrospectiva e do README e no levantamento da contribuição individual da Entrega 9 (#215).
+  Artefatos: docs/entregas/release-candidate.md, docs/RETROSPECTIVA.md e README.md
+  Validação: PRs, autores, revisores e issues conferidos no GitHub, comportamento da galeria conferido no código
